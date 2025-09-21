@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>产品指标监控</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#64748B',
+            success: '#10B981',
+            warning: '#F59E0B',
+            danger: '#EF4444',
+            background: '#F8FAFC',
+            card: '#FFFFFF'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .card-hover {
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .card-hover:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.1);
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-background min-h-screen text-gray-800 font-sans">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <h1 class="text-xl font-semibold text-primary">
+        <i class="fa fa-bar-chart mr-2"></i>产品指标
+      </h1>
+      <div class="flex items-center space-x-3">
+        <button class="text-gray-500 hover:text-primary">
+          <i class="fa fa-bell-o"></i>
+        </button>
+        <button class="text-gray-500 hover:text-primary">
+          <i class="fa fa-cog"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="container mx-auto px-4 pt-20 pb-8">
+    <!-- 时间选择器 -->
+    <div class="mb-6 bg-white rounded-xl p-4 card-shadow">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-medium">数据概览</h2>
+        <div class="flex space-x-2">
+          <button class="px-3 py-1 text-xs bg-primary text-white rounded-full">今日</button>
+          <button class="px-3 py-1 text-xs text-gray-500 rounded-full">本周</button>
+          <button class="px-3 py-1 text-xs text-gray-500 rounded-full">本月</button>
+        </div>
+      </div>
+      
+      <!-- 核心指标卡片 -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-blue-50 rounded-lg p-3">
+          <p class="text-xs text-gray-500">活跃用户</p>
+          <p class="text-xl font-bold mt-1">12,890</p>
+          <p class="text-xs text-success flex items-center mt-1">
+            <i class="fa fa-arrow-up mr-1"></i>+12.5%
+          </p>
+        </div>
+        <div class="bg-green-50 rounded-lg p-3">
+          <p class="text-xs text-gray-500">转化率</p>
+          <p class="text-xl font-bold mt-1">6.8%</p>
+          <p class="text-xs text-success flex items-center mt-1">
+            <i class="fa fa-arrow-up mr-1"></i>+2.3%
+          </p>
+        </div>
+        <div class="bg-orange-50 rounded-lg p-3">
+          <p class="text-xs text-gray-500">平均时长</p>
+          <p class="text-xl font-bold mt-1">8.2m</p>
+          <p class="text-xs text-danger flex items-center mt-1">
+            <i class="fa fa-arrow-down mr-1"></i>-1.1%
+          </p>
+        </div>
+        <div class="bg-purple-50 rounded-lg p-3">
+          <p class="text-xs text-gray-500">留存率</p>
+          <p class="text-xl font-bold mt-1">42.3%</p>
+          <p class="text-xs text-success flex items-center mt-1">
+            <i class="fa fa-arrow-up mr-1"></i>+3.7%
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 用户增长趋势图表 -->
+    <div class="mb-6 bg-white rounded-xl p-4 card-shadow">
+      <h2 class="text-lg font-medium mb-4">用户增长趋势</h2>
+      <div class="h-64">
+        <canvas id="userGrowthChart"></canvas>
+      </div>
+    </div>
+
+    <!-- 活跃用户分布 -->
+    <div class="mb-6 bg-white rounded-xl p-4 card-shadow">
+      <h2 class="text-lg font-medium mb-4">用户地域分布</h2>
+      <div class="h-64">
+        <canvas id="userDistributionChart"></canvas>
+      </div>
+    </div>
+
+    <!-- 功能使用分析 -->
+    <div class="mb-6">
+      <h2 class="text-lg font-medium mb-3">功能使用分析</h2>
+      <div class="space-y-3">
+        <div class="bg-white rounded-xl p-4 card-shadow card-hover">
+          <div class="flex justify-between items-center mb-2">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <i class="fa fa-users text-primary"></i>
+              </div>
+              <span class="font-medium">社区互动</span>
+            </div>
+            <span class="text-success text-sm">+18.2%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-primary h-2.5 rounded-full" style="width: 75%"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">使用率: 75%</p>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 card-shadow card-hover">
+          <div class="flex justify-between items-center mb-2">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                <i class="fa fa-shopping-cart text-success"></i>
+              </div>
+              <span class="font-medium">电商购买</span>
+            </div>
+            <span class="text-success text-sm">+5.3%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-success h-2.5 rounded-full" style="width: 62%"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">使用率: 62%</p>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 card-shadow card-hover">
+          <div class="flex justify-between items-center mb-2">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                <i class="fa fa-line-chart text-warning"></i>
+              </div>
+              <span class="font-medium">数据报告</span>
+            </div>
+            <span class="text-danger text-sm">-3.1%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-warning h-2.5 rounded-full" style="width: 45%"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">使用率: 45%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 近期活动日志 -->
+    <div class="bg-white rounded-xl p-4 card-shadow">
+      <h2 class="text-lg font-medium mb-3">系统活动日志</h2>
+      <div class="space-y-3 max-h-60 overflow-y-auto scrollbar-hide">
+        <div class="flex items-start">
+          <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-1">
+            <i class="fa fa-check text-success text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium">版本更新已部署</p>
+            <p class="text-xs text-gray-500 mt-1">v2.3.0 已成功部署到生产环境</p>
+            <p class="text-xs text-gray-400 mt-1">10分钟前</p>
+          </div>
+        </div>
+        
+        <div class="flex items-start">
+          <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-1">
+            <i class="fa fa-users text-primary text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium">用户突破10万大关</p>
+            <p class="text-xs text-gray-500 mt-1">注册用户总数达到100,000</p>
+            <p class="text-xs text-gray-400 mt-1">2小时前</p>
+          </div>
+        </div>
+        
+        <div class="flex items-start">
+          <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-1">
+            <i class="fa fa-exclamation-triangle text-warning text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium">服务器负载过高</p>
+            <p class="text-xs text-gray-500 mt-1">API服务器CPU使用率超过85%</p>
+            <p class="text-xs text-gray-400 mt-1">5小时前</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 底部导航 -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+    <div class="grid grid-cols-4 gap-1">
+      <button class="flex flex-col items-center justify-center py-3 text-primary">
+        <i class="fa fa-dashboard text-lg"></i>
+        <span class="text-xs mt-1">仪表盘</span>
+      </button>
+      <button class="flex flex-col items-center justify-center py-3 text-gray-500">
+        <i class="fa fa-line-chart text-lg"></i>
+        <span class="text-xs mt-1">数据分析</span>
+      </button>
+      <button class="flex flex-col items-center justify-center py-3 text-gray-500">
+        <i class="fa fa-bell text-lg"></i>
+        <span class="text-xs mt-1">通知</span>
+      </button>
+      <button class="flex flex-col items-center justify-center py-3 text-gray-500">
+        <i class="fa fa-user text-lg"></i>
+        <span class="text-xs mt-1">我的</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 等待DOM加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始化用户增长趋势图表
+      const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+      const userGrowthChart = new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+          labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+          datasets: [
+            {
+              label: '活跃用户',
+              data: [5000, 6200, 7500, 8800, 10200, 12890],
+              borderColor: '#3B82F6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: '新增用户',
+              data: [1200, 1500, 1800, 2200, 2800, 3500],
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                boxWidth: 6,
+                font: {
+                  size: 10
+                }
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
+              ticks: {
+                font: {
+                  size: 10
+                },
+                callback: function(value) {
+                  if (value >= 1000) {
+                    return (value / 1000) + 'k';
+                  }
+                  return value;
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  size: 10
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // 初始化用户地域分布图表
+      const userDistributionCtx = document.getElementById('userDistributionChart').getContext('2d');
+      const userDistributionChart = new Chart(userDistributionCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['北京', '上海', '广州', '深圳', '其他'],
+          datasets: [
+            {
+              data: [25, 20, 15, 12, 28],
+              backgroundColor: [
+                '#3B82F6',
+                '#10B981',
+                '#F59E0B',
+                '#8B5CF6',
+                '#E5E7EB'
+              ],
+              borderWidth: 0,
+              hoverOffset: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                boxWidth: 6,
+                font: {
+                  size: 10
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.label + ': ' + context.raw + '%';
+                }
+              }
+            }
+          },
+          cutout: '70%'
+        }
+      });
+
+      // 模拟数据更新
+      // 数字滚动动画效果
+      function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          if (obj.dataset.type === 'percent') {
+            obj.innerHTML = (progress * (end - start) + start).toFixed(1) + '%';
+          } else if (obj.dataset.type === 'time') {
+            obj.innerHTML = (progress * (end - start) + start).toFixed(1) + 'm';
+          } else {
+            obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+          }
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      // 随机波动函数
+      function random波动(baseValue, range) {
+        return baseValue * (1 + (Math.random() * 2 * range - range));
+      }
+
+      // 更新核心指标数据
+      function updateCoreMetrics() {
+        // 活跃用户
+        const activeUsersEl = document.querySelector('.bg-blue-50 .text-xl');
+        const currentActiveUsers = parseInt(activeUsersEl.innerText.replace(/,/g, ''));
+        const newActiveUsers = Math.floor(random波动(currentActiveUsers, 0.02));
+        animateValue(activeUsersEl, currentActiveUsers, newActiveUsers, 1000);
+        
+        // 转化率
+        const conversionRateEl = document.querySelector('.bg-green-50 .text-xl');
+        const currentConversionRate = parseFloat(conversionRateEl.innerText);
+        const newConversionRate = random波动(currentConversionRate, 0.1);
+        animateValue(conversionRateEl, currentConversionRate, newConversionRate, 1000);
+        
+        // 平均时长
+        const avgTimeEl = document.querySelector('.bg-orange-50 .text-xl');
+        const currentAvgTime = parseFloat(avgTimeEl.innerText);
+        const newAvgTime = random波动(currentAvgTime, 0.05);
+        animateValue(avgTimeEl, currentAvgTime, newAvgTime, 1000);
+        
+        // 留存率
+        const retentionRateEl = document.querySelector('.bg-purple-50 .text-xl');
+        const currentRetentionRate = parseFloat(retentionRateEl.innerText);
+        const newRetentionRate = random波动(currentRetentionRate, 0.05);
+        animateValue(retentionRateEl, currentRetentionRate, newRetentionRate, 1000);
+      }
+
+      // 添加新的活动日志
+      function addNewActivity() {
+        const logContainer = document.querySelector('.max-h-60.overflow-y-auto');
+        const activities = [
+          {
+            type: 'success',
+            icon: 'fa-check',
+            title: '数据同步完成',
+            description: '所有数据源已完成同步，数据更新至最新状态',
+            color: 'bg-green-100'
+          },
+          {
+            type: 'info',
+            icon: 'fa-info-circle',
+            title: '用户行为分析报告生成',
+            description: '最新一周的用户行为分析报告已生成完毕',
+            color: 'bg-blue-100'
+          },
+          {
+            type: 'warning',
+            icon: 'fa-exclamation-circle',
+            title: 'API响应时间延长',
+            description: '部分API端点响应时间较昨日增加20%',
+            color: 'bg-yellow-100'
+          },
+          {
+            type: 'success',
+            icon: 'fa-users',
+            title: '新增VIP用户',
+            description: '今日新增12名VIP用户，创本周新高',
+            color: 'bg-purple-100'
+          }
+        ];
+        
+        const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+        const newLog = document.createElement('div');
+        newLog.className = 'flex items-start animate-fadeIn';
+        newLog.innerHTML = `
+          <div class="w-8 h-8 ${randomActivity.color} rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-1">
+            <i class="fa ${randomActivity.icon} ${randomActivity.type === 'success' ? 'text-success' : randomActivity.type === 'info' ? 'text-primary' : 'text-warning'} text-xs"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium">${randomActivity.title}</p>
+            <p class="text-xs text-gray-500 mt-1">${randomActivity.description}</p>
+            <p class="text-xs text-gray-400 mt-1">刚刚</p>
+          </div>
+        `;
+        
+        // 插入到顶部
+        if (logContainer.firstChild) {
+          logContainer.insertBefore(newLog, logContainer.firstChild);
+        } else {
+          logContainer.appendChild(newLog);
+        }
+        
+        // 限制日志数量
+        const logs = logContainer.querySelectorAll('.flex.items-start');
+        if (logs.length > 10) {
+          logContainer.removeChild(logs[logs.length - 1]);
+        }
+      }
+
+      // 更新图表数据
+      function updateCharts() {
+        // 更新用户增长趋势图
+        const lastDataPoint = userGrowthChart.data.datasets[0].data[userGrowthChart.data.datasets[0].data.length - 1];
+        const newActiveUsers = Math.floor(random波动(lastDataPoint, 0.03));
+        const newNewUsers = Math.floor(random波动(userGrowthChart.data.datasets[1].data[userGrowthChart.data.datasets[1].data.length - 1], 0.05));
+        
+        userGrowthChart.data.datasets[0].data.push(newActiveUsers);
+        userGrowthChart.data.datasets[1].data.push(newNewUsers);
+        
+        // 保持只有6个数据点
+        if (userGrowthChart.data.datasets[0].data.length > 6) {
+          userGrowthChart.data.datasets[0].data.shift();
+          userGrowthChart.data.datasets[1].data.shift();
+        }
+        
+        userGrowthChart.update();
+        
+        // 随机更新地域分布数据
+        if (Math.random() > 0.7) { // 30%的概率更新地域分布
+          const newData = [
+            Math.floor(random波动(25, 0.2)),
+            Math.floor(random波动(20, 0.2)),
+            Math.floor(random波动(15, 0.2)),
+            Math.floor(random波动(12, 0.2))
+          ];
+          const total = newData.reduce((a, b) => a + b, 0);
+          newData.push(100 - total);
+          userDistributionChart.data.datasets[0].data = newData;
+          userDistributionChart.update();
+        }
+      }
+
+      // 定期更新功能使用分析数据
+      function updateFeatureUsage() {
+        const features = document.querySelectorAll('.card-hover');
+        features.forEach(feature => {
+          if (Math.random() > 0.6) { // 40%的概率更新该功能数据
+            const progressBar = feature.querySelector('.bg-gray-200 .h-2.5');
+            const usageText = feature.querySelector('.text-xs.text-gray-500');
+            const changeText = feature.querySelector('.text-success, .text-danger');
+            
+            const currentUsage = parseFloat(usageText.innerText.match(/\d+/)[0]);
+            const newUsage = Math.max(0, Math.min(100, currentUsage + (Math.random() * 6 - 3)));
+            
+            // 平滑过渡动画
+            progressBar.style.transition = 'width 1s ease';
+            progressBar.style.width = newUsage + '%';
+            usageText.innerText = '使用率: ' + newUsage.toFixed(1) + '%';
+            
+            // 更新变化百分比
+            const change = ((newUsage - currentUsage) / currentUsage * 100).toFixed(1);
+            if (parseFloat(change) > 0) {
+              changeText.className = 'text-success text-sm';
+              changeText.innerHTML = '<i class="fa fa-arrow-up mr-1"></i>+' + change + '%';
+            } else if (parseFloat(change) < 0) {
+              changeText.className = 'text-danger text-sm';
+              changeText.innerHTML = '<i class="fa fa-arrow-down mr-1"></i>' + change + '%';
+            }
+          }
+        });
+      }
+
+      // 初始化数据类型标记
+      document.querySelector('.bg-blue-50 .text-xl').dataset.type = 'number';
+      document.querySelector('.bg-green-50 .text-xl').dataset.type = 'percent';
+      document.querySelector('.bg-orange-50 .text-xl').dataset.type = 'time';
+      document.querySelector('.bg-purple-50 .text-xl').dataset.type = 'percent';
+
+      // 添加CSS动画
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out;
+        }
+      `;
+      document.head.appendChild(style);
+
+      // 设置定时器定期更新数据
+      setInterval(() => {
+        updateCoreMetrics();
+        updateCharts();
+        updateFeatureUsage();
+        
+        // 30%的概率添加新活动日志
+        if (Math.random() > 0.7) {
+          addNewActivity();
+        }
+      }, 5000);
+    });
+  </script>
+</body>
+</html>
