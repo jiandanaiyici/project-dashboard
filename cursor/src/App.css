@@ -1,0 +1,232 @@
+/* 全局样式 */
+.App {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 图表容器样式 */
+.ring-chart,
+.trend-chart,
+.gauge-chart {
+  width: 100%;
+}
+
+.chart-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #262626;
+}
+
+/* 仪表盘样式 */
+.dashboard {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 卡片样式优化 */
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-card-head-title {
+  font-weight: 600;
+  color: #262626;
+}
+
+/* 统计数字样式 */
+.ant-statistic-title {
+  color: #8c8c8c;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.ant-statistic-content {
+  color: #262626;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* 告警样式 */
+.ant-alert {
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.ant-alert-message {
+  font-weight: 500;
+}
+
+/* 按钮样式 */
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* 表格样式 */
+.ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #262626;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 16px;
+  }
+  
+  .ant-col {
+    margin-bottom: 16px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard {
+    padding: 12px;
+  }
+  
+  .ant-card {
+    margin-bottom: 12px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 18px;
+  }
+}
+
+/* 加载状态样式 */
+.ant-spin-container {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 图表加载状态 */
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #8c8c8c;
+}
+
+/* 空状态样式 */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #8c8c8c;
+}
+
+.chart-empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #d9d9d9;
+}
+
+/* 工具提示样式 */
+.ant-tooltip-inner {
+  background-color: rgba(0, 0, 0, 0.85);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.ant-tooltip-arrow::before {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 动画效果 */
+.ant-card {
+  transition: all 0.3s ease;
+}
+
+.ant-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.ant-btn {
+  transition: all 0.3s ease;
+}
+
+.ant-statistic {
+  transition: all 0.3s ease;
+}
+
+.ant-statistic:hover {
+  transform: scale(1.02);
+}
+
+/* 深色主题支持 */
+@media (prefers-color-scheme: dark) {
+  .App {
+    background-color: #141414;
+  }
+  
+  .dashboard {
+    background-color: #141414;
+  }
+  
+  .ant-card {
+    background-color: #1f1f1f;
+    border-color: #303030;
+  }
+  
+  .ant-card-head-title {
+    color: #ffffff;
+  }
+  
+  .ant-statistic-title {
+    color: #8c8c8c;
+  }
+  
+  .ant-statistic-content {
+    color: #ffffff;
+  }
+}
