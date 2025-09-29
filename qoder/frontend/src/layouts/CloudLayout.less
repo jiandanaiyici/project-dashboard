@@ -1,0 +1,608 @@
+// 云风格布局样式 - 现代云导航设计
+.cloud-layout {
+  min-height: 100vh;
+  background: #f5f6fa;
+
+  .cloud-header {
+    background: #fff;
+    border-bottom: 1px solid #e8eaed;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(8px);
+    padding: 0;
+    height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .cloud-content {
+    background: transparent;
+    padding: 0;
+    
+    .content-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+  }
+}
+
+// Logo 区域 - 现代云导航风格
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.05), rgba(114, 46, 209, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  
+  &:hover {
+    background: linear-gradient(135deg, rgba(24, 144, 255, 0.1), rgba(114, 46, 209, 0.1));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .logo-icon {
+    font-size: 28px;
+    color: #1890ff;
+    filter: drop-shadow(0 2px 4px rgba(24, 144, 255, 0.2));
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #262626;
+    background: linear-gradient(135deg, #1890ff, #722ed1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+// 主导航区域 - 现代云导航风格
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0 48px;
+
+  .nav-item-wrapper {
+    position: relative;
+  }
+
+  .nav-item {
+    position: relative;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(4px);
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #1890ff, #722ed1);
+      opacity: 0;
+      border-radius: 12px;
+      z-index: -1;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      background: rgba(24, 144, 255, 0.08);
+      border-color: rgba(24, 144, 255, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    }
+
+    &.active {
+      background: linear-gradient(135deg, rgba(230, 247, 255, 0.9), rgba(240, 245, 255, 0.9));
+      border-color: #1890ff;
+      box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+
+      .nav-icon {
+        color: #1890ff;
+        filter: drop-shadow(0 1px 2px rgba(24, 144, 255, 0.3));
+      }
+
+      .nav-label {
+        color: #1890ff;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(24, 144, 255, 0.1);
+      }
+    }
+
+    .nav-item-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      color: #666;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-label {
+      font-size: 14px;
+      color: #262626;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ant-badge {
+      .ant-badge-count {
+        background: #ff4d4f;
+        border: none;
+        box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+        animation: badgePulse 2s ease-in-out infinite;
+      }
+    }
+  }
+}
+
+// 子菜单下拉 - 现代云导航风格
+.submenu-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(232, 234, 237, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 1001;
+  animation: submenuSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1890ff, #722ed1);
+  }
+
+  .submenu-content {
+    padding: 8px;
+  }
+
+  .submenu-item {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(24, 144, 255, 0.08), rgba(24, 144, 255, 0.04));
+      color: #1890ff;
+      transform: translateX(4px);
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: #1890ff;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    &:hover:before {
+      transform: scaleY(1);
+    }
+
+    &.active {
+      background: linear-gradient(135deg, rgba(230, 247, 255, 0.9), rgba(240, 245, 255, 0.9));
+      color: #1890ff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+
+      &:before {
+        transform: scaleY(1);
+      }
+    }
+  }
+}
+
+@keyframes submenuSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 子菜单栏 - 现代云导航风格
+.submenu-bar {
+  background: linear-gradient(135deg, #fafbfc, #ffffff);
+  border-top: 1px solid #e8eaed;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  
+  .submenu-bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 48px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .submenu-bar-content::-webkit-scrollbar {
+    display: none;
+  }
+
+  .submenu-bar-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    white-space: nowrap;
+    position: relative;
+
+    &:hover {
+      color: #1890ff;
+      background: rgba(24, 144, 255, 0.08);
+      border-color: rgba(24, 144, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    &.active {
+      color: #1890ff;
+      background: #fff;
+      border-color: #1890ff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// 右侧操作区 - 现代云导航风格
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .action-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(4px);
+
+    &:hover {
+      background: rgba(24, 144, 255, 0.1);
+      color: #1890ff;
+      border-color: rgba(24, 144, 255, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    }
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid transparent;
+
+    &:hover {
+      background: rgba(24, 144, 255, 0.08);
+      border-color: rgba(24, 144, 255, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    }
+
+    .user-avatar {
+      border: 2px solid #e8eaed;
+      transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-name {
+      font-size: 14px;
+      color: #262626;
+      font-weight: 500;
+    }
+
+    &:hover .user-avatar {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+    }
+  }
+
+  .mobile-menu-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(4px);
+
+    &:hover {
+      background: rgba(24, 144, 255, 0.1);
+      color: #1890ff;
+      border-color: rgba(24, 144, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    }
+  }
+}
+
+// 移动端抽屉菜单 - 现代云导航风格
+.mobile-nav-drawer {
+  .ant-drawer-header {
+    border-bottom: 1px solid #e8eaed;
+    background: #fafbfc;
+    padding: 16px 24px;
+  }
+
+  .ant-drawer-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #262626;
+    background: linear-gradient(135deg, #1890ff, #722ed1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .ant-drawer-body {
+    padding: 0;
+  }
+
+  .mobile-nav-content {
+    .mobile-nav-section {
+      border-bottom: 1px solid #f0f0f0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      font-size: 16px;
+      color: #262626;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 3px solid transparent;
+      position: relative;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, rgba(24, 144, 255, 0.05), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      &:hover {
+        background: #f5f5f5;
+        transform: translateX(4px);
+      }
+
+      &:hover:before {
+        opacity: 1;
+      }
+
+      &.active {
+        background: linear-gradient(90deg, #e6f7ff, #f0f5ff);
+        border-left-color: #1890ff;
+        color: #1890ff;
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+
+        .nav-icon {
+          color: #1890ff;
+          filter: drop-shadow(0 1px 2px rgba(24, 144, 255, 0.3));
+        }
+      }
+
+      .nav-icon {
+        font-size: 18px;
+        color: #666;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .nav-label {
+        font-weight: 500;
+        flex: 1;
+      }
+    }
+
+    .mobile-submenu {
+      background: #fafbfc;
+
+      .mobile-submenu-item {
+        padding: 12px 24px 12px 56px;
+        font-size: 14px;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-left: 3px solid transparent;
+        position: relative;
+
+        &:before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 3px;
+          height: 100%;
+          background: #1890ff;
+          transform: scaleY(0);
+          transition: transform 0.3s ease;
+        }
+
+        &:hover {
+          background: linear-gradient(90deg, rgba(24, 144, 255, 0.05), transparent);
+          transform: translateX(4px);
+        }
+
+        &:hover:before {
+          transform: scaleY(1);
+        }
+
+        &.active {
+          background: linear-gradient(90deg, #e6f7ff, #f0f5ff);
+          color: #1890ff;
+          border-left-color: #1890ff;
+          font-weight: 600;
+          box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+
+          &:before {
+            transform: scaleY(1);
+          }
+        }
+      }
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 1200px) {
+  .cloud-layout {
+    .cloud-header .header-content {
+      padding: 0 16px;
+
+      .header-nav {
+        margin: 0 24px;
+        gap: 4px;
+
+        .nav-item {
+          padding: 10px 12px;
+
+          .nav-label {
+            font-size: 13px;
+          }
+        }
+      }
+    }
+
+    .cloud-content .content-wrapper {
+      padding: 16px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .cloud-layout {
+    .cloud-header .header-content {
+      padding: 0 12px;
+
+      .logo-text {
+        display: none;
+      }
+    }
+
+    .cloud-content .content-wrapper {
+      padding: 12px;
+    }
+  }
+}
+
+// 徽章动画
+.ant-badge-count {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// 优化滚动条
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
