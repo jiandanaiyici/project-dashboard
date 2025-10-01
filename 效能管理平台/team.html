@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团队协作 - EfficiencyPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .team-member-card {
+            transition: all 0.3s ease;
+        }
+        
+        .team-member-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .activity-item {
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .status-indicator {
+            position: relative;
+        }
+        
+        .status-indicator.online::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .status-indicator.busy::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #f59e0b;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .status-indicator.offline::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #6b7280;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .comment-input {
+            transition: all 0.3s ease;
+        }
+        
+        .comment-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-effect fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EP</span>
+                </div>
+                <span class="text-xl font-bold text-slate-800">EfficiencyPro</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">仪表板</a>
+                <a href="tasks.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">任务管理</a>
+                <a href="analytics.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">数据分析</a>
+                <a href="team.html" class="nav-link text-blue-600 font-medium active">团队协作</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="px-4 py-2 text-slate-700 hover:text-blue-600 font-medium">登录</button>
+                <button class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
+                    免费试用
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-24 pb-8 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">团队协作</h1>
+                    <p class="text-slate-600">实时沟通、文件共享、活动动态</p>
+                </div>
+                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                    <button class="px-4 py-2 bg-white text-slate-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>邀请成员</span>
+                    </button>
+                    <button class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
+                        创建会议
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="pb-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Team Members -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-slate-800">团队成员</h2>
+                            <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span class="text-sm text-slate-600">4人在线</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="teamMembers">
+                            <!-- Team members will be dynamically added here -->
+                        </div>
+                    </div>
+
+                    <!-- File Sharing -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-slate-800">文件共享</h2>
+                            <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">查看全部</button>
+                        </div>
+                        
+                        <div class="file-upload-area rounded-lg p-8 text-center mb-6" id="fileUploadArea">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-slate-600 mb-2">拖拽文件到此处或点击上传</p>
+                            <p class="text-sm text-slate-500">支持 PDF, DOC, XLS, PPT, JPG, PNG 等格式</p>
+                            <input type="file" id="fileInput" multiple class="hidden">
+                        </div>
+                        
+                        <div class="space-y-4" id="fileList">
+                            <!-- Files will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-semibold text-slate-800">团队动态</h2>
+                            <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">刷新</button>
+                        </div>
+                        
+                        <div class="space-y-4 max-h-96 overflow-y-auto" id="activityFeed">
+                            <!-- Activity items will be dynamically added here -->
+                        </div>
+                        
+                        <!-- Comment Input -->
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-medium">我</span>
+                                </div>
+                                <div class="flex-1">
+                                    <textarea id="commentInput" placeholder="分享你的想法..." class="comment-input w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3"></textarea>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <div class="flex items-center space-x-2">
+                                            <button class="text-gray-400 hover:text-blue-600 transition-colors">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                                </svg>
+                                            </button>
+                                            <button class="text-gray-400 hover:text-blue-600 transition-colors">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a2.5 2.5 0 010 5H9m4.5-5H15a2.5 2.5 0 010 5h-1.5m-5-5v5m5-5v5"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <button id="sendComment" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                            发送
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-white py-12 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 mb-6">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EP</span>
+                </div>
+                <span class="text-xl font-bold">EfficiencyPro</span>
+            </div>
+            <p class="text-slate-400 mb-8">© 2025 EfficiencyPro. 专业的效能管理平台，让工作更高效。</p>
+            <div class="flex justify-center space-x-8 text-sm text-slate-400">
+                <a href="#" class="hover:text-white transition-colors">隐私政策</a>
+                <a href="#" class="hover:text-white transition-colors">服务条款</a>
+                <a href="#" class="hover:text-white transition-colors">联系我们</a>
+                <a href="#" class="hover:text-white transition-colors">帮助中心</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Team collaboration data and functionality
+        let teamMembers = [
+            {
+                id: 1,
+                name: "张明",
+                role: "产品经理",
+                avatar: "resources/avatar-1.jpg",
+                status: "online",
+                tasks: 8,
+                email: "zhang.ming@company.com"
+            },
+            {
+                id: 2,
+                name: "李华",
+                role: "前端开发",
+                avatar: "resources/avatar-2.jpg",
+                status: "online",
+                tasks: 12,
+                email: "li.hua@company.com"
+            },
+            {
+                id: 3,
+                name: "王芳",
+                role: "UI设计师",
+                avatar: "resources/avatar-3.jpg",
+                status: "busy",
+                tasks: 6,
+                email: "wang.fang@company.com"
+            },
+            {
+                id: 4,
+                name: "刘强",
+                role: "后端开发",
+                avatar: "resources/avatar-4.jpg",
+                status: "online",
+                tasks: 10,
+                email: "liu.qiang@company.com"
+            }
+        ];
+
+        let activities = [
+            {
+                id: 1,
+                user: "张明",
+                action: "完成了任务",
+                target: "用户界面设计",
+                time: "2分钟前",
+                type: "task"
+            },
+            {
+                id: 2,
+                user: "李华",
+                action: "上传了文件",
+                target: "项目需求文档.pdf",
+                time: "15分钟前",
+                type: "file"
+            },
+            {
+                id: 3,
+                user: "王芳",
+                action: "评论了",
+                target: "设计方案讨论",
+                time: "1小时前",
+                type: "comment"
+            },
+            {
+                id: 4,
+                user: "刘强",
+                action: "创建了任务",
+                target: "API接口开发",
+                time: "2小时前",
+                type: "task"
+            },
+            {
+                id: 5,
+                user: "张明",
+                action: "更新了",
+                target: "项目进度",
+                time: "3小时前",
+                type: "update"
+            }
+        ];
+
+        let sharedFiles = [
+            {
+                id: 1,
+                name: "项目需求文档.pdf",
+                size: "2.4 MB",
+                type: "pdf",
+                uploadedBy: "李华",
+                uploadedAt: "2025-10-01 14:30"
+            },
+            {
+                id: 2,
+                name: "设计原型.sketch",
+                size: "15.7 MB",
+                type: "sketch",
+                uploadedBy: "王芳",
+                uploadedAt: "2025-10-01 11:20"
+            },
+            {
+                id: 3,
+                name: "会议纪要.docx",
+                size: "156 KB",
+                type: "doc",
+                uploadedBy: "张明",
+                uploadedAt: "2025-09-30 16:45"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTeamMembers();
+            renderActivityFeed();
+            renderFileList();
+            initEventListeners();
+        });
+
+        function renderTeamMembers() {
+            const container = document.getElementById('teamMembers');
+            container.innerHTML = '';
+
+            teamMembers.forEach(member => {
+                const memberCard = document.createElement('div');
+                memberCard.className = 'team-member-card bg-gray-50 rounded-xl p-6';
+                
+                const statusColors = {
+                    online: 'bg-green-500',
+                    busy: 'bg-yellow-500',
+                    offline: 'bg-gray-400'
+                };
+
+                memberCard.innerHTML = `
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="status-indicator ${member.status}">
+                            <img src="${member.avatar}" alt="${member.name}" class="w-12 h-12 rounded-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-slate-800">${member.name}</h3>
+                            <p class="text-sm text-slate-600">${member.role}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-slate-800">${member.tasks} 任务</div>
+                            <div class="flex items-center space-x-1">
+                                <div class="w-2 h-2 ${statusColors[member.status]} rounded-full"></div>
+                                <span class="text-xs text-slate-600">${member.status === 'online' ? '在线' : member.status === 'busy' ? '忙碌' : '离线'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                            发送消息
+                        </button>
+                        <button class="px-3 py-2 border border-gray-300 text-slate-700 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                            查看资料
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(memberCard);
+            });
+        }
+
+        function renderActivityFeed() {
+            const container = document.getElementById('activityFeed');
+            container.innerHTML = '';
+
+            activities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item p-3 rounded-lg';
+                
+                const typeIcons = {
+                    task: 'check-circle',
+                    file: 'document',
+                    comment: 'chat',
+                    update: 'refresh'
+                };
+
+                const typeColors = {
+                    task: 'text-green-500',
+                    file: 'text-blue-500',
+                    comment: 'text-purple-500',
+                    update: 'text-orange-500'
+                };
+
+                activityItem.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 ${typeColors[activity.type]}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${getIconPath(typeIcons[activity.type])}"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm text-slate-800">
+                                <span class="font-medium">${activity.user}</span>
+                                ${activity.action}
+                                <span class="font-medium">${activity.target}</span>
+                            </p>
+                            <p class="text-xs text-slate-500 mt-1">${activity.time}</p>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(activityItem);
+            });
+        }
+
+        function renderFileList() {
+            const container = document.getElementById('fileList');
+            container.innerHTML = '';
+
+            sharedFiles.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors';
+                
+                const typeIcons = {
+                    pdf: 'document-text',
+                    sketch: 'color-swatch',
+                    doc: 'document',
+                    jpg: 'photograph',
+                    png: 'photograph'
+                };
+
+                fileItem.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${getIconPath(typeIcons[file.type])}"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium text-slate-800 truncate">${file.name}</p>
+                            <p class="text-sm text-slate-600">${file.size} • ${file.uploadedBy} • ${file.uploadedAt}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="text-gray-400 hover:text-blue-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                        </button>
+                        <button class="text-gray-400 hover:text-red-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(fileItem);
+            });
+        }
+
+        function getIconPath(iconName) {
+            const icons = {
+                'check-circle': 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+                'document': 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                'document-text': 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                'chat': 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+                'refresh': 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
+                'color-swatch': 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z',
+                'photograph': 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+            };
+            return icons[iconName] || icons['document'];
+        }
+
+        function initEventListeners() {
+            // File upload
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            fileUploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('dragover');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files);
+                handleFileUpload(files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                handleFileUpload(files);
+            });
+
+            // Comment input
+            const commentInput = document.getElementById('commentInput');
+            const sendComment = document.getElementById('sendComment');
+
+            sendComment.addEventListener('click', () => {
+                const comment = commentInput.value.trim();
+                if (comment) {
+                    addComment(comment);
+                    commentInput.value = '';
+                }
+            });
+
+            commentInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const comment = commentInput.value.trim();
+                    if (comment) {
+                        addComment(comment);
+                        commentInput.value = '';
+                    }
+                }
+            });
+        }
+
+        function handleFileUpload(files) {
+            files.forEach(file => {
+                const newFile = {
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    size: formatFileSize(file.size),
+                    type: file.name.split('.').pop().toLowerCase(),
+                    uploadedBy: "我",
+                    uploadedAt: new Date().toLocaleString('zh-CN')
+                };
+
+                sharedFiles.unshift(newFile);
+            });
+
+            renderFileList();
+            showNotification(`成功上传 ${files.length} 个文件`, 'success');
+        }
+
+        function addComment(comment) {
+            const newActivity = {
+                id: Date.now(),
+                user: "我",
+                action: "评论了",
+                target: comment.substring(0, 20) + (comment.length > 20 ? '...' : ''),
+                time: "刚刚",
+                type: "comment"
+            };
+
+            activities.unshift(newActivity);
+            renderActivityFeed();
+            showNotification('评论发布成功', 'success');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-20 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transform translate-x-full transition-transform duration-300`;
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    notification.classList.add('bg-orange-500');
+                    break;
+                default:
+                    notification.classList.add('bg-blue-500');
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务管理 - EfficiencyPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .task-card {
+            transition: all 0.3s ease;
+            cursor: grab;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .task-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            cursor: grabbing;
+        }
+        
+        .kanban-column {
+            min-height: 600px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .kanban-column.drag-over {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .priority-high { border-left: 4px solid #ef4444; }
+        .priority-medium { border-left: 4px solid #f59e0b; }
+        .priority-low { border-left: 4px solid #10b981; }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .filter-tag {
+            transition: all 0.3s ease;
+        }
+        
+        .filter-tag.active {
+            background: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-effect fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EP</span>
+                </div>
+                <span class="text-xl font-bold text-slate-800">EfficiencyPro</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">仪表板</a>
+                <a href="tasks.html" class="nav-link text-blue-600 font-medium active">任务管理</a>
+                <a href="analytics.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">数据分析</a>
+                <a href="team.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">团队协作</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="px-4 py-2 text-slate-700 hover:text-blue-600 font-medium">登录</button>
+                <button class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
+                    免费试用
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-24 pb-8 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">任务管理</h1>
+                    <p class="text-slate-600">拖拽任务卡片来更新状态，点击+号添加新任务</p>
+                </div>
+                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                    <button id="addTaskBtn" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>添加任务</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="搜索任务..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <select id="assigneeFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">所有负责人</option>
+                            <option value="张明">张明</option>
+                            <option value="李华">李华</option>
+                            <option value="王芳">王芳</option>
+                            <option value="刘强">刘强</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-slate-600">优先级:</span>
+                        <button class="filter-tag px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 active" data-priority="all">全部</button>
+                        <button class="filter-tag px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200" data-priority="high">高</button>
+                        <button class="filter-tag px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200" data-priority="medium">中</button>
+                        <button class="filter-tag px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200" data-priority="low">低</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kanban Board -->
+    <section class="pb-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- To Do Column -->
+                <div class="kanban-column bg-white rounded-2xl shadow-lg p-6" data-status="todo">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
+                            <h2 class="text-lg font-semibold text-slate-800">待办事项</h2>
+                            <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-sm" id="todoCount">0</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4" id="todoTasks">
+                        <!-- Tasks will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- In Progress Column -->
+                <div class="kanban-column bg-white rounded-2xl shadow-lg p-6" data-status="inprogress">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
+                            <h2 class="text-lg font-semibold text-slate-800">进行中</h2>
+                            <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-sm" id="inprogressCount">0</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4" id="inprogressTasks">
+                        <!-- Tasks will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Done Column -->
+                <div class="kanban-column bg-white rounded-2xl shadow-lg p-6" data-status="done">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <h2 class="text-lg font-semibold text-slate-800">已完成</h2>
+                            <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-sm" id="doneCount">0</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4" id="doneTasks">
+                        <!-- Tasks will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-slate-800">添加新任务</h3>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="addTaskForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">任务标题</label>
+                    <input type="text" id="taskTitle" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="输入任务标题">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">任务描述</label>
+                    <textarea id="taskDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="输入任务描述"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">负责人</label>
+                        <select id="taskAssignee" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">选择负责人</option>
+                            <option value="张明">张明</option>
+                            <option value="李华">李华</option>
+                            <option value="王芳">王芳</option>
+                            <option value="刘强">刘强</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">优先级</label>
+                        <select id="taskPriority" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">选择优先级</option>
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">截止日期</label>
+                    <input type="date" id="taskDueDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button type="button" id="cancelBtn" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        取消
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
+                        创建任务
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-white py-12 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 mb-6">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EP</span>
+                </div>
+                <span class="text-xl font-bold">EfficiencyPro</span>
+            </div>
+            <p class="text-slate-400 mb-8">© 2025 EfficiencyPro. 专业的效能管理平台，让工作更高效。</p>
+            <div class="flex justify-center space-x-8 text-sm text-slate-400">
+                <a href="#" class="hover:text-white transition-colors">隐私政策</a>
+                <a href="#" class="hover:text-white transition-colors">服务条款</a>
+                <a href="#" class="hover:text-white transition-colors">联系我们</a>
+                <a href="#" class="hover:text-white transition-colors">帮助中心</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Task management functionality
+        let tasks = [
+            {
+                id: 1,
+                title: "设计新用户界面",
+                description: "为移动应用设计新的用户界面，包括主页、个人资料和设置页面",
+                assignee: "张明",
+                priority: "high",
+                status: "todo",
+                dueDate: "2025-10-15",
+                createdAt: new Date()
+            },
+            {
+                id: 2,
+                title: "优化数据库查询",
+                description: "优化用户数据查询性能，减少响应时间",
+                assignee: "李华",
+                priority: "medium",
+                status: "inprogress",
+                dueDate: "2025-10-10",
+                createdAt: new Date()
+            },
+            {
+                id: 3,
+                title: "编写API文档",
+                description: "为新的REST API编写详细的技术文档",
+                assignee: "王芳",
+                priority: "low",
+                status: "done",
+                dueDate: "2025-10-05",
+                createdAt: new Date()
+            },
+            {
+                id: 4,
+                title: "用户测试反馈分析",
+                description: "分析用户测试反馈，整理改进建议",
+                assignee: "刘强",
+                priority: "medium",
+                status: "todo",
+                dueDate: "2025-10-20",
+                createdAt: new Date()
+            },
+            {
+                id: 5,
+                title: "安全漏洞修复",
+                description: "修复发现的安全漏洞，更新依赖包",
+                assignee: "张明",
+                priority: "high",
+                status: "inprogress",
+                dueDate: "2025-10-08",
+                createdAt: new Date()
+            },
+            {
+                id: 6,
+                title: "性能监控配置",
+                description: "配置应用性能监控工具，设置告警规则",
+                assignee: "李华",
+                priority: "medium",
+                status: "todo",
+                dueDate: "2025-10-25",
+                createdAt: new Date()
+            }
+        ];
+
+        let currentFilter = {
+            search: '',
+            assignee: '',
+            priority: 'all'
+        };
+
+        // Initialize task management
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTasks();
+            updateTaskCounts();
+            initEventListeners();
+            initDragAndDrop();
+        });
+
+        function renderTasks() {
+            const filteredTasks = tasks.filter(task => {
+                const matchesSearch = task.title.toLowerCase().includes(currentFilter.search.toLowerCase()) ||
+                                    task.description.toLowerCase().includes(currentFilter.search.toLowerCase());
+                const matchesAssignee = !currentFilter.assignee || task.assignee === currentFilter.assignee;
+                const matchesPriority = currentFilter.priority === 'all' || task.priority === currentFilter.priority;
+                
+                return matchesSearch && matchesAssignee && matchesPriority;
+            });
+
+            // Clear all columns
+            document.getElementById('todoTasks').innerHTML = '';
+            document.getElementById('inprogressTasks').innerHTML = '';
+            document.getElementById('doneTasks').innerHTML = '';
+
+            // Render filtered tasks
+            filteredTasks.forEach(task => {
+                const taskElement = createTaskElement(task);
+                const targetColumn = document.getElementById(task.status + 'Tasks');
+                if (targetColumn) {
+                    targetColumn.appendChild(taskElement);
+                }
+            });
+
+            updateTaskCounts();
+        }
+
+        function createTaskElement(task) {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = `task-card bg-white rounded-lg p-4 shadow-sm border priority-${task.priority}`;
+            taskDiv.draggable = true;
+            taskDiv.dataset.taskId = task.id;
+
+            const priorityColors = {
+                high: 'bg-red-100 text-red-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                low: 'bg-green-100 text-green-800'
+            };
+
+            const priorityLabels = {
+                high: '高',
+                medium: '中',
+                low: '低'
+            };
+
+            taskDiv.innerHTML = `
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold text-slate-800 text-sm leading-tight">${task.title}</h3>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${priorityColors[task.priority]}">
+                        ${priorityLabels[task.priority]}
+                    </span>
+                </div>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-2">${task.description}</p>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs font-medium">${task.assignee.charAt(0)}</span>
+                        </div>
+                        <span>${task.assignee}</span>
+                    </div>
+                    <span>${formatDate(task.dueDate)}</span>
+                </div>
+            `;
+
+            return taskDiv;
+        }
+
+        function updateTaskCounts() {
+            const todoCount = tasks.filter(task => task.status === 'todo').length;
+            const inprogressCount = tasks.filter(task => task.status === 'inprogress').length;
+            const doneCount = tasks.filter(task => task.status === 'done').length;
+
+            document.getElementById('todoCount').textContent = todoCount;
+            document.getElementById('inprogressCount').textContent = inprogressCount;
+            document.getElementById('doneCount').textContent = doneCount;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+        }
+
+        function initEventListeners() {
+            // Add task modal
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const modal = document.getElementById('addTaskModal');
+            const closeModal = document.getElementById('closeModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const form = document.getElementById('addTaskForm');
+
+            addTaskBtn.addEventListener('click', () => {
+                modal.classList.add('show');
+            });
+
+            closeModal.addEventListener('click', () => {
+                modal.classList.remove('show');
+                form.reset();
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                modal.classList.remove('show');
+                form.reset();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                    form.reset();
+                }
+            });
+
+            // Form submission
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const newTask = {
+                    id: Date.now(),
+                    title: document.getElementById('taskTitle').value,
+                    description: document.getElementById('taskDescription').value,
+                    assignee: document.getElementById('taskAssignee').value,
+                    priority: document.getElementById('taskPriority').value,
+                    status: 'todo',
+                    dueDate: document.getElementById('taskDueDate').value,
+                    createdAt: new Date()
+                };
+
+                tasks.push(newTask);
+                renderTasks();
+                modal.classList.remove('show');
+                form.reset();
+
+                // Show success notification
+                showNotification('任务创建成功！', 'success');
+            });
+
+            // Search and filters
+            const searchInput = document.getElementById('searchInput');
+            const assigneeFilter = document.getElementById('assigneeFilter');
+            const priorityFilters = document.querySelectorAll('.filter-tag');
+
+            searchInput.addEventListener('input', (e) => {
+                currentFilter.search = e.target.value;
+                renderTasks();
+            });
+
+            assigneeFilter.addEventListener('change', (e) => {
+                currentFilter.assignee = e.target.value;
+                renderTasks();
+            });
+
+            priorityFilters.forEach(filter => {
+                filter.addEventListener('click', (e) => {
+                    priorityFilters.forEach(f => f.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentFilter.priority = e.target.dataset.priority;
+                    renderTasks();
+                });
+            });
+        }
+
+        function initDragAndDrop() {
+            let draggedElement = null;
+
+            // Add drag event listeners to task cards
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('task-card')) {
+                    draggedElement = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                }
+            });
+
+            document.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('task-card')) {
+                    e.target.classList.remove('dragging');
+                    draggedElement = null;
+                }
+            });
+
+            // Add drop event listeners to columns
+            const columns = document.querySelectorAll('.kanban-column');
+            columns.forEach(column => {
+                column.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    column.classList.add('drag-over');
+                });
+
+                column.addEventListener('dragleave', (e) => {
+                    if (!column.contains(e.relatedTarget)) {
+                        column.classList.remove('drag-over');
+                    }
+                });
+
+                column.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    column.classList.remove('drag-over');
+                    
+                    if (draggedElement) {
+                        const taskId = parseInt(draggedElement.dataset.taskId);
+                        const newStatus = column.dataset.status;
+                        
+                        // Update task status
+                        const task = tasks.find(t => t.id === taskId);
+                        if (task) {
+                            task.status = newStatus;
+                            renderTasks();
+                            showNotification('任务状态已更新！', 'success');
+                        }
+                    }
+                });
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-20 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transform translate-x-full transition-transform duration-300`;
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    notification.classList.add('bg-orange-500');
+                    break;
+                default:
+                    notification.classList.add('bg-blue-500');
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析 - EfficiencyPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-container {
+            transition: all 0.3s ease;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .time-selector {
+            transition: all 0.3s ease;
+        }
+        
+        .time-selector.active {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+        
+        .animate-counter {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-effect fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EP</span>
+                </div>
+                <span class="text-xl font-bold text-slate-800">EfficiencyPro</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">仪表板</a>
+                <a href="tasks.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">任务管理</a>
+                <a href="analytics.html" class="nav-link text-blue-600 font-medium active">数据分析</a>
+                <a href="team.html" class="nav-link text-slate-700 hover:text-blue-600 font-medium">团队协作</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="px-4 py-2 text-slate-700 hover:text-blue-600 font-medium">登录</button>
+                <button class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300">
+                    免费试用
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-24 pb-8 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">数据分析</h1>
+                    <p class="text-slate-600">深入洞察团队效能和项目进展</p>
+                </div>
+                <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                    <button class="time-selector px-4 py-2 rounded-lg bg-white text-slate-700 hover:bg-gray-50 active" data-period="7d">7天</button>
+                    <button class="time-selector px-4 py-2 rounded-lg bg-white text-slate-700 hover:bg-gray-50" data-period="30d">30天</button>
+                    <button class="time-selector px-4 py-2 rounded-lg bg-white text-slate-700 hover:bg-gray-50" data-period="90d">90天</button>
+                    <button class="time-selector px-4 py-2 rounded-lg bg-white text-slate-700 hover:bg-gray-50" data-period="1y">1年</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Metrics -->
+    <section class="pb-8 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Tasks -->
+                <div class="metric-card bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-slate-800 animate-counter" data-target="156">0</div>
+                            <div class="text-sm text-slate-600">总任务数</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-green-500 font-medium">+12%</span>
+                        <span class="text-slate-500 ml-1">较上期</span>
+                    </div>
+                </div>
+
+                <!-- Completion Rate -->
+                <div class="metric-card bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-slate-800 animate-counter" data-target="87">0</div>
+                            <div class="text-sm text-slate-600">完成率 (%)</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-green-500 font-medium">+5%</span>
+                        <span class="text-slate-500 ml-1">较上期</span>
+                    </div>
+                </div>
+
+                <!-- Average Time -->
+                <div class="metric-card bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-slate-800 animate-counter" data-target="24">0</div>
+                            <div class="text-sm text-slate-600">平均完成时间 (小时)</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-red-500 font-medium">-8%</span>
+                        <span class="text-slate-500 ml-1">较上期</span>
+                    </div>
+                </div>
+
+                <!-- Team Efficiency -->
+                <div class="metric-card bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-slate-800 animate-counter" data-target="92">0</div>
+                            <div class="text-sm text-slate-600">团队效率 (%)</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-green-500 font-medium">+3%</span>
+                        <span class="text-slate-500 ml-1">较上期</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="pb-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Task Completion Trend -->
+                <div class="chart-container bg-white rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-slate-800">任务完成趋势</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm text-slate-600">已完成</span>
+                            <div class="w-3 h-3 bg-gray-300 rounded-full ml-4"></div>
+                            <span class="text-sm text-slate-600">新增</span>
+                        </div>
+                    </div>
+                    <div id="completionTrendChart" class="h-80"></div>
+                </div>
+
+                <!-- Task Distribution -->
+                <div class="chart-container bg-white rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-slate-800">任务分布</h3>
+                        <select id="distributionType" class="px-3 py-1 border border-gray-300 rounded-lg text-sm">
+                            <option value="status">按状态</option>
+                            <option value="priority">按优先级</option>
+                            <option value="assignee">按负责人</option>
+                        </select>
+                    </div>
+                    <div id="taskDistributionChart" class="h-80"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Team Performance -->
+                <div class="lg:col-span-2 chart-container bg-white rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-slate-800">团队绩效</h3>
+                        <div class="flex items-center space-x-2">
+                            <button class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-lg">任务数</button>
+                            <button class="px-3 py-1 text-sm text-slate-600 hover:bg-gray-100 rounded-lg">完成率</button>
+                        </div>
+                    </div>
+                    <div id="teamPerformanceChart" class="h-80"></div>
+                </div>
+
+                <!-- Priority Breakdown -->
+                <div class="chart-container bg-white rounded-2xl shadow-lg p-8">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-6">优先级分析</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+                                <span class="text-slate-700">高优先级</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                                <span class="text-sm text-slate-600">18</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                                <span class="text-slate-700">中优先级</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                                <span class="text-sm text-slate-600">24</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                                <span class="text-slate-700">低优先级</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                                <span class="text-sm text-slate-600">12</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Circular Progress -->
+                    <div class="flex justify-center mt-8">
+                        <div class="relative">
+                            <svg class="progress-ring w-32 h-32">
+                                <circle class="progress-ring-circle stroke-current text-gray-200" stroke-width="8" fill="transparent" r="56" cx="64" cy="64"/>
+                                <circle class="progress-ring-circle stroke-current text-blue-500" stroke-width="8" fill="transparent" r="56" cx="64" cy="64" stroke-dasharray="351.86" stroke-dashoffset="87.97"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-slate-800">75%</div>
+                                    <div class="text-sm text-slate-600">完成度</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analytics -->
+            <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Workload Distribution -->
+                <div class="chart-container bg-white rounded-2xl shadow-lg p-8">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-6">工作负载分布</h3>
+                    <div id="workloadChart" class="h-64"></div>
+                </div>
+
+                <!-- Time Tracking -->
+                <div class="chart-container bg-white rounded-2xl shadow-lg p-8">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-6">时间追踪</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <span class="font-medium text-slate-800">开发工作</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-slate-800">32小时</div>
+                                <div class="text-sm text-slate-600">65%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                <span class="font-medium text-slate-800">会议沟通</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-slate-800">12小时</div>
+                                <div class="text-sm text-slate-600">24%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                <span class="font-medium text-slate-800">文档编写</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-slate-800">5小时</div>
+                                <div class="text-sm text-slate-600">11%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-white py-12 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-2 mb-6">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">EP</span>
+                </div>
+                <span class="text-xl font-bold">EfficiencyPro</span>
+            </div>
+            <p class="text-slate-400 mb-8">© 2025 EfficiencyPro. 专业的效能管理平台，让工作更高效。</p>
+            <div class="flex justify-center space-x-8 text-sm text-slate-400">
+                <a href="#" class="hover:text-white transition-colors">隐私政策</a>
+                <a href="#" class="hover:text-white transition-colors">服务条款</a>
+                <a href="#" class="hover:text-white transition-colors">联系我们</a>
+                <a href="#" class="hover:text-white transition-colors">帮助中心</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Analytics data and functionality
+        let currentPeriod = '7d';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initAnalytics();
+            initEventListeners();
+            animateCounters();
+        });
+
+        function initAnalytics() {
+            initCompletionTrendChart();
+            initTaskDistributionChart();
+            initTeamPerformanceChart();
+            initWorkloadChart();
+        }
+
+        function initEventListeners() {
+            // Time period selector
+            const timeSelectors = document.querySelectorAll('.time-selector');
+            timeSelectors.forEach(selector => {
+                selector.addEventListener('click', (e) => {
+                    timeSelectors.forEach(s => s.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentPeriod = e.target.dataset.period;
+                    updateCharts();
+                });
+            });
+
+            // Distribution type selector
+            const distributionType = document.getElementById('distributionType');
+            distributionType.addEventListener('change', (e) => {
+                updateTaskDistributionChart(e.target.value);
+            });
+        }
+
+        function animateCounters() {
+            const counters = document.querySelectorAll('.animate-counter');
+            
+            const observerOptions = {
+                threshold: 0.5,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const target = parseInt(counter.getAttribute('data-target'));
+                        animateCounter(counter, target);
+                        observer.unobserve(counter);
+                    }
+                });
+            }, observerOptions);
+
+            counters.forEach(counter => observer.observe(counter));
+        }
+
+        function animateCounter(element, target) {
+            anime({
+                targets: { count: 0 },
+                count: target,
+                duration: 2000,
+                easing: 'easeOutQuart',
+                update: function(anim) {
+                    element.textContent = Math.floor(anim.animatables[0].target.count);
+                }
+            });
+        }
+
+        function initCompletionTrendChart() {
+            const chart = echarts.init(document.getElementById('completionTrendChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['已完成', '新增'],
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '已完成',
+                        type: 'line',
+                        smooth: true,
+                        data: [12, 15, 18, 22, 25, 28, 32],
+                        itemStyle: { color: '#3b82f6' },
+                        areaStyle: {
+                            opacity: 0.3,
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#3b82f6' },
+                                { offset: 1, color: 'rgba(59, 130, 246, 0.1)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: '新增',
+                        type: 'line',
+                        smooth: true,
+                        data: [8, 12, 14, 16, 18, 20, 24],
+                        itemStyle: { color: '#6b7280' },
+                        areaStyle: {
+                            opacity: 0.3,
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#6b7280' },
+                                { offset: 1, color: 'rgba(107, 114, 128, 0.1)' }
+                            ])
+                        }
+                    }
+                ]
+            };
+
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        function initTaskDistributionChart() {
+            const chart = echarts.init(document.getElementById('taskDistributionChart'));
+            updateTaskDistributionChart('status');
+        }
+
+        function updateTaskDistributionChart(type) {
+            const chart = echarts.getInstanceByDom(document.getElementById('taskDistributionChart'));
+            
+            let data, title;
+            switch(type) {
+                case 'status':
+                    data = [
+                        { value: 45, name: '已完成', itemStyle: { color: '#10b981' } },
+                        { value: 32, name: '进行中', itemStyle: { color: '#3b82f6' } },
+                        { value: 23, name: '待办', itemStyle: { color: '#6b7280' } }
+                    ];
+                    title = '任务状态分布';
+                    break;
+                case 'priority':
+                    data = [
+                        { value: 18, name: '高优先级', itemStyle: { color: '#ef4444' } },
+                        { value: 24, name: '中优先级', itemStyle: { color: '#f59e0b' } },
+                        { value: 12, name: '低优先级', itemStyle: { color: '#10b981' } }
+                    ];
+                    title = '任务优先级分布';
+                    break;
+                case 'assignee':
+                    data = [
+                        { value: 28, name: '张明', itemStyle: { color: '#8b5cf6' } },
+                        { value: 22, name: '李华', itemStyle: { color: '#06b6d4' } },
+                        { value: 18, name: '王芳', itemStyle: { color: '#f59e0b' } },
+                        { value: 16, name: '刘强', itemStyle: { color: '#10b981' } }
+                    ];
+                    title = '任务负责人分布';
+                    break;
+            }
+
+            const option = {
+                title: {
+                    text: title,
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14,
+                        color: '#374151'
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                series: [
+                    {
+                        name: '任务分布',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        center: ['50%', '60%'],
+                        data: data,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+                        label: {
+                            fontSize: 12
+                        }
+                    }
+                ]
+            };
+
+            chart.setOption(option);
+        }
+
+        function initTeamPerformanceChart() {
+            const chart = echarts.init(document.getElementById('teamPerformanceChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['任务数', '完成率'],
+                    bottom: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['张明', '李华', '王芳', '刘强']
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '任务数',
+                        position: 'left'
+                    },
+                    {
+                        type: 'value',
+                        name: '完成率 (%)',
+                        position: 'right',
+                        max: 100
+                    }
+                ],
+                series: [
+                    {
+                        name: '任务数',
+                        type: 'bar',
+                        data: [28, 22, 18, 16],
+                        itemStyle: { color: '#3b82f6' }
+                    },
+                    {
+                        name: '完成率',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: [92, 88, 95, 87],
+                        itemStyle: { color: '#10b981' }
+                    }
+                ]
+            };
+
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        function initWorkloadChart() {
+            const chart = echarts.init(document.getElementById('workloadChart'));
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['刘强', '王芳', '李华', '张明']
+                },
+                series: [
+                    {
+                        name: '工作负载',
+                        type: 'bar',
+                        data: [16, 18, 22, 28],
+                        itemStyle: {
+                            color: function(params) {
+                                const colors = ['#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+                                return colors[params.dataIndex];
+                            }
+                        }
+                    }
+                ]
+            };
+
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        function updateCharts() {
+            // Update charts based on selected time period
+            // This would typically fetch new data from an API
+            console.log('Updating charts for period:', currentPeriod);
+        }
+    </script>
+</body>
+</html>
