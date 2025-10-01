@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>技术开发个人效能评估指标体系</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            accent: '#722ED1',
+            neutral: '#1F2937',
+            'neutral-light': '#F3F4F6',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .gradient-mask {
+        mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-bar-chart text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-neutral hidden sm:block">效能评估指标体系</h1>
+      </div>
+      
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="#overview" class="text-gray-600 hover:text-primary transition-colors">概述</a>
+        <a href="#code-quality" class="text-gray-600 hover:text-primary transition-colors">代码质量</a>
+        <a href="#efficiency" class="text-gray-600 hover:text-primary transition-colors">开发效率</a>
+        <a href="#collaboration" class="text-gray-600 hover:text-primary transition-colors">协作效能</a>
+        <a href="#growth" class="text-gray-600 hover:text-primary transition-colors">学习成长</a>
+        <a href="#automation" class="text-gray-600 hover:text-primary transition-colors">自动化流程</a>
+        <a href="#implementation" class="text-gray-600 hover:text-primary transition-colors">执行建议</a>
+      </nav>
+      
+      <button id="menu-toggle" class="md:hidden text-gray-600 focus:outline-none">
+        <i class="fa fa-bars text-xl"></i>
+      </button>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+        <a href="#overview" class="py-2 text-gray-600 hover:text-primary transition-colors">概述</a>
+        <a href="#code-quality" class="py-2 text-gray-600 hover:text-primary transition-colors">代码质量</a>
+        <a href="#efficiency" class="py-2 text-gray-600 hover:text-primary transition-colors">开发效率</a>
+        <a href="#collaboration" class="py-2 text-gray-600 hover:text-primary transition-colors">协作效能</a>
+        <a href="#growth" class="py-2 text-gray-600 hover:text-primary transition-colors">学习成长</a>
+        <a href="#automation" class="py-2 text-gray-600 hover:text-primary transition-colors">自动化流程</a>
+        <a href="#implementation" class="py-2 text-gray-600 hover:text-primary transition-colors">执行建议</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区域 -->
+  <section class="pt-24 pb-16 bg-gradient-to-br from-primary/5 to-secondary/5">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <span class="inline-block px-3 py-1 mb-4 text-sm font-medium bg-primary/10 text-primary rounded-full">
+          技术开发评估框架
+        </span>
+        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-neutral leading-tight mb-6">
+          技术开发个人效能<br class="sm:hidden">评估指标体系
+        </h1>
+        <p class="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+          从代码质量、开发效率、协作效能、学习成长和自动化流程五个维度，
+          构建全面的个人效能评估框架，引导开发者关注长期价值。
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="#overview" class="px-6 py-3 bg-primary text-white font-medium rounded-lg shadow-md hover:shadow-lg hover:bg-primary/90 transition-all">
+            查看详情 <i class="fa fa-arrow-down ml-2"></i>
+          </a>
+          <button id="download-btn" class="px-6 py-3 bg-white text-primary border border-primary font-medium rounded-lg shadow-sm hover:shadow-md transition-all">
+            导出文档 <i class="fa fa-download ml-2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 概述部分 -->
+  <section id="overview" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto mb-12 text-center">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">评估体系概述</h2>
+        <p class="text-gray-600">
+          本指标体系弥补了"代码提交量、工作时长"等基础指标的片面性，
+          从五个核心维度构建更全面的个人效能评估框架。
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- 维度卡片 1 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-code text-primary text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">代码质量</h3>
+          <p class="text-gray-600">
+            聚焦代码的可维护性、稳定性和健壮性，避免"数量优先"导致的质量隐患。
+          </p>
+        </div>
+        
+        <!-- 维度卡片 2 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-tachometer text-secondary text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">开发效率</h3>
+          <p class="text-gray-600">
+            关注开发过程的流畅度和任务交付速度，而非单纯的"工时堆积"。
+          </p>
+        </div>
+        
+        <!-- 维度卡片 3 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-users text-accent text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">协作效能</h3>
+          <p class="text-gray-600">
+            评估开发者在团队中的协作质量和沟通效率，体现团队价值。
+          </p>
+        </div>
+        
+        <!-- 维度卡片 4 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-graduation-cap text-amber-600 text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">学习成长</h3>
+          <p class="text-gray-600">
+            衡量开发者的技术迭代和能力拓展，避免陷入"重复劳动"。
+          </p>
+        </div>
+        
+        <!-- 维度卡片 5 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-cogs text-emerald-600 text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">自动化流程</h3>
+          <p class="text-gray-600">
+            反映开发流程的自动化水平和规范化程度，提升流程效率。
+          </p>
+        </div>
+        
+        <!-- 指标分布图表 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+          <h3 class="text-xl font-semibold mb-4">指标分布</h3>
+          <div class="h-56">
+            <canvas id="metricsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 代码质量维度 -->
+  <section id="code-quality" class="py-16 bg-neutral-light">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row items-start gap-8">
+        <div class="md:w-1/3">
+          <span class="inline-block px-3 py-1 mb-4 text-sm font-medium bg-primary/10 text-primary rounded-full">
+            维度一
+          </span>
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">代码质量</h2>
+          <p class="text-gray-600 mb-6">
+            聚焦代码的可维护性、稳定性和健壮性，避免"数量优先"导致的质量隐患，
+            确保代码库的长期健康和可维护性。
+          </p>
+          <div class="flex items-center text-primary font-medium">
+            <span>核心关注点：规范性、稳定性、可维护性</span>
+            <i class="fa fa-arrow-right ml-2"></i>
+          </div>
+        </div>
+        
+        <div class="md:w-2/3 w-full">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b">
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">指标名称</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">计算方式</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">阈值参考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">静态代码分析问题数</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">工具检测的代码异味、漏洞、规范违规总数</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        每千行代码≤5个关键问题
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">测试覆盖率</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（被测试覆盖的代码行数/总代码行数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        核心≥80%，非核心≥60%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">缺陷逃逸率</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（生产环境发现的缺陷数/总缺陷数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≤10%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">技术债务指数</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">工具计算的"修复所有问题所需时间"</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        累计≤团队1周工作量
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">代码重复率</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（重复代码行数/总代码行数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≤5%
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 开发效率维度 -->
+  <section id="efficiency" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row-reverse items-start gap-8">
+        <div class="md:w-1/3">
+          <span class="inline-block px-3 py-1 mb-4 text-sm font-medium bg-secondary/10 text-secondary rounded-full">
+            维度二
+          </span>
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">开发效率</h2>
+          <p class="text-gray-600 mb-6">
+            关注开发过程的流畅度和任务交付速度，而非单纯的"工时堆积"，
+            衡量开发者处理任务的实际效率和专注度。
+          </p>
+          <div class="flex items-center text-secondary font-medium">
+            <span>核心关注点：流畅度、专注度、交付速度</span>
+            <i class="fa fa-arrow-right ml-2"></i>
+          </div>
+        </div>
+        
+        <div class="md:w-2/3 w-full">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b">
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">指标名称</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">计算方式</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">阈值参考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">任务周期时间</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">从任务分配到完成的总时长（剔除阻塞时间）</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        如Bug修复≤24小时
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">专注时间占比</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（连续编码≥30分钟的时段总和/总工作时长）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥60%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">上下文切换次数</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">一天内从一个任务切换到另一个任务的次数</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≤5次/天
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">重构占比</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（重构代码行数/总代码行数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        核心模块迭代中≥20%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">阻塞时间占比</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（等待依赖/审批/环境的时间/总工作时长）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≤15%
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 协作效能维度 -->
+  <section id="collaboration" class="py-16 bg-neutral-light">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row items-start gap-8">
+        <div class="md:w-1/3">
+          <span class="inline-block px-3 py-1 mb-4 text-sm font-medium bg-accent/10 text-accent rounded-full">
+            维度三
+          </span>
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">协作效能</h2>
+          <p class="text-gray-600 mb-6">
+            评估开发者在团队中的协作质量和沟通效率，
+            衡量其在团队中的贡献和知识共享能力。
+          </p>
+          <div class="flex items-center text-accent font-medium">
+            <span>核心关注点：沟通效率、知识共享、团队协作</span>
+            <i class="fa fa-arrow-right ml-2"></i>
+          </div>
+        </div>
+        
+        <div class="md:w-2/3 w-full">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b">
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">指标名称</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">计算方式</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">阈值参考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">PR审查响应时长</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">从PR创建到首次审查评论的时间</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≤4小时（工作时间内）
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">PR通过率</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（首次通过的PR数/总PR数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥80%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">文档完善度</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（新增/更新文档的功能数/总开发功能数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥90%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">跨团队协作频率</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">与其他团队的沟通次数/周</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        如≥3次/周
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">结对编程时长</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">参与结对编程的时间占比</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        关键功能开发中≥10%
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 学习成长维度 -->
+  <section id="growth" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row-reverse items-start gap-8">
+        <div class="md:w-1/3">
+          <span class="inline-block px-3 py-1 mb-4 text-sm font-medium bg-amber-100 text-amber-600 rounded-full">
+            维度四
+          </span>
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">学习成长</h2>
+          <p class="text-gray-600 mb-6">
+            衡量开发者的技术迭代和能力拓展，避免陷入"重复劳动"，
+            关注个人技术能力的持续提升和知识输出。
+          </p>
+          <div class="flex items-center text-amber-600 font-medium">
+            <span>核心关注点：技术迭代、能力拓展、知识输出</span>
+            <i class="fa fa-arrow-right ml-2"></i>
+          </div>
+        </div>
+        
+        <div class="md:w-2/3 w-full">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b">
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">指标名称</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">计算方式</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">阈值参考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">新技术使用占比</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（使用新技术/框架的代码量/总代码量）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥15%/季度
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">技能拓展速度</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">掌握新技能的时间周期</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        单一技能从入门到应用≤1个月
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">技术分享次数</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">参与内部分享/写技术博客的次数/季度</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥1次/季度
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">问题解决自主性</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（独立解决的技术难题数/总难题数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥70%
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 自动化与流程成熟度维度 -->
+  <section id="automation" class="py-16 bg-neutral-light">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row items-start gap-8">
+        <div class="md:w-1/3">
+          <span class="inline-block px-3 py-1 mb-4 text-sm font-medium bg-emerald-100 text-emerald-600 rounded-full">
+            维度五
+          </span>
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">自动化与流程成熟度</h2>
+          <p class="text-gray-600 mb-6">
+            反映开发流程的自动化水平和规范化程度，
+            衡量开发团队在工程化和自动化方面的成熟度。
+          </p>
+          <div class="flex items-center text-emerald-600 font-medium">
+            <span>核心关注点：自动化水平、流程稳定性、标准化程度</span>
+            <i class="fa fa-arrow-right ml-2"></i>
+          </div>
+        </div>
+        
+        <div class="md:w-2/3 w-full">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b">
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">指标名称</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">计算方式</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">阈值参考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">CI/CD流水线成功率</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（成功执行的CI/CD次数/总执行次数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥95%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">自动化测试占比</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（自动化测试用例数/总测试用例数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥70%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">部署自动化率</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">（自动部署次数/总部署次数）×100%</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≥90%
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium">环境一致性问题数</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">因环境不一致导致的问题数/月</td>
+                    <td class="px-6 py-4 text-sm">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        ≤2次/月
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 执行建议部分 -->
+  <section id="implementation" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto mb-12 text-center">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">指标落地执行建议</h2>
+        <p class="text-gray-600">
+          为避免指标"落地难、效果差"，需结合以下原则执行，确保评估体系真正发挥作用。
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <!-- 建议卡片 1 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-user-circle text-primary text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">角色差异化选择指标</h3>
+          <p class="text-gray-600">
+            无需全员覆盖所有指标，例如前端开发者侧重"静态代码分析问题数、测试覆盖率"，
+            运维开发者侧重"部署自动化率、环境一致性问题数"。
+          </p>
+        </div>
+        
+        <!-- 建议卡片 2 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-line-chart text-secondary text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">聚焦趋势而非单一数值</h3>
+          <p class="text-gray-600">
+            每周/每月跟踪核心指标的变化趋势（如"技术债务指数持续下降"
+            "CI/CD成功率逐步提升"），比单次数值更能反映个人成长。
+          </p>
+        </div>
+        
+        <!-- 建议卡片 3 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-balance-scale text-accent text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">平衡量化与质性反馈</h3>
+          <p class="text-gray-600">
+            当指标异常时（如"PR通过率低"），需结合团队反馈判断原因——
+            是"审查标准严格"还是"代码自检不足"，避免仅靠数据下结论。
+          </p>
+        </div>
+        
+        <!-- 建议卡片 4 -->
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 card-hover">
+          <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-wrench text-emerald-600 text-xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">明确数据收集工具</h3>
+          <p class="text-gray-600">
+            建议通过工具自动化收集数据，减少手动统计成本，例如用SonarQube统计代码质量指标、
+            用Jira统计任务周期时间、用企业IM工具统计跨团队协作频率。
+          </p>
+        </div>
+      </div>
+      
+      <!-- 备注信息 -->
+      <div class="mt-12 max-w-5xl mx-auto bg-neutral-light rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-3 flex items-center">
+          <i class="fa fa-info-circle text-primary mr-2"></i> 备注信息
+        </h3>
+        <p class="text-gray-600">
+          本指标体系的阈值参考为通用标准，各团队可根据业务复杂度（如ToC产品vs ToB产品）、
+          技术栈特点（如传统开发vs云原生开发）调整阈值，确保指标贴合实际需求。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-neutral text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <div class="flex items-center space-x-2 mb-2">
+            <i class="fa fa-bar-chart text-primary text-2xl"></i>
+            <h2 class="text-xl font-bold">效能评估指标体系</h2>
+          </div>
+          <p class="text-gray-400 text-sm">
+            技术开发个人效能的全面评估框架
+          </p>
+        </div>
+        
+        <div class="flex flex-col md:flex-row items-center md:space-x-8 space-y-4 md:space-y-0">
+          <a href="#overview" class="text-gray-400 hover:text-white transition-colors">概述</a>
+          <a href="#code-quality" class="text-gray-400 hover:text-white transition-colors">代码质量</a>
+          <a href="#efficiency" class="text-gray-400 hover:text-white transition-colors">开发效率</a>
+          <a href="#collaboration" class="text-gray-400 hover:text-white transition-colors">协作效能</a>
+          <a href="#growth" class="text-gray-400 hover:text-white transition-colors">学习成长</a>
+          <a href="#automation" class="text-gray-400 hover:text-white transition-colors">自动化流程</a>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
+        <p>© 2024 技术开发效能评估体系 | 文档版本：V1.0</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 回到顶部按钮 -->
+  <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-primary/90">
+    <i class="fa fa-arrow-up"></i>
+  </button>
+
+  <!-- 下载提示模态框 -->
+  <div id="download-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 invisible transition-all duration-300">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 transform scale-95 transition-transform duration-300">
+      <div class="p-6 border-b">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xl font-semibold">导出文档</h3>
+          <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="p-6">
+        <p class="text-gray-600 mb-4">请选择导出格式：</p>
+        <div class="grid grid-cols-2 gap-4">
+          <button class="border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center hover:border-primary hover:text-primary transition-colors">
+            <i class="fa fa-file-pdf-o text-2xl mb-2"></i>
+            <span>PDF格式</span>
+          </button>
+          <button class="border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center hover:border-primary hover:text-primary transition-colors">
+            <i class="fa fa-file-excel-o text-2xl mb-2"></i>
+            <span>Excel格式</span>
+          </button>
+          <button class="border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center hover:border-primary hover:text-primary transition-colors">
+            <i class="fa fa-file-word-o text-2xl mb-2"></i>
+            <span>Word格式</span>
+          </button>
+          <button class="border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center hover:border-primary hover:text-primary transition-colors">
+            <i class="fa fa-file-text-o text-2xl mb-2"></i>
+            <span>Markdown格式</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 初始化指标分布图表
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('metricsChart').getContext('2d');
+      const metricsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['代码质量', '开发效率', '协作效能', '学习成长', '自动化流程'],
+          datasets: [{
+            data: [5, 5, 5, 4, 4],
+            backgroundColor: [
+              '#165DFF',
+              '#36CFC9',
+              '#722ED1',
+              '#F59E0B',
+              '#10B981'
+            ],
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  return `${label}: ${value} 个指标`;
+                }
+              }
+            }
+          },
+          cutout: '65%',
+          animation: {
+            animateScale: true,
+            animateRotate: true
+          }
+        }
+      });
+      
+      // 移动端菜单切换
+      const menuToggle = document.getElementById('menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      menuToggle.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+      });
+      
+      // 导航栏滚动效果
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+          navbar.classList.add('py-2', 'shadow');
+          navbar.classList.remove('py-3');
+        } else {
+          navbar.classList.add('py-3');
+          navbar.classList.remove('py-2', 'shadow');
+        }
+      });
+      
+      // 回到顶部按钮
+      const backToTopBtn = document.getElementById('back-to-top');
+      
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+          backToTopBtn.classList.remove('opacity-0', 'invisible');
+          backToTopBtn.classList.add('opacity-100', 'visible');
+        } else {
+          backToTopBtn.classList.add('opacity-0', 'invisible');
+          backToTopBtn.classList.remove('opacity-100', 'visible');
+        }
+      });
+      
+      backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      // 平滑滚动
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          
+          // 关闭移动菜单（如果打开）
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+          
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+          
+          if (targetElement) {
+            const navbarHeight = navbar.offsetHeight;
+            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+            
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+      
+      // 下载模态框
+      const downloadBtn = document.getElementById('download-btn');
+      const downloadModal = document.getElementById('download-modal');
+      const closeModal = document.getElementById('close-modal');
+      
+      downloadBtn.addEventListener('click', function() {
+        downloadModal.classList.remove('opacity-0', 'invisible');
+        downloadModal.classList.add('opacity-100', 'visible');
+        downloadModal.querySelector('div').classList.remove('scale-95');
+        downloadModal.querySelector('div').classList.add('scale-100');
+      });
+      
+      function closeModalFunc() {
+        downloadModal.classList.add('opacity-0', 'invisible');
+        downloadModal.classList.remove('opacity-100', 'visible');
+        downloadModal.querySelector('div').classList.add('scale-95');
+        downloadModal.querySelector('div').classList.remove('scale-100');
+      }
+      
+      closeModal.addEventListener('click', closeModalFunc);
+      
+      // 点击模态框外部关闭
+      downloadModal.addEventListener('click', function(e) {
+        if (e.target === downloadModal) {
+          closeModalFunc();
+        }
+      });
+      
+      // 为模态框内的按钮添加点击事件
+      const modalButtons = downloadModal.querySelectorAll('button:not(#close-modal)');
+      modalButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const format = this.querySelector('span').textContent;
+          alert(`已开始导出 ${format} 文档...`);
+          closeModalFunc();
+        });
+      });
+    });
+  </script>
+</body>
+</html>
