@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>技术效能评估仪表盘</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563EB',
+            secondary: '#10B981',
+            accent: '#8B5CF6',
+            warning: '#F59E0B',
+            danger: '#EF4444',
+            dark: '#1E293B',
+            'dark-light': '#334155',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      }
+      .progress-ring {
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+      }
+      .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
+  <!-- 顶部导航 -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+          <i class="fa fa-rocket text-white text-xl"></i>
+        </div>
+        <h1 class="text-xl font-bold text-dark">技术效能评估中心</h1>
+      </div>
+      
+      <div class="flex items-center space-x-6">
+        <div class="hidden md:flex items-center space-x-4">
+          <button class="text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-calendar-o"></i>
+            <span class="ml-1">2024 Q3</span>
+          </button>
+          <button class="text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-refresh"></i>
+          </button>
+          <button class="text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-download"></i>
+          </button>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+          <img src="https://picsum.photos/id/1005/40/40" alt="用户头像" class="w-8 h-8 rounded-full object-cover border-2 border-primary">
+          <span class="hidden md:inline font-medium">张开发</span>
+          <i class="fa fa-chevron-down text-xs text-gray-500"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-6">
+    <!-- 总体评分卡片 -->
+    <section class="mb-8">
+      <div class="bg-gradient-to-r from-primary to-accent rounded-2xl p-6 md:p-8 text-white card-shadow">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div>
+            <h2 class="text-[clamp(1.25rem,3vw,1.75rem)] font-bold mb-2">个人效能综合评估</h2>
+            <p class="text-white/80 max-w-2xl">基于五大维度的全方位评估，帮助你了解自己的优势与待提升领域</p>
+          </div>
+          
+          <div class="mt-6 md:mt-0 flex flex-col items-center">
+            <div class="relative w-32 h-32 mb-2">
+              <!-- 环形进度条背景 -->
+              <svg class="w-full h-full progress-ring">
+                <circle cx="64" cy="64" r="56" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="12"/>
+                <!-- 环形进度条 -->
+                <circle cx="64" cy="64" r="56" fill="none" stroke="white" stroke-width="12" 
+                        stroke-dasharray="351.86" stroke-dashoffset="88" class="transition-all duration-1000"/>
+              </svg>
+              <!-- 评分文字 -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-4xl font-bold">75</span>
+                <span class="text-sm text-white/80">良好</span>
+              </div>
+            </div>
+            <span class="text-sm text-white/80">较上季度提升 5 分</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 核心指标概览 -->
+    <section class="mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-dark">核心效能指标</h2>
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-500">时间范围:</span>
+          <select class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary/50">
+            <option>本季度</option>
+            <option>上季度</option>
+            <option>本年度</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- 指标卡片 1 -->
+        <div class="bg-white rounded-xl p-5 card-shadow card-hover border border-gray-100">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <span class="text-sm text-gray-500">代码质量指数</span>
+              <h3 class="text-2xl font-bold mt-1">82<span class="text-sm font-normal text-gray-500 ml-1">/100</span></h3>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <i class="fa fa-code text-primary"></i>
+            </div>
+          </div>
+          <div class="flex items-center text-secondary text-sm">
+            <i class="fa fa-arrow-up mr-1"></i>
+            <span>较上月提升 3 分</span>
+          </div>
+        </div>
+        
+        <!-- 指标卡片 2 -->
+        <div class="bg-white rounded-xl p-5 card-shadow card-hover border border-gray-100">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <span class="text-sm text-gray-500">开发效率</span>
+              <h3 class="text-2xl font-bold mt-1">68<span class="text-sm font-normal text-gray-500 ml-1">/100</span></h3>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
+              <i class="fa fa-tachometer text-warning"></i>
+            </div>
+          </div>
+          <div class="flex items-center text-danger text-sm">
+            <i class="fa fa-arrow-down mr-1"></i>
+            <span>较上月下降 2 分</span>
+          </div>
+        </div>
+        
+        <!-- 指标卡片 3 -->
+        <div class="bg-white rounded-xl p-5 card-shadow card-hover border border-gray-100">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <span class="text-sm text-gray-500">协作效能</span>
+              <h3 class="text-2xl font-bold mt-1">85<span class="text-sm font-normal text-gray-500 ml-1">/100</span></h3>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+              <i class="fa fa-users text-accent"></i>
+            </div>
+          </div>
+          <div class="flex items-center text-secondary text-sm">
+            <i class="fa fa-arrow-up mr-1"></i>
+            <span>较上月提升 5 分</span>
+          </div>
+        </div>
+        
+        <!-- 指标卡片 4 -->
+        <div class="bg-white rounded-xl p-5 card-shadow card-hover border border-gray-100">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <span class="text-sm text-gray-500">学习成长</span>
+              <h3 class="text-2xl font-bold mt-1">65<span class="text-sm font-normal text-gray-500 ml-1">/100</span></h3>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
+              <i class="fa fa-graduation-cap text-secondary"></i>
+            </div>
+          </div>
+          <div class="flex items-center text-secondary text-sm">
+            <i class="fa fa-arrow-up mr-1"></i>
+            <span>较上月提升 1 分</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 详细分析区域 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- 左侧：维度雷达图 -->
+      <div class="lg:col-span-1 bg-white rounded-xl p-5 card-shadow border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4">效能维度分布</h3>
+        <div class="aspect-square flex items-center justify-center">
+          <canvas id="radarChart"></canvas>
+        </div>
+        <div class="mt-4 text-sm text-gray-500">
+          <p>雷达图展示五大维度的平衡情况，帮助识别优势与短板</p>
+        </div>
+      </div>
+      
+      <!-- 右侧：指标详情 -->
+      <div class="lg:col-span-2 bg-white rounded-xl p-5 card-shadow border border-gray-100">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold">关键指标详情</h3>
+          <div class="relative">
+            <select class="appearance-none text-sm border border-gray-200 rounded-lg px-3 py-1.5 pr-8 bg-white focus:outline-none focus:ring-2 focus:ring-primary/50">
+              <option>全部维度</option>
+              <option>代码质量</option>
+              <option>开发效率</option>
+              <option>协作效能</option>
+              <option>学习成长</option>
+              <option>自动化流程</option>
+            </select>
+            <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 pointer-events-none"></i>
+          </div>
+        </div>
+        
+        <!-- 指标详情列表 -->
+        <div class="space-y-5">
+          <!-- 指标项 1 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex items-center">
+                <i class="fa fa-check-circle text-secondary mr-2"></i>
+                <span class="font-medium">测试覆盖率</span>
+              </div>
+              <span class="text-sm font-medium">85%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-secondary h-2.5 rounded-full" style="width: 85%"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-xs text-gray-500">
+              <span>目标: ≥80%</span>
+              <span class="text-secondary">超出目标 5%</span>
+            </div>
+          </div>
+          
+          <!-- 指标项 2 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex items-center">
+                <i class="fa fa-exclamation-circle text-warning mr-2"></i>
+                <span class="font-medium">专注时间占比</span>
+              </div>
+              <span class="text-sm font-medium">55%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-warning h-2.5 rounded-full" style="width: 55%"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-xs text-gray-500">
+              <span>目标: ≥60%</span>
+              <span class="text-danger">低于目标 5%</span>
+            </div>
+          </div>
+          
+          <!-- 指标项 3 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex items-center">
+                <i class="fa fa-check-circle text-secondary mr-2"></i>
+                <span class="font-medium">PR审查响应时长</span>
+              </div>
+              <span class="text-sm font-medium">3.5小时</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-secondary h-2.5 rounded-full" style="width: 88%"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-xs text-gray-500">
+              <span>目标: ≤4小时</span>
+              <span class="text-secondary">符合目标</span>
+            </div>
+          </div>
+          
+          <!-- 指标项 4 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex items-center">
+                <i class="fa fa-exclamation-circle text-warning mr-2"></i>
+                <span class="font-medium">新技术使用占比</span>
+              </div>
+              <span class="text-sm font-medium">10%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-warning h-2.5 rounded-full" style="width: 67%"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-xs text-gray-500">
+              <span>目标: ≥15%</span>
+              <span class="text-danger">低于目标 5%</span>
+            </div>
+          </div>
+          
+          <!-- 指标项 5 -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex items-center">
+                <i class="fa fa-check-circle text-secondary mr-2"></i>
+                <span class="font-medium">CI/CD流水线成功率</span>
+              </div>
+              <span class="text-sm font-medium">96%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-secondary h-2.5 rounded-full" style="width: 96%"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-xs text-gray-500">
+              <span>目标: ≥95%</span>
+              <span class="text-secondary">超出目标 1%</span>
+            </div>
+          </div>
+        </div>
+        
+        <button class="mt-6 w-full py-2 text-primary border border-primary/30 rounded-lg text-sm hover:bg-primary/5 transition-colors">
+          查看全部指标 <i class="fa fa-chevron-right ml-1 text-xs"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 趋势分析与改进建议 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- 趋势分析 -->
+      <div class="lg:col-span-2 bg-white rounded-xl p-5 card-shadow border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4">效能趋势分析</h3>
+        <div class="h-64">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- 改进建议 -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4">个性化改进建议</h3>
+        <div class="space-y-4">
+          <div class="p-3 bg-warning/10 rounded-lg border border-warning/20">
+            <h4 class="font-medium text-warning flex items-center">
+              <i class="fa fa-lightbulb-o mr-2"></i> 提升开发效率
+            </h4>
+            <p class="text-sm text-gray-600 mt-1">每天安排2个3小时的专注时段，关闭邮件和消息通知，减少上下文切换。</p>
+          </div>
+          
+          <div class="p-3 bg-accent/10 rounded-lg border border-accent/20">
+            <h4 class="font-medium text-accent flex items-center">
+              <i class="fa fa-lightbulb-o mr-2"></i> 增加技术探索
+            </h4>
+            <p class="text-sm text-gray-600 mt-1">每两周安排4小时学习新技术，本季度建议关注微前端或Serverless相关技术。</p>
+          </div>
+          
+          <div class="p-3 bg-primary/10 rounded-lg border border-primary/20">
+            <h4 class="font-medium text-primary flex items-center">
+              <i class="fa fa-trophy mr-2"></i> 保持优势
+            </h4>
+            <p class="text-sm text-gray-600 mt-1">PR审查响应及时是你的优势，建议分享你的高效协作经验给团队其他成员。</p>
+          </div>
+        </div>
+        
+        <button class="mt-5 w-full py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">
+          生成详细提升计划
+        </button>
+      </div>
+    </div>
+    
+    <!-- 维度详情卡片 -->
+    <section class="mb-8">
+      <h2 class="text-xl font-bold text-dark mb-6">维度深度分析</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 维度卡片 1 -->
+        <div class="bg-white rounded-xl overflow-hidden card-shadow card-hover border border-gray-100">
+          <div class="p-5 border-b border-gray-100">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold flex items-center">
+                <i class="fa fa-code text-primary mr-2"></i>
+                代码质量
+              </h3>
+              <span class="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">82分</span>
+            </div>
+          </div>
+          
+          <div class="p-5">
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>静态代码分析问题数</span>
+                  <span>3个/千行</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                  <div class="bg-primary h-2 rounded-full" style="width: 60%"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>缺陷逃逸率</span>
+                  <span>8%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                  <div class="bg-primary h-2 rounded-full" style="width: 80%"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>技术债务指数</span>
+                  <span>3天工作量</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                  <div class="bg-primary h-2 rounded-full" style="width: 70%"></div>
+                </div>
+              </div>
+            </div>
+            
+            <button class="mt-4 w-full py-2 text-primary border border-primary/30 rounded-lg text-sm hover:bg-primary/5 transition-colors">
+              查看详细分析
+            </button>
+          </div>
+        </div>
+        
+        <!-- 维度卡片 2 -->
+        <div class="bg-white rounded-xl overflow-hidden card-shadow card-hover border border-gray-100">
+          <div class="p-5 border-b border-gray-100">
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold flex items-center">
+                <i class="fa fa-tachometer text-warning mr-2"></i>
+                开发效率
+              </h3>
+              <span class="px-2 py-1 bg-warning/10 text-warning text-xs rounded-full">68分</span>
+            </div>
+          </div>
+          
+          <div class="p-5">
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>任务周期时间</span>
+                  <span>28小时</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                  <div class="bg-warning h-2 rounded-full" style="width: 70%"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>上下文切换次数</span>
+                  <span>7次/天</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                  <div class="bg-warning h-2 rounded-full" style="width: 50%"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>阻塞时间占比</span>
+                  <span>18%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                  <div class="bg-warning h-2 rounded-full" style="width: 60%"></div>
+                </div>
+              </div>
+            </div>
+            
+            <button class="mt-4 w-full py-2 text-warning border border-warning/30 rounded-lg text-sm hover:bg-warning/5 transition-colors">
+              查看详细分析
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-dark text-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <div class="flex items-center space-x-2 mb-2">
+            <i class="fa fa-rocket text-primary text-xl"></i>
+            <h2 class="text-xl font-bold">技术效能评估中心</h2>
+          </div>
+          <p class="text-gray-400 text-sm">
+            助力开发者持续成长的全方位评估工具
+          </p>
+        </div>
+        
+        <div class="flex flex-wrap justify-center gap-x-8 gap-y-4 text-gray-400">
+          <a href="#" class="hover:text-white transition-colors">关于系统</a>
+          <a href="#" class="hover:text-white transition-colors">指标说明</a>
+          <a href="#" class="hover:text-white transition-colors">使用指南</a>
+          <a href="#" class="hover:text-white transition-colors">反馈建议</a>
+          <a href="#" class="hover:text-white transition-colors">联系我们</a>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500 text-sm">
+        <p>© 2024 技术效能评估中心 | 保护开发者隐私 · 数据仅用于个人成长</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 页面加载完成后初始化图表
+    document.addEventListener('DOMContentLoaded', function() {
+      // 雷达图 - 效能维度分布
+      const radarCtx = document.getElementById('radarChart').getContext('2d');
+      const radarChart = new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+          labels: ['代码质量', '开发效率', '协作效能', '学习成长', '自动化流程'],
+          datasets: [{
+            label: '当前评分',
+            data: [82, 68, 85, 65, 80],
+            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+            borderColor: 'rgba(37, 99, 235, 1)',
+            pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(37, 99, 235, 1)'
+          }, {
+            label: '团队平均',
+            data: [75, 70, 72, 60, 75],
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+            borderColor: 'rgba(16, 185, 129, 1)',
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(16, 185, 129, 1)'
+          }]
+        },
+        options: {
+          scales: {
+            r: {
+              angleLines: {
+                display: true,
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
+              suggestedMin: 50,
+              suggestedMax: 100,
+              ticks: {
+                stepSize: 10,
+                backdropColor: 'transparent'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                padding: 15
+              }
+            }
+          }
+        }
+      });
+      
+      // 趋势图 - 效能变化趋势
+      const trendCtx = document.getElementById('trendChart').getContext('2d');
+      const trendChart = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+          datasets: [{
+            label: '代码质量',
+            data: [72, 75, 78, 76, 80, 82],
+            borderColor: 'rgba(37, 99, 235, 1)',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            tension: 0.3,
+            fill: false
+          }, {
+            label: '开发效率',
+            data: [70, 73, 71, 69, 70, 68],
+            borderColor: 'rgba(245, 158, 11, 1)',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            tension: 0.3,
+            fill: false
+          }, {
+            label: '协作效能',
+            data: [75, 76, 78, 80, 83, 85],
+            borderColor: 'rgba(139, 92, 246, 1)',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            tension: 0.3,
+            fill: false
+          }, {
+            label: '综合评分',
+            data: [68, 70, 72, 71, 73, 75],
+            borderColor: 'rgba(16, 185, 129, 1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.3,
+            fill: true,
+            borderWidth: 2.5,
+            pointRadius: 3,
+            pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          scales: {
+            y: {
+              min: 50,
+              max: 100,
+              ticks: {
+                stepSize: 10
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                padding: 15
+              }
+            }
+          }
+        }
+      });
+      
+      // 添加卡片悬停动画效果
+      const cards = document.querySelectorAll('.card-hover');
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.classList.add('shadow-lg');
+        });
+        card.addEventListener('mouseleave', function() {
+          this.classList.remove('shadow-lg');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
