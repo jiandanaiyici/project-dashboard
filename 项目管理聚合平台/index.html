@@ -1,0 +1,1392 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目管理与人员监控聚合平台</title>
+  <!-- 外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6.26.0/babel.min.js"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            success: '#52C41A',
+            warning: '#FAAD14',
+            danger: '#FF4D4F',
+            info: '#1890FF',
+            dark: '#1D2129',
+            'gray-light': '#F2F3F5',
+            'gray-medium': '#C9CDD4'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .card-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .hover-lift {
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-dark min-h-screen flex flex-col">
+  <div id="app" class="flex flex-col h-screen overflow-hidden"></div>
+
+  <script type="text/babel">
+    // 模拟数据
+    const mockData = {
+      // 项目数据
+      projects: [
+        { id: 1, name: "电商平台重构", status: "进行中", progress: 65, members: 12, riskLevel: "低" },
+        { id: 2, name: "用户管理系统", status: "测试中", progress: 85, members: 8, riskLevel: "中" },
+        { id: 3, name: "支付网关升级", status: "规划中", progress: 10, members: 5, riskLevel: "低" },
+        { id: 4, name: "数据分析平台", status: "进行中", progress: 40, members: 15, riskLevel: "高" }
+      ],
+      
+      // 应用数据
+      applications: [
+        { id: 1, name: "移动端APP", product: "电商平台", pv: 125000, uv: 45000, errorRate: 0.3, responseTime: 230, whiteScreenTime: 180 },
+        { id: 2, name: "管理后台", product: "电商平台", pv: 15000, uv: 3200, errorRate: 0.1, responseTime: 350, whiteScreenTime: 210 },
+        { id: 3, name: "用户中心", product: "用户系统", pv: 85000, uv: 32000, errorRate: 0.2, responseTime: 190, whiteScreenTime: 150 },
+        { id: 4, name: "支付接口", product: "支付系统", pv: 62000, uv: 28000, errorRate: 0.05, responseTime: 150, whiteScreenTime: 0 }
+      ],
+      
+      // 人员数据
+      personnel: [
+        { id: 1, name: "张三", role: "产品经理", project: "电商平台重构", status: "在职", performance: 4.8 },
+        { id: 2, name: "李四", role: "项目经理", project: "用户管理系统", status: "在职", performance: 4.6 },
+        { id: 3, name: "王五", role: "交付经理", project: "支付网关升级", status: "在职", performance: 4.7 },
+        { id: 4, name: "赵六", role: "前端开发", project: "电商平台重构", status: "已离职", performance: 4.5, exitEvaluation: "优秀的团队贡献者，技术能力强" },
+        { id: 5, name: "钱七", role: "后端开发", project: "数据分析平台", status: "在职", performance: 4.3 },
+        { id: 6, name: "孙八", role: "测试工程师", project: "用户管理系统", status: "调动中", performance: 4.4 }
+      ],
+      
+      // 人员流动数据
+      personnelMovement: {
+        month: ["1月", "2月", "3月", "4月", "5月", "6月"],
+        join: [5, 8, 3, 6, 4, 7],
+        leave: [2, 3, 1, 4, 2, 3],
+        transfer: [3, 5, 4, 2, 6, 4]
+      },
+      
+      // 性能趋势数据
+      performanceTrend: {
+        date: ["6/1", "6/8", "6/15", "6/22", "6/29", "7/6"],
+        responseTime: [230, 245, 220, 210, 235, 225],
+        errorRate: [0.3, 0.35, 0.28, 0.25, 0.27, 0.24],
+        whiteScreenTime: [180, 190, 175, 160, 170, 165]
+      },
+      
+      // 用户分布数据
+      userDistribution: {
+        regions: ["华东", "华北", "华南", "西部", "东北"],
+        percentages: [35, 25, 20, 15, 5]
+      }
+    };
+
+    // 组件：导航栏
+    const Navbar = () => {
+      return (
+        <nav className="bg-white border-b border-gray-200 shadow-sm z-10">
+          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 flex items-center">
+                  <i className="fa fa-dashboard text-primary text-2xl mr-2"></i>
+                  <span className="font-bold text-xl text-primary">项目管理聚合平台</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <button className="p-2 rounded-full hover:bg-gray-100 relative">
+                  <i className="fa fa-bell-o text-gray-600"></i>
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+                </button>
+                <div className="flex items-center">
+                  <img className="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/1005/200/200" alt="用户头像" />
+                  <span className="ml-2 text-sm font-medium">张经理</span>
+                  <i className="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+      );
+    };
+
+    // 组件：侧边栏
+    const Sidebar = ({ activeMenu, onMenuChange }) => {
+      return (
+        <div className="bg-white w-64 border-r border-gray-200 h-full flex-shrink-0">
+          <div className="p-4">
+            <div className="text-sm font-medium text-gray-500 uppercase tracking-wider">主菜单</div>
+            <nav className="mt-4 space-y-1">
+              {[
+                { id: 'dashboard', name: '总览', icon: 'fa-tachometer' },
+                { id: 'projects', name: '项目管理', icon: 'fa-briefcase' },
+                { id: 'applications', name: '应用监控', icon: 'fa-cubes' },
+                { id: 'personnel', name: '人员管理', icon: 'fa-users' },
+                { id: 'performance', name: '性能分析', icon: 'fa-line-chart' },
+                { id: 'releases', name: '发布管理', icon: 'fa-rocket' },
+                { id: 'settings', name: '系统设置', icon: 'fa-cog' }
+              ].map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => onMenuChange(item.id)}
+                  className={`w-full flex items-center px-3 py-2 text-sm rounded-md ${
+                    activeMenu === item.id
+                      ? 'bg-primary/10 text-primary font-medium'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <i className={`fa ${item.icon} mr-3`}></i>
+                  {item.name}
+                </button>
+              ))}
+            </nav>
+          </div>
+          
+          <div className="p-4 border-t border-gray-200">
+            <div className="text-sm font-medium text-gray-500 uppercase tracking-wider">快速访问</div>
+            <div className="mt-4 space-y-1">
+              {[
+                { id: 'risk', name: '风险预警', count: 3, color: 'danger' },
+                { id: 'pending', name: '待处理事项', count: 7, color: 'warning' }
+              ].map(item => (
+                <button
+                  key={item.id}
+                  className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100"
+                >
+                  <div className="flex items-center">
+                    <i className={`fa fa-exclamation-circle mr-3 text-${item.color}`}></i>
+                    {item.name}
+                  </div>
+                  <span className={`inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none rounded-full bg-${item.color}/10 text-${item.color}`}>
+                    {item.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：项目卡片
+    const ProjectCard = ({ project }) => {
+      // 确定进度条颜色
+      let progressColor = 'bg-success';
+      if (project.riskLevel === '中') progressColor = 'bg-warning';
+      if (project.riskLevel === '高') progressColor = 'bg-danger';
+      
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-4 hover-lift card-shadow">
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="font-medium text-gray-900">{project.name}</h3>
+            <span className={`px-2 py-1 text-xs rounded-full ${
+              project.status === '进行中' ? 'bg-primary/10 text-primary' :
+              project.status === '测试中' ? 'bg-info/10 text-info' :
+              'bg-gray-100 text-gray-600'
+            }`}>
+              {project.status}
+            </span>
+          </div>
+          
+          <div className="mb-3">
+            <div className="flex justify-between text-xs text-gray-500 mb-1">
+              <span>进度</span>
+              <span>{project.progress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className={`${progressColor} h-2 rounded-full`} style={{ width: `${project.progress}%` }}></div>
+            </div>
+          </div>
+          
+          <div className="flex justify-between text-sm">
+            <div className="flex items-center text-gray-600">
+              <i className="fa fa-users mr-1"></i>
+              <span>{project.members} 成员</span>
+            </div>
+            <div className={`flex items-center text-${
+              project.riskLevel === '低' ? 'success' : 
+              project.riskLevel === '中' ? 'warning' : 'danger'
+            }`}>
+              <i className="fa fa-shield mr-1"></i>
+              <span>{project.riskLevel}风险</span>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：应用卡片
+    const ApplicationCard = ({ app }) => {
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-4 hover-lift card-shadow">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <h3 className="font-medium text-gray-900">{app.name}</h3>
+              <p className="text-xs text-gray-500">{app.product}</p>
+            </div>
+            <button className="text-gray-400 hover:text-gray-600">
+              <i className="fa fa-ellipsis-v"></i>
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="bg-gray-50 p-2 rounded">
+              <p className="text-xs text-gray-500">PV</p>
+              <p className="font-medium">{app.pv.toLocaleString()}</p>
+            </div>
+            <div className="bg-gray-50 p-2 rounded">
+              <p className="text-xs text-gray-500">UV</p>
+              <p className="font-medium">{app.uv.toLocaleString()}</p>
+            </div>
+            <div className="bg-gray-50 p-2 rounded">
+              <p className="text-xs text-gray-500">错误率</p>
+              <p className={`font-medium ${app.errorRate > 0.2 ? 'text-danger' : 'text-success'}`}>{app.errorRate}%</p>
+            </div>
+            <div className="bg-gray-50 p-2 rounded">
+              <p className="text-xs text-gray-500">响应时间(ms)</p>
+              <p className={`font-medium ${app.responseTime > 300 ? 'text-danger' : app.responseTime > 200 ? 'text-warning' : 'text-success'}`}>{app.responseTime}</p>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：人员卡片
+    const PersonnelCard = ({ person }) => {
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-4 hover-lift card-shadow">
+          <div className="flex items-center">
+            <img className="h-12 w-12 rounded-full object-cover" src={`https://picsum.photos/id/${1010 + person.id}/200/200`} alt={person.name} />
+            <div className="ml-3 flex-1">
+              <div className="flex justify-between">
+                <h3 className="font-medium text-gray-900">{person.name}</h3>
+                <span className={`px-2 py-0.5 text-xs rounded-full ${
+                  person.status === '在职' ? 'bg-success/10 text-success' :
+                  person.status === '已离职' ? 'bg-gray-100 text-gray-600' :
+                  'bg-warning/10 text-warning'
+                }`}>
+                  {person.status}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">{person.role}</p>
+              <p className="text-xs text-gray-500">{person.project}</p>
+            </div>
+          </div>
+          
+          <div className="mt-3">
+            <div className="flex justify-between text-xs text-gray-500 mb-1">
+              <span>绩效评分</span>
+              <span>{person.performance}/5.0</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1.5">
+              <div className="bg-primary h-1.5 rounded-full" style={{ width: `${person.performance * 20}%` }}></div>
+            </div>
+          </div>
+          
+          {person.exitEvaluation && (
+            <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+              <p className="font-medium text-gray-700 mb-1">离职评价：</p>
+              <p>{person.exitEvaluation}</p>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // 组件：环形图
+    const DoughnutChart = ({ title, data, labels, colors }) => {
+      const chartRef = React.useRef(null);
+      const chartInstance = React.useRef(null);
+      
+      React.useEffect(() => {
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
+        }
+        
+        const ctx = chartRef.current.getContext('2d');
+        chartInstance.current = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: colors || [
+                '#165DFF', '#36CFC9', '#52C41A', '#FAAD14', '#FF4D4F'
+              ],
+              borderWidth: 0,
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  boxWidth: 12,
+                  padding: 15
+                }
+              },
+              title: {
+                display: true,
+                text: title,
+                font: {
+                  size: 14,
+                  weight: 'normal'
+                },
+                padding: {
+                  bottom: 15
+                }
+              }
+            },
+            cutout: '70%'
+          }
+        });
+        
+        return () => {
+          if (chartInstance.current) {
+            chartInstance.current.destroy();
+          }
+        };
+      }, [title, data, labels, colors]);
+      
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-4 h-full">
+          <canvas ref={chartRef} className="w-full h-[250px]"></canvas>
+        </div>
+      );
+    };
+
+    // 组件：趋势图
+    const LineChart = ({ title, datasets, labels }) => {
+      const chartRef = React.useRef(null);
+      const chartInstance = React.useRef(null);
+      
+      React.useEffect(() => {
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
+        }
+        
+        const ctx = chartRef.current.getContext('2d');
+        chartInstance.current = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  boxWidth: 12,
+                  padding: 15
+                }
+              },
+              title: {
+                display: true,
+                text: title,
+                font: {
+                  size: 14,
+                  weight: 'normal'
+                },
+                padding: {
+                  bottom: 15
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: false,
+                grid: {
+                  borderDash: [2, 4]
+                }
+              }
+            },
+            interaction: {
+              mode: 'index',
+              intersect: false
+            },
+            elements: {
+              point: {
+                radius: 2,
+                hoverRadius: 5
+              },
+              line: {
+                tension: 0.3
+              }
+            }
+          }
+        });
+        
+        return () => {
+          if (chartInstance.current) {
+            chartInstance.current.destroy();
+          }
+        };
+      }, [title, datasets, labels]);
+      
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-4 h-full">
+          <canvas ref={chartRef} className="w-full h-[250px]"></canvas>
+        </div>
+      );
+    };
+
+    // 组件：总览页面
+    const DashboardPage = () => {
+      // 性能趋势数据集
+      const performanceDatasets = [
+        {
+          label: '响应时间(ms)',
+          data: mockData.performanceTrend.responseTime,
+          borderColor: '#165DFF',
+          backgroundColor: 'rgba(22, 93, 255, 0.1)',
+          fill: true
+        },
+        {
+          label: '错误率(%)',
+          data: mockData.performanceTrend.errorRate,
+          borderColor: '#FF4D4F',
+          backgroundColor: 'rgba(255, 77, 79, 0.1)',
+          fill: true,
+          yAxisID: 'y1'
+        }
+      ];
+      
+      // 人员流动数据集
+      const movementDatasets = [
+        {
+          label: '入职',
+          data: mockData.personnelMovement.join,
+          borderColor: '#52C41A',
+          backgroundColor: 'rgba(82, 196, 26, 0.1)',
+          fill: true
+        },
+        {
+          label: '离职',
+          data: mockData.personnelMovement.leave,
+          borderColor: '#FF4D4F',
+          backgroundColor: 'rgba(255, 77, 79, 0.1)',
+          fill: true
+        },
+        {
+          label: '调动',
+          data: mockData.personnelMovement.transfer,
+          borderColor: '#FAAD14',
+          backgroundColor: 'rgba(250, 173, 20, 0.1)',
+          fill: true
+        }
+      ];
+
+      return (
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">平台总览</h1>
+            <p className="text-gray-500 mt-1">查看项目、应用和人员的关键指标</p>
+          </div>
+          
+          {/* 关键指标卡片 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {[
+              { title: '活跃项目', value: mockData.projects.length, icon: 'fa-briefcase', color: 'primary' },
+              { title: '应用总数', value: mockData.applications.length, icon: 'fa-cubes', color: 'info' },
+              { title: '团队成员', value: mockData.personnel.filter(p => p.status === '在职').length, icon: 'fa-users', color: 'success' },
+              { title: '本月调动', value: mockData.personnelMovement.transfer[mockData.personnelMovement.transfer.length - 1], icon: 'fa-exchange', color: 'warning' }
+            ].map((item, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm p-4 hover-lift card-shadow">
+                <div className="flex items-center">
+                  <div className={`p-3 rounded-lg bg-${item.color}/10 text-${item.color}`}>
+                    <i className={`fa ${item.icon} text-xl`}></i>
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm text-gray-500">{item.title}</p>
+                    <p className="text-2xl font-bold text-gray-900">{item.value}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* 图表行 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <LineChart 
+              title="应用性能趋势" 
+              datasets={performanceDatasets} 
+              labels={mockData.performanceTrend.date} 
+            />
+            <LineChart 
+              title="人员流动趋势" 
+              datasets={movementDatasets} 
+              labels={mockData.personnelMovement.month} 
+            />
+          </div>
+          
+          {/* 环形图行 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <DoughnutChart 
+              title="用户地区分布" 
+              data={mockData.userDistribution.percentages} 
+              labels={mockData.userDistribution.regions} 
+            />
+            <DoughnutChart 
+              title="项目状态分布" 
+              data={[
+                mockData.projects.filter(p => p.status === '进行中').length,
+                mockData.projects.filter(p => p.status === '测试中').length,
+                mockData.projects.filter(p => p.status === '规划中').length
+              ]} 
+              labels={['进行中', '测试中', '规划中']} 
+              colors={['#165DFF', '#1890FF', '#C9CDD4']}
+            />
+          </div>
+          
+          {/* 最近项目 */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">最近项目</h2>
+              <button className="text-primary text-sm hover:underline">查看全部</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {mockData.projects.map(project => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：项目管理页面
+    const ProjectsPage = () => {
+      return (
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">项目管理</h1>
+            <p className="text-gray-500 mt-1">管理所有项目的进度、质量和团队</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+              <div className="flex items-center mb-3 md:mb-0">
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="搜索项目..." 
+                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                  />
+                  <i className="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <select className="ml-3 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                  <option>所有状态</option>
+                  <option>进行中</option>
+                  <option>测试中</option>
+                  <option>规划中</option>
+                </select>
+              </div>
+              <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center">
+                <i className="fa fa-plus mr-2"></i> 新建项目
+              </button>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目名称</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">进度</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">团队规模</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">风险等级</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">预计发布</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {mockData.projects.map(project => (
+                    <tr key={project.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{project.name}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          project.status === '进行中' ? 'bg-primary/10 text-primary' :
+                          project.status === '测试中' ? 'bg-info/10 text-info' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {project.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="w-32 bg-gray-200 rounded-full h-2">
+                          <div className={`bg-primary h-2 rounded-full`} style={{ width: `${project.progress}%` }}></div>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">{project.progress}%</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {project.members} 人
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          project.riskLevel === '低' ? 'bg-success/10 text-success' :
+                          project.riskLevel === '中' ? 'bg-warning/10 text-warning' :
+                          'bg-danger/10 text-danger'
+                        }`}>
+                          {project.riskLevel}风险
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        2023-{7 + Math.floor(Math.random() * 6)}-{10 + Math.floor(Math.random() * 20)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button className="text-primary hover:text-primary/80 mr-3">详情</button>
+                        <button className="text-gray-500 hover:text-gray-700 mr-3">编辑</button>
+                        <button className="text-gray-500 hover:text-gray-700">
+                          <i className="fa fa-ellipsis-v"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          {/* 项目质量管控流程 */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">项目发布质量管控流程</h2>
+              <button className="text-primary text-sm hover:underline">查看详情</button>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="relative">
+                {/* 连接线 */}
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                
+                {/* 流程步骤 */}
+                <div className="space-y-8 relative">
+                  {[
+                    { step: 1, title: '需求评审', desc: '产品、开发、测试三方确认需求完整性和可行性' },
+                    { step: 2, title: '开发完成', desc: '开发团队完成功能开发并进行自测' },
+                    { step: 3, title: '代码审查', desc: '通过code review确保代码质量和规范' },
+                    { step: 4, title: '测试验证', desc: '测试团队进行全面测试并提交测试报告' },
+                    { step: 5, title: '性能测试', desc: '验证系统性能指标是否达到预期标准' },
+                    { step: 6, title: '发布审批', desc: '交付经理审核并批准发布申请' },
+                    { step: 7, title: '灰度发布', desc: '小范围发布并监控系统稳定性' },
+                    { step: 8, title: '正式发布', desc: '全量发布并进行发布后验证' }
+                  ].map((item, index) => (
+                    <div key={item.step} className="flex">
+                      <div className="flex-shrink-0 relative z-10">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          index < 5 ? 'bg-success text-white' : 'bg-gray-200 text-gray-500'
+                        }`}>
+                          {item.step}
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-base font-medium text-gray-900">{item.title}</h3>
+                        <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
+                        {index < 5 && (
+                          <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success">
+                            已完成
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：应用监控页面
+    const ApplicationsPage = () => {
+      return (
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">应用监控</h1>
+            <p className="text-gray-500 mt-1">监控所有应用的性能指标和用户数据</p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="lg:col-span-2">
+              <LineChart 
+                title="应用响应时间趋势" 
+                datasets={[
+                  {
+                    label: '移动端APP',
+                    data: [230, 245, 220, 210, 235, 225],
+                    borderColor: '#165DFF',
+                    backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                    fill: true
+                  },
+                  {
+                    label: '管理后台',
+                    data: [350, 365, 340, 330, 345, 335],
+                    borderColor: '#36CFC9',
+                    backgroundColor: 'rgba(54, 207, 201, 0.1)',
+                    fill: true
+                  },
+                  {
+                    label: '用户中心',
+                    data: [190, 205, 180, 170, 185, 175],
+                    borderColor: '#52C41A',
+                    backgroundColor: 'rgba(82, 196, 26, 0.1)',
+                    fill: true
+                  }
+                ]} 
+                labels={mockData.performanceTrend.date} 
+              />
+            </div>
+            <div>
+              <DoughnutChart 
+                title="应用错误率分布" 
+                data={mockData.applications.map(app => app.errorRate)} 
+                labels={mockData.applications.map(app => app.name)} 
+              />
+            </div>
+          </div>
+          
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">应用列表</h2>
+              <button className="text-primary text-sm hover:underline">查看全部</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {mockData.applications.map(app => (
+                <ApplicationCard key={app.id} app={app} />
+              ))}
+            </div>
+          </div>
+          
+          {/* 应用发布规范 */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">应用发布规范管控</h2>
+              <button className="text-primary text-sm hover:underline">查看规范文档</button>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-base font-medium text-gray-900 mb-3 flex items-center">
+                    <i className="fa fa-check-circle text-success mr-2"></i> 发布前检查项
+                  </h3>
+                  <ul className="space-y-2 text-sm">
+                    {[
+                      '代码已通过审查并合并到主分支',
+                      '单元测试覆盖率达到80%以上',
+                      '已完成集成测试和系统测试',
+                      '性能测试结果满足要求',
+                      '安全漏洞扫描无高危问题',
+                      '文档已更新并同步'
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <i className="fa fa-angle-right text-gray-400 mt-1 mr-2"></i>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="text-base font-medium text-gray-900 mb-3 flex items-center">
+                    <i className="fa fa-cogs text-primary mr-2"></i> 发布流程规范
+                  </h3>
+                  <ul className="space-y-2 text-sm">
+                    {[
+                      '小版本更新：自动构建 → 测试环境验证 → 生产环境发布',
+                      '大版本更新：自动构建 → 测试环境验证 → 预发布环境验证 → 灰度发布 → 全量发布',
+                      '紧急修复：评估影响范围 → 修复代码 → 快速验证 → 定向发布',
+                      '所有发布必须有回滚方案',
+                      '生产环境发布时间窗口：每周二、四 18:00-22:00'
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <i className="fa fa-angle-right text-gray-400 mt-1 mr-2"></i>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：人员管理页面
+    const PersonnelPage = () => {
+      return (
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">人员管理</h1>
+            <p className="text-gray-500 mt-1">管理团队成员、流动情况和绩效</p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div>
+              <DoughnutChart 
+                title="人员角色分布" 
+                data={[
+                  mockData.personnel.filter(p => p.role.includes('产品')).length,
+                  mockData.personnel.filter(p => p.role.includes('项目')).length,
+                  mockData.personnel.filter(p => p.role.includes('交付')).length,
+                  mockData.personnel.filter(p => p.role.includes('开发')).length,
+                  mockData.personnel.filter(p => p.role.includes('测试')).length
+                ]} 
+                labels={['产品', '项目经理', '交付经理', '开发', '测试']} 
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <LineChart 
+                title="人员流动统计" 
+                datasets={[
+                  {
+                    label: '入职',
+                    data: mockData.personnelMovement.join,
+                    borderColor: '#52C41A',
+                    backgroundColor: 'rgba(82, 196, 26, 0.1)',
+                    fill: true
+                  },
+                  {
+                    label: '离职',
+                    data: mockData.personnelMovement.leave,
+                    borderColor: '#FF4D4F',
+                    backgroundColor: 'rgba(255, 77, 79, 0.1)',
+                    fill: true
+                  }
+                ]} 
+                labels={mockData.personnelMovement.month} 
+              />
+            </div>
+          </div>
+          
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">团队成员</h2>
+              <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center">
+                <i className="fa fa-plus mr-2"></i> 添加成员
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {mockData.personnel.map(person => (
+                <PersonnelCard key={person.id} person={person} />
+              ))}
+            </div>
+          </div>
+          
+          {/* 人员调动与评价系统 */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">人员调动与评价系统</h2>
+              <button className="text-primary text-sm hover:underline">查看历史记录</button>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="mb-6">
+                <h3 className="text-base font-medium text-gray-900 mb-3">人员调动流程</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">员工</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">原项目</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">新项目</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">调动日期</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <img className="h-8 w-8 rounded-full" src="https://picsum.photos/id/1016/200/200" alt="" />
+                            <div className="ml-3">
+                              <div className="text-sm font-medium text-gray-900">孙八</div>
+                              <div className="text-xs text-gray-500">测试工程师</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">用户管理系统</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">数据分析平台</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-06-15</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">处理中</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button className="text-primary hover:text-primary/80">详情</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-base font-medium text-gray-900 mb-3">离职评价系统</h3>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-4">
+                    <img className="h-10 w-10 rounded-full" src="https://picsum.photos/id/1012/200/200" alt="" />
+                    <div className="ml-3">
+                      <div className="text-sm font-medium text-gray-900">赵六</div>
+                      <div className="text-xs text-gray-500">前端开发 · 已离职</div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">评价人</label>
+                      <div className="flex items-center">
+                        <img className="h-6 w-6 rounded-full" src="https://picsum.photos/id/1005/200/200" alt="" />
+                        <span className="ml-2 text-sm text-gray-700">张三（产品经理）</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">评价内容</label>
+                      <p className="text-sm text-gray-700">优秀的团队贡献者，技术能力强，解决问题效率高，在项目中多次解决关键技术难题。团队协作良好，乐于分享知识。</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">技术能力</label>
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <i key={star} className={`fa fa-star text-yellow-400 ${star <= 4 ? '' : 'text-gray-300'}`}></i>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">团队协作</label>
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <i key={star} className={`fa fa-star text-yellow-400 ${star <= 5 ? '' : 'text-gray-300'}`}></i>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button className="mt-2 text-primary text-sm hover:underline">查看完整评价</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：性能分析页面
+    const PerformancePage = () => {
+      return (
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">性能分析</h1>
+            <p className="text-gray-500 mt-1">分析应用性能指标、错误数据和用户体验</p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {mockData.applications.map(app => (
+              <div key={app.id} className="bg-white rounded-lg shadow-sm p-4 hover-lift card-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-medium text-gray-900">{app.name}</h3>
+                  <span className="text-xs text-gray-500">{app.product}</span>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">白屏时间</span>
+                      <span className={`font-medium ${app.whiteScreenTime > 200 ? 'text-danger' : app.whiteScreenTime > 150 ? 'text-warning' : 'text-success'}`}>
+                        {app.whiteScreenTime}ms
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className={`h-2 rounded-full ${app.whiteScreenTime > 200 ? 'bg-danger' : app.whiteScreenTime > 150 ? 'bg-warning' : 'bg-success'}`} 
+                           style={{ width: `${Math.min(app.whiteScreenTime / 300 * 100, 100)}%` }}></div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">响应时间</span>
+                      <span className={`font-medium ${app.responseTime > 300 ? 'text-danger' : app.responseTime > 200 ? 'text-warning' : 'text-success'}`}>
+                        {app.responseTime}ms
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className={`h-2 rounded-full ${app.responseTime > 300 ? 'bg-danger' : app.responseTime > 200 ? 'bg-warning' : 'bg-success'}`} 
+                           style={{ width: `${Math.min(app.responseTime / 500 * 100, 100)}%` }}></div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">错误率</span>
+                      <span className={`font-medium ${app.errorRate > 0.2 ? 'text-danger' : app.errorRate > 0.1 ? 'text-warning' : 'text-success'}`}>
+                        {app.errorRate}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className={`h-2 rounded-full ${app.errorRate > 0.2 ? 'bg-danger' : app.errorRate > 0.1 ? 'bg-warning' : 'bg-success'}`} 
+                           style={{ width: `${Math.min(app.errorRate / 0.5 * 100, 100)}%` }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <LineChart 
+              title="白屏时间趋势" 
+              datasets={[
+                {
+                  label: '移动端APP',
+                  data: [180, 190, 175, 160, 170, 165],
+                  borderColor: '#165DFF',
+                  backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                  fill: true
+                },
+                {
+                  label: '管理后台',
+                  data: [210, 220, 205, 195, 200, 190],
+                  borderColor: '#36CFC9',
+                  backgroundColor: 'rgba(54, 207, 201, 0.1)',
+                  fill: true
+                }
+              ]} 
+              labels={mockData.performanceTrend.date} 
+            />
+            <LineChart 
+              title="用户访问量趋势" 
+              datasets={[
+                {
+                  label: 'PV',
+                  data: [105000, 110000, 115000, 120000, 122000, 125000],
+                  borderColor: '#165DFF',
+                  backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                  fill: true
+                },
+                {
+                  label: 'UV',
+                  data: [38000, 40000, 41000, 43000, 44000, 45000],
+                  borderColor: '#52C41A',
+                  backgroundColor: 'rgba(82, 196, 26, 0.1)',
+                  fill: true,
+                  yAxisID: 'y1'
+                }
+              ]} 
+              labels={mockData.performanceTrend.date} 
+            />
+          </div>
+          
+          {/* 前端性能问题定位 */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">前端性能问题定位</h2>
+              <button className="text-primary text-sm hover:underline">查看所有问题</button>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="mb-4">
+                <h3 className="text-base font-medium text-gray-900 mb-3">最近性能问题</h3>
+                <div className="space-y-4">
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-primary/50 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-medium text-gray-900">首页加载缓慢</h4>
+                        <p className="text-sm text-gray-600 mt-1">移动端APP · 高优先级</p>
+                      </div>
+                      <span className="px-2 py-1 text-xs rounded-full bg-danger/10 text-danger">待修复</span>
+                    </div>
+                    
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                      <div className="bg-gray-50 p-2 rounded">
+                        <p className="text-xs text-gray-500">平均加载时间</p>
+                        <p className="font-medium">3.2s</p>
+                      </div>
+                      <div className="bg-gray-50 p-2 rounded">
+                        <p className="text-xs text-gray-500">影响用户比例</p>
+                        <p className="font-medium">15.3%</p>
+                      </div>
+                      <div className="bg-gray-50 p-2 rounded">
+                        <p className="text-xs text-gray-500">首次出现时间</p>
+                        <p className="font-medium">2023-06-28</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3">
+                      <p className="text-xs text-gray-500 mb-1">问题定位（基于Source Map）</p>
+                      <div className="bg-gray-50 p-3 rounded text-xs font-mono overflow-x-auto">
+                        <p className="text-danger">// 性能瓶颈代码位置</p>
+                        <p>src/components/HomeBanner/index.js:45-62</p>
+                        <p className="mt-1 text-gray-700">大型图片未做懒加载处理，导致首屏加载资源过大</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="border border-gray-200 rounded-lg p-4 hover:border-primary/50 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-medium text-gray-900">列表滚动卡顿</h4>
+                        <p className="text-sm text-gray-600 mt-1">管理后台 · 中优先级</p>
+                      </div>
+                      <span className="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">修复中</span>
+                    </div>
+                    
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                      <div className="bg-gray-50 p-2 rounded">
+                        <p className="text-xs text-gray-500">平均帧率</p>
+                        <p className="font-medium">28fps</p>
+                      </div>
+                      <div className="bg-gray-50 p-2 rounded">
+                        <p className="text-xs text-gray-500">影响用户比例</p>
+                        <p className="font-medium">8.7%</p>
+                      </div>
+                      <div className="bg-gray-50 p-2 rounded">
+                        <p className="text-xs text-gray-500">首次出现时间</p>
+                        <p className="font-medium">2023-06-25</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3">
+                      <p className="text-xs text-gray-500 mb-1">问题定位（基于Source Map）</p>
+                      <div className="bg-gray-50 p-3 rounded text-xs font-mono overflow-x-auto">
+                        <p className="text-danger">// 性能瓶颈代码位置</p>
+                        <p>src/components/DataTable/index.js:128-145</p>
+                        <p className="mt-1 text-gray-700">列表滚动时频繁触发重绘，未做虚拟列表优化</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 组件：发布管理页面
+    const ReleasesPage = () => {
+      return (
+        <div className="p-6 overflow-y-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">发布管理</h1>
+            <p className="text-gray-500 mt-1">管理应用发布记录和发布计划</p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">近期发布计划</h2>
+            
+            <div className="space-y-4">
+              {[
+                { app: '移动端APP', version: 'v2.3.0', date: '2023-07-10', status: '计划中', type: '功能发布' },
+                { app: '管理后台', version: 'v1.8.2', date: '2023-07-05', status: '测试中', type: 'Bug修复' },
+                { app: '用户中心', version: 'v3.1.0', date: '2023-07-15', status: '开发中', type: '功能发布' },
+                { app: '支付接口', version: 'v4.0.1', date: '2023-07-08', status: '计划中', type: '安全更新' }
+              ].map((item, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-primary/50 transition-colors">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between">
+                    <div>
+                      <div className="flex items-center">
+                        <h3 className="font-medium text-gray-900">{item.app}</h3>
+                        <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">{item.version}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{item.type}</p>
+                    </div>
+                    
+                    <div className="mt-3 md:mt-0 flex items-center">
+                      <span className="text-sm text-gray-600 mr-4">{item.date}</span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        item.status === '计划中' ? 'bg-gray-100 text-gray-600' :
+                        item.status === '测试中' ? 'bg-info/10 text-info' :
+                        'bg-primary/10 text-primary'
+                      }`}>
+                        {item.status}
+                      </span>
+                      <button className="ml-4 text-primary text-sm hover:underline">详情</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">发布历史</h2>
+              <div className="flex">
+                <select className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary mr-2">
+                  <option>所有应用</option>
+                  <option>移动端APP</option>
+                  <option>管理后台</option>
+                  <option>用户中心</option>
+                  <option>支付接口</option>
+                </select>
+                <button className="text-primary text-sm hover:underline">导出记录</button>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">应用名称</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">版本号</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布类型</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布时间</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布人</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">成功率</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {[
+                      { app: '移动端APP', version: 'v2.2.0', type: '功能发布', time: '2023-06-20 18:30', person: '李四', status: '成功', successRate: 100 },
+                      { app: '管理后台', version: 'v1.8.1', type: 'Bug修复', time: '2023-06-15 19:15', person: '王五', status: '成功', successRate: 100 },
+                      { app: '用户中心', version: 'v3.0.0', type: '功能发布', time: '2023-06-10 20:00', person: '张三', status: '成功', successRate: 99.8 },
+                      { app: '支付接口', version: 'v4.0.0', type: '重构', time: '2023-06-05 17:45', person: '赵六', status: '部分成功', successRate: 95.2 }
+                    ].map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.app}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.version}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            item.type === '功能发布' ? 'bg-primary/10 text-primary' :
+                            item.type === 'Bug修复' ? 'bg-success/10 text-success' :
+                            item.type === '安全更新' ? 'bg-warning/10 text-warning' :
+                            'bg-info/10 text-info'
+                          }`}>
+                            {item.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.time}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <img className="h-6 w-6 rounded-full" src={`https://picsum.photos/id/${1020 + index}/200/200`} alt="" />
+                            <span className="ml-2 text-sm text-gray-700">{item.person}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            item.status === '成功' ? 'bg-success/10 text-success' :
+                            item.status === '部分成功' ? 'bg-warning/10 text-warning' :
+                            'bg-danger/10 text-danger'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.successRate}%
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button className="text-primary hover:text-primary/80 mr-3">查看报告</button>
+                          <button className="text-gray-500 hover:text-gray-700">日志</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 主应用组件
+    const App = () => {
+      const [activeMenu, setActiveMenu] = React.useState('dashboard');
+      
+      // 根据活跃菜单渲染对应页面
+      const renderPage = () => {
+        switch (activeMenu) {
+          case 'dashboard':
+            return <DashboardPage />;
+          case 'projects':
+            return <ProjectsPage />;
+          case 'applications':
+            return <ApplicationsPage />;
+          case 'personnel':
+            return <PersonnelPage />;
+          case 'performance':
+            return <PerformancePage />;
+          case 'releases':
+            return <ReleasesPage />;
+          default:
+            return <DashboardPage />;
+        }
+      };
+      
+      return (
+        <div className="flex flex-col h-full">
+          <Navbar />
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
+            <main className="flex-1 overflow-y-auto bg-gray-50">
+              {renderPage()}
+            </main>
+          </div>
+        </div>
+      );
+    };
+
+    // 渲染应用
+    ReactDOM.render(<App />, document.getElementById('app'));
+  </script>
+</body>
+</html>
