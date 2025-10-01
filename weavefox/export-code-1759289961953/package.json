@@ -1,0 +1,14 @@
+{
+  "name": "developer-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "main": "/src/index.jsx",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "antd": "^5.16.1",
+    "@ant-design/icons": "^5.2.6",
+    "recharts": "^2.12.7",
+    "react-router-dom": "^6.22.3"
+  }
+}
