@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowStack - 项目管理</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            neutral: '#F5F7FA',
+            dark: '#1D2129',
+            success: '#52C41A',
+            warning: '#FAAD14',
+            danger: '#FF4D4F',
+            'dark-blue': '#0F2E6B',
+            'task-bug': '#FF4D4F',
+            'task-feature': '#165DFF',
+            'task-techdebt': '#FAAD14',
+            'task-research': '#36CFC9'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #165DFF 0%, #0F2E6B 100%);
+      }
+      .kanban-column {
+        min-width: 300px;
+        max-width: 300px;
+      }
+      .task-card {
+        transition: all 0.2s ease;
+      }
+      .task-card:hover {
+        transform: translateX(4px);
+      }
+      .scrollbar-thin {
+        scrollbar-width: thin;
+      }
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 4px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: rgba(156, 163, 175, 0.5);
+        border-radius: 2px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-inter text-dark min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg gradient-bg flex items-center justify-center">
+            <span class="text-white font-bold text-xl">F</span>
+          </div>
+          <span class="text-xl font-bold text-dark">FlowStack</span>
+        </div>
+        
+        <!-- 中间导航菜单 -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">全域大盘</a>
+          <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">项目管理</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">团队效能</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">发布管控</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">AI决策</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">个人看板</a>
+        </nav>
+        
+        <!-- 右侧用户区域 -->
+        <div class="flex items-center space-x-4">
+          <button class="relative p-2 text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-bell text-lg"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+          </button>
+          <div class="flex items-center space-x-2 cursor-pointer">
+            <img src="https://picsum.photos/id/1005/200/200" alt="张经理的头像" class="w-8 h-8 rounded-full object-cover border-2 border-gray-200">
+            <span class="hidden md:inline text-sm font-medium">张经理</span>
+            <i class="fa fa-angle-down text-gray-500"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 项目导航栏 -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-wrap items-center justify-between py-3">
+        <!-- 项目信息 -->
+        <div class="flex items-center">
+          <h2 class="text-lg font-semibold mr-3">支付系统重构</h2>
+          <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">进行中</span>
+          <span class="ml-4 text-sm text-gray-500 hidden md:inline">
+            <i class="fa fa-calendar-o mr-1"></i> 迭代 4/8
+          </span>
+        </div>
+        
+        <!-- 项目导航标签 -->
+        <div class="flex flex-wrap mt-3 sm:mt-0">
+          <a href="#" class="px-3 py-1.5 text-sm text-primary border-b-2 border-primary mr-1">看板</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1">迭代</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1">文档</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1">成员</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors">设置</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主内容区 -->
+  <main class="flex-grow container mx-auto px-4 py-6">
+    <!-- 页面操作区 -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      <div class="flex items-center">
+        <!-- 视图切换 -->
+        <div class="inline-flex rounded-md shadow-sm" role="group">
+          <button type="button" class="px-4 py-2 text-sm font-medium bg-primary text-white rounded-l-lg hover:bg-primary/90 transition-colors">
+            <i class="fa fa-columns mr-2"></i>看板
+          </button>
+          <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border-t border-b border-gray-200 hover:bg-gray-100 transition-colors">
+            <i class="fa fa-list mr-2"></i>列表
+          </button>
+          <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-r-lg border-t border-b border-gray-200 hover:bg-gray-100 transition-colors">
+            <i class="fa fa-calendar mr-2"></i>日历
+          </button>
+        </div>
+        
+        <!-- 过滤器 -->
+        <div class="ml-4 flex flex-wrap gap-2">
+          <div class="relative">
+            <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+              <option>所有任务</option>
+              <option>仅我的任务</option>
+              <option>已阻塞任务</option>
+              <option>即将到期</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <i class="fa fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+              <option>当前迭代</option>
+              <option>迭代 1</option>
+              <option>迭代 2</option>
+              <option>迭代 3</option>
+              <option>迭代 4</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <i class="fa fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+              <option>所有类型</option>
+              <option>Feature</option>
+              <option>Bug</option>
+              <option>Tech Debt</option>
+              <option>Research</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <i class="fa fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center mt-4 md:mt-0">
+        <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center mr-3">
+          <i class="fa fa-filter mr-2"></i>筛选
+        </button>
+        <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center mr-3">
+          <i class="fa fa-sort mr-2"></i>排序
+        </button>
+        <button class="bg-primary hover:bg-primary/90 text-white rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center">
+          <i class="fa fa-plus mr-2"></i>创建任务
+        </button>
+      </div>
+    </div>
+    
+    <!-- 项目概览和团队成员 -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+      <!-- 项目概览卡片 -->
+      <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">总任务数</div>
+            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <i class="fa fa-tasks text-primary text-sm"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-2xl font-bold">48</div>
+          <div class="mt-1 text-xs text-gray-500">
+            <span class="text-success"><i class="fa fa-arrow-up mr-1"></i>8</span> 相比上一迭代
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">已完成</div>
+            <div class="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+              <i class="fa fa-check text-success text-sm"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-2xl font-bold">26</div>
+          <div class="mt-1 text-xs text-gray-500">
+            <span class="text-success"><i class="fa fa-arrow-up mr-1"></i>52%</span> 完成率
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">阻塞任务</div>
+            <div class="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center">
+              <i class="fa fa-exclamation-triangle text-warning text-sm"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-2xl font-bold">3</div>
+          <div class="mt-1 text-xs text-gray-500">
+            <span class="text-danger"><i class="fa fa-arrow-up mr-1"></i>2</span> 相比昨天
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">迭代进度</div>
+            <div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center">
+              <i class="fa fa-clock-o text-secondary text-sm"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-2xl font-bold">65%</div>
+          <div class="mt-1 text-xs text-gray-500">
+            <span>剩余 5 天</span> · <span class="text-success">按计划进行</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 团队成员 -->
+      <div class="bg-white rounded-xl p-5 card-shadow">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-gray-800">团队成员</h3>
+          <button class="text-primary text-sm hover:underline">查看全部</button>
+        </div>
+        
+        <div class="space-y-3 max-h-48 overflow-y-auto scrollbar-thin pr-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="https://picsum.photos/id/1005/200/200" alt="张经理的头像" class="w-7 h-7 rounded-full object-cover">
+              <div class="ml-3">
+                <div class="text-sm font-medium">张经理</div>
+                <div class="text-xs text-gray-500">项目经理</div>
+              </div>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              在线
+            </span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像" class="w-7 h-7 rounded-full object-cover">
+              <div class="ml-3">
+                <div class="text-sm font-medium">李工程师</div>
+                <div class="text-xs text-gray-500">后端开发</div>
+              </div>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              在线
+            </span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="https://picsum.photos/id/1066/200/200" alt="陈开发的头像" class="w-7 h-7 rounded-full object-cover">
+              <div class="ml-3">
+                <div class="text-sm font-medium">陈开发</div>
+                <div class="text-xs text-gray-500">前端开发</div>
+              </div>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              忙碌
+            </span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="https://picsum.photos/id/1027/200/200" alt="王测试的头像" class="w-7 h-7 rounded-full object-cover">
+              <div class="ml-3">
+                <div class="text-sm font-medium">王测试</div>
+                <div class="text-xs text-gray-500">QA工程师</div>
+              </div>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              离线
+            </span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <img src="https://picsum.photos/id/1025/200/200" alt="赵架构的头像" class="w-7 h-7 rounded-full object-cover">
+              <div class="ml-3">
+                <div class="text-sm font-medium">赵架构</div>
+                <div class="text-xs text-gray-500">系统架构师</div>
+              </div>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              在线
+            </span>
+          </div>
+        </div>
+        
+        <button class="mt-4 w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2 text-sm font-medium transition-colors flex items-center justify-center">
+          <i class="fa fa-user-plus mr-2"></i>邀请成员
+        </button>
+      </div>
+    </div>
+    
+    <!-- 迭代规划和文档中心 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div class="lg:col-span-2 bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">迭代规划与燃尽图</h3>
+            <p class="text-gray-500 text-sm mt-1">迭代 4：6月1日 - 6月15日 · 共40故事点</p>
+          </div>
+          <div class="flex space-x-2">
+            <button class="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary font-medium">故事点</button>
+            <button class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors">工时</button>
+          </div>
+        </div>
+        
+        <!-- 容量规划 -->
+        <div class="mb-6">
+          <h4 class="font-medium text-gray-700 mb-3">容量规划</h4>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">李工程师</span>
+                <span class="text-gray-600">10/12 故事点</span>
+              </div>
+              <div class="h-2 bg-gray-200 rounded-full">
+                <div class="h-full bg-primary rounded-full" style="width: 83%"></div>
+              </div>
+            </div>
+            
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">陈开发</span>
+                <span class="text-gray-600">8/10 故事点</span>
+              </div>
+              <div class="h-2 bg-gray-200 rounded-full">
+                <div class="h-full bg-primary rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+            
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">王测试</span>
+                <span class="text-gray-600">5/8 故事点</span>
+              </div>
+              <div class="h-2 bg-gray-200 rounded-full">
+                <div class="h-full bg-primary rounded-full" style="width: 62%"></div>
+              </div>
+            </div>
+            
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-600">赵架构</span>
+                <span class="text-gray-600">7/10 故事点</span>
+              </div>
+              <div class="h-2 bg-gray-200 rounded-full">
+                <div class="h-full bg-primary rounded-full" style="width: 70%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 燃尽图 -->
+        <div class="h-64">
+          <canvas id="burndownChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- 文档与需求中心 -->
+      <div class="bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">文档与需求中心</h3>
+            <p class="text-gray-500 text-sm mt-1">关联任务与测试用例</p>
+          </div>
+          <button class="bg-primary/10 hover:bg-primary/20 text-primary rounded-lg py-1.5 px-3 text-sm font-medium transition-colors flex items-center">
+            <i class="fa fa-plus mr-2"></i>新建文档
+          </button>
+        </div>
+        
+        <!-- 需求列表 -->
+        <div class="mb-6">
+          <h4 class="font-medium text-gray-700 mb-3">需求文档</h4>
+          <div class="space-y-3">
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between items-start">
+                <div class="font-medium text-sm">支付系统重构需求规格说明书</div>
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">最新版</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-user-o mr-1"></i> 张经理
+                <span class="mx-2">•</span>
+                <i class="fa fa-calendar-o mr-1"></i> 5月10日更新
+                <span class="mx-2">•</span>
+                <i class="fa fa-link mr-1"></i> 8个任务
+              </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between items-start">
+                <div class="font-medium text-sm">第三方支付接口对接规范</div>
+                <span class="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-full">v1.2</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-user-o mr-1"></i> 赵架构
+                <span class="mx-2">•</span>
+                <i class="fa fa-calendar-o mr-1"></i> 5月20日更新
+                <span class="mx-2">•</span>
+                <i class="fa fa-link mr-1"></i> 5个任务
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 技术文档 -->
+        <div>
+          <h4 class="font-medium text-gray-700 mb-3">技术文档</h4>
+          <div class="space-y-3">
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between items-start">
+                <div class="font-medium text-sm">支付系统数据库设计</div>
+                <span class="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-full">v2.1</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-user-o mr-1"></i> 赵架构
+                <span class="mx-2">•</span>
+                <i class="fa fa-calendar-o mr-1"></i> 5月25日更新
+                <span class="mx-2">•</span>
+                <i class="fa fa-link mr-1"></i> 3个任务
+              </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between items-start">
+                <div class="font-medium text-sm">前端组件库设计规范</div>
+                <span class="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-full">v1.0</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-user-o mr-1"></i> 陈开发
+                <span class="mx-2">•</span>
+                <i class="fa fa-calendar-o mr-1"></i> 6月1日更新
+                <span class="mx-2">•</span>
+                <i class="fa fa-link mr-1"></i> 4个任务
+              </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between items-start">
+                <div class="font-medium text-sm">支付安全测试方案</div>
+                <span class="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full">草稿</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-user-o mr-1"></i> 王测试
+                <span class="mx-2">•</span>
+                <i class="fa fa-calendar-o mr-1"></i> 6月5日更新
+                <span class="mx-2">•</span>
+                <i class="fa fa-link mr-1"></i> 2个任务
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 里程碑和近期活动 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <!-- 项目里程碑 -->
+      <div class="lg:col-span-1 bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">项目里程碑</h3>
+            <p class="text-gray-500 text-sm mt-1">关键节点与交付物</p>
+          </div>
+          <button class="text-primary text-sm hover:underline">查看全部</button>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="relative pl-6 pb-6 border-l-2 border-success">
+            <div class="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-success"></div>
+            <div class="font-medium text-sm">需求分析完成</div>
+            <div class="text-xs text-gray-500 mt-1">5月10日 · 已完成</div>
+            <div class="mt-2 text-xs text-gray-600">完成支付系统重构的需求收集与分析，确定技术方案</div>
+            <div class="mt-2 flex space-x-2">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                <i class="fa fa-file-text-o mr-1"></i> 3份文档
+              </span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                <i class="fa fa-check-circle-o mr-1"></i> 12个任务
+              </span>
+            </div>
+          </div>
+          
+          <div class="relative pl-6 pb-6 border-l-2 border-success">
+            <div class="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-success"></div>
+            <div class="font-medium text-sm">核心模块设计完成</div>
+            <div class="text-xs text-gray-500 mt-1">5月25日 · 已完成</div>
+            <div class="mt-2 text-xs text-gray-600">完成架构设计与数据库模型设计，通过技术评审</div>
+            <div class="mt-2 flex space-x-2">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                <i class="fa fa-file-text-o mr-1"></i> 5份文档
+              </span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                <i class="fa fa-check-circle-o mr-1"></i> 8个任务
+              </span>
+            </div>
+          </div>
+          
+          <div class="relative pl-6 pb-6 border-l-2 border-primary">
+            <div class="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-primary"></div>
+            <div class="font-medium text-sm">支付核心功能开发完成</div>
+            <div class="text-xs text-gray-500 mt-1">6月15日 · 进行中</div>
+            <div class="mt-2 text-xs text-gray-600">完成支付流程、订单管理、退款功能开发</div>
+            <div class="mt-2 flex space-x-2">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                <i class="fa fa-file-text-o mr-1"></i> 2份文档
+              </span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                <i class="fa fa-check-circle-o mr-1"></i> 16/24个任务
+              </span>
+            </div>
+          </div>
+          
+          <div class="relative pl-6 border-l-2 border-gray-300">
+            <div class="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-gray-300"></div>
+            <div class="font-medium text-sm">系统测试与性能优化</div>
+            <div class="text-xs text-gray-500 mt-1">6月30日 · 未开始</div>
+            <div class="mt-2 text-xs text-gray-600">完成系统功能测试、压力测试与性能优化</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 近期活动 -->
+      <div class="lg:col-span-2 bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">近期活动</h3>
+            <p class="text-gray-500 text-sm mt-1">团队动态与任务更新</p>
+          </div>
+          <button class="text-primary text-sm hover:underline">查看全部</button>
+        </div>
+        
+        <div class="space-y-4 max-h-80 overflow-y-auto scrollbar-thin pr-2">
+          <div class="flex">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 rounded-full bg-primary"></div>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm">
+                <span class="font-medium text-gray-900">李工程师</span>
+                <span class="text-gray-600">将任务</span>
+                <span class="font-medium text-gray-900">修复大额支付偶发超时问题</span>
+                <span class="text-gray-600">从</span>
+                <span class="text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-xs">待办</span>
+                <span class="text-gray-600">移至</span>
+                <span class="text-gray-700 bg-primary/10 px-1.5 py-0.5 rounded text-xs">开发中</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">10分钟前</div>
+            </div>
+          </div>
+          
+          <div class="flex">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 rounded-full bg-success"></div>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm">
+                <span class="font-medium text-gray-900">陈开发</span>
+                <span class="text-gray-600">完成了任务</span>
+                <span class="font-medium text-gray-900">设计支付系统数据模型</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">1小时前</div>
+            </div>
+          </div>
+          
+          <div class="flex">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 rounded-full bg-warning"></div>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm">
+                <span class="font-medium text-gray-900">张经理</span>
+                <span class="text-gray-600">创建了新任务</span>
+                <span class="font-medium text-gray-900">实现支付宝支付接口对接</span>
+                <span class="text-gray-600">并分配给</span>
+                <span class="font-medium text-gray-900">李工程师</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">2小时前</div>
+            </div>
+          </div>
+          
+          <div class="flex">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 rounded-full bg-secondary"></div>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm">
+                <span class="font-medium text-gray-900">赵架构</span>
+                <span class="text-gray-600">更新了文档</span>
+                <span class="font-medium text-gray-900">第三方支付接口对接规范</span>
+                <span class="text-gray-600">至v1.2版本</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">3小时前</div>
+            </div>
+          </div>
+          
+          <div class="flex">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 rounded-full bg-danger"></div>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm">
+                <span class="font-medium text-gray-900">王测试</span>
+                <span class="text-gray-600">将任务</span>
+                <span class="font-medium text-gray-900">添加支付安全验证机制</span>
+                <span class="text-gray-600">标记为</span>
+                <span class="text-gray-700 bg-warning/10 px-1.5 py-0.5 rounded text-xs">阻塞</span>
+                <span class="text-gray-600">，原因：等待安全团队提供验证方案</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">昨天 16:30</div>
+            </div>
+          </div>
+          
+          <div class="flex">
+            <div class="flex-shrink-0 mt-1">
+              <div class="w-2 h-2 rounded-full bg-primary"></div>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm">
+                <span class="font-medium text-gray-900">系统</span>
+                <span class="text-gray-600">自动同步了</span>
+                <span class="font-medium text-gray-900">GitHub上的3个issue</span>
+                <span class="text-gray-600">到任务列表</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-1">昨天 10:15</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 看板区域 -->
+    <div class="flex overflow-x-auto pb-4 gap-6">
+      <!-- 待办 -->
+      <div class="kanban-column bg-white rounded-xl p-4 card-shadow flex-shrink-0">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-gray-400 mr-2"></div>
+            <h3 class="font-medium text-gray-800">待办</h3>
+          </div>
+          <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">8</span>
+        </div>
+        
+        <div class="space-y-3 max-h-[calc(100vh-580px)] overflow-y-auto scrollbar-thin pr-2">
+          <!-- 任务卡片 -->
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-gray-500">P1</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">实现支付宝支付接口对接</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              对接支付宝当面付、APP支付接口，实现支付流程和回调处理
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">支付宝</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">支付接口</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月10日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-gray-500">P2</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">添加微信支付回调处理逻辑</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              处理微信支付异步通知，实现订单状态更新和支付结果验证
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">微信支付</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">回调</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1025/200/200" alt="赵架构的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月12日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-techdebt/10 text-task-techdebt">
+                Tech Debt
+              </span>
+              <span class="text-xs text-gray-500">P2</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">重构支付订单状态管理代码</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              优化订单状态机设计，解决当前状态流转混乱问题，提高可维护性
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">重构</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">状态管理</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月14日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-bug/10 text-task-bug">
+                Bug
+              </span>
+              <span class="text-xs text-danger">P1</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">修复支付金额显示异常问题</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              在某些情况下，支付金额会显示为0，实际支付金额正确但显示错误
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">显示问题</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">前端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1066/200/200" alt="陈开发的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月9日
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 开发中 -->
+      <div class="kanban-column bg-white rounded-xl p-4 card-shadow flex-shrink-0">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-primary mr-2"></div>
+            <h3 class="font-medium text-gray-800">开发中</h3>
+          </div>
+          <span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">12</span>
+        </div>
+        
+        <div class="space-y-3 max-h-[calc(100vh-580px)] overflow-y-auto scrollbar-thin pr-2">
+          <!-- 任务卡片 -->
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-gray-500">P0</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">设计新的支付流程UI界面</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              根据新的支付流程设计UI界面，包含多支付方式选择、支付状态展示等
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">UI/UX</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">前端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1066/200/200" alt="陈开发的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月8日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-gray-500">P1</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">实现银联支付接口对接</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              集成银联支付网关，实现PC端和移动端的银联支付功能
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">银联</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">后端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1027/200/200" alt="王测试的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月9日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-bug/10 text-task-bug">
+                Bug
+              </span>
+              <span class="text-xs text-gray-500">P0</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">修复大额支付偶发超时问题</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              金额超过10000元的支付请求偶尔会超时，需要优化超时处理机制
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">性能</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">后端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月7日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-warning/30 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-warning flex items-center">
+                <i class="fa fa-exclamation-circle mr-1"></i> P0
+              </span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">添加支付安全验证机制</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              实现支付前的安全验证，包括设备指纹、短信验证等多重安全机制
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">安全</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">前后端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1005/200/200" alt="张经理的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月8日
+              </div>
+            </div>
+            <div class="mt-2 p-2 bg-warning/10 rounded text-xs text-warning">
+              <i class="fa fa-info-circle mr-1"></i> 等待安全团队提供验证方案
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 测试中 -->
+      <div class="kanban-column bg-white rounded-xl p-4 card-shadow flex-shrink-0">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-warning mr-2"></div>
+            <h3 class="font-medium text-gray-800">测试中</h3>
+          </div>
+          <span class="bg-warning/10 text-warning text-xs px-2 py-1 rounded-full">5</span>
+        </div>
+        
+        <div class="space-y-3 max-h-[calc(100vh-580px)] overflow-y-auto scrollbar-thin pr-2">
+          <!-- 任务卡片 -->
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-gray-500">P1</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">实现支付记录查询功能</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              开发用户支付记录查询页面，支持按时间、金额筛选和导出
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">查询</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">全栈</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1025/200/200" alt="赵架构的头像">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1074/200/200" alt="测试人员的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月5日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-bug/10 text-task-bug">
+                Bug
+              </span>
+              <span class="text-xs text-gray-500">P1</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2">修复退款金额计算错误问题</h4>
+            <div class="text-xs text-gray-600 mb-3 line-clamp-2">
+              部分退款时，退款金额计算错误，多退了0.01元，需要修复计算逻辑
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">退款</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">后端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1074/200/200" alt="测试人员的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-o mr-1"></i> 6月6日
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 已完成 -->
+      <div class="kanban-column bg-white rounded-xl p-4 card-shadow flex-shrink-0">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-success mr-2"></div>
+            <h3 class="font-medium text-gray-800">已完成</h3>
+          </div>
+          <span class="bg-success/10 text-success text-xs px-2 py-1 rounded-full">7</span>
+        </div>
+        
+        <div class="space-y-3 max-h-[calc(100vh-580px)] overflow-y-auto scrollbar-thin pr-2">
+          <!-- 任务卡片 -->
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-gray-500">P1</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2 line-through text-gray-500">设计支付系统数据模型</h4>
+            <div class="text-xs text-gray-500 mb-3 line-clamp-2 line-through">
+              设计支付订单、交易记录、退款等核心表结构和关系模型
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">数据库</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">设计</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1005/200/200" alt="张经理的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-check-o mr-1"></i> 6月2日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-research/10 text-task-research">
+                Research
+              </span>
+              <span class="text-xs text-gray-500">P2</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2 line-through text-gray-500">主流支付网关对比调研</h4>
+            <div class="text-xs text-gray-500 mb-3 line-clamp-2 line-through">
+              调研支付宝、微信、银联等主流支付网关的优缺点和适用场景
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">调研</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">文档</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1027/200/200" alt="王测试的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-check-o mr-1"></i> 6月1日
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-bug/10 text-task-bug">
+                Bug
+              </span>
+              <span class="text-xs text-gray-500">P1</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2 line-through text-gray-500">修复支付失败后状态未更新问题</h4>
+            <div class="text-xs text-gray-500 mb-3 line-clamp-2 line-through">
+              支付失败后，订单状态仍显示为"处理中"，需要修复状态同步逻辑
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">Bug修复</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">后端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-check-o mr-1"></i> 5月30日
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 已关闭 -->
+      <div class="kanban-column bg-white rounded-xl p-4 card-shadow flex-shrink-0">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-gray-600 mr-2"></div>
+            <h3 class="font-medium text-gray-800">已关闭</h3>
+          </div>
+          <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">3</span>
+        </div>
+        
+        <div class="space-y-3 max-h-[calc(100vh-580px)] overflow-y-auto scrollbar-thin pr-2">
+          <!-- 任务卡片 -->
+          <div class="bg-white border border-gray-200 rounded-lg p-3 task-card card-shadow hover-lift cursor-move">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-task-feature/10 text-task-feature">
+                Feature
+              </span>
+              <span class="text-xs text-gray-500">P3</span>
+            </div>
+            <h4 class="text-sm font-medium mb-2 line-through text-gray-500">集成Apple Pay支付</h4>
+            <div class="text-xs text-gray-500 mb-3 line-clamp-2 line-through">
+              集成Apple Pay支付方式，支持iOS用户使用苹果支付
+            </div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">Apple Pay</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">移动端</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-2">
+                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://picsum.photos/id/1066/200/200" alt="陈开发的头像">
+              </div>
+              <div class="text-xs text-gray-500">
+                <i class="fa fa-calendar-times-o mr-1"></i> 6月3日 · 已取消
+              </div>
+            </div>
+            <div class="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-600">
+              <i class="fa fa-info-circle mr-1"></i> 原因：优先级降低，将在后续迭代考虑
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 添加列按钮 -->
+      <div class="w-40 flex-shrink-0">
+        <button class="w-full h-12 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-500 hover:border-primary hover:text-primary transition-colors">
+          <i class="fa fa-plus mr-2"></i> 添加列
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 py-6 mt-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">F</span>
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-800">FlowStack</span>
+          <span class="ml-4 text-xs text-gray-500">© 2025 FlowStack Inc. 保留所有权利</span>
+        </div>
+        <div class="flex items-center space-x-6 mt-4 md:mt-0">
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">使用文档</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">隐私政策</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">联系我们</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">关于我们</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 初始化燃尽图
+    document.addEventListener('DOMContentLoaded', function() {
+      const burndownCtx = document.getElementById('burndownChart').getContext('2d');
+      const burndownChart = new Chart(burndownCtx, {
+        type: 'line',
+        data: {
+          labels: ['6/1', '6/3', '6/5', '6/7', '6/9', '6/11', '6/13', '6/15'],
+          datasets: [{
+            label: '计划',
+            data: [40, 35, 30, 25, 20, 15, 10, 0],
+            borderColor: 'rgba(200, 200, 200, 0.8)',
+            borderDash: [5, 5],
+            backgroundColor: 'transparent',
+            tension: 0.4,
+            pointRadius: 0
+          }, {
+            label: '实际',
+            data: [40, 36, 32, 26, 22, 18, null, null],
+            borderColor: '#165DFF',
+            backgroundColor: 'rgba(22, 93, 255, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#165DFF',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(29, 33, 41, 0.9)',
+              padding: 10,
+              cornerRadius: 6,
+              titleFont: {
+                size: 12
+              },
+              bodyFont: {
+                size: 12
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  size: 10
+                }
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
+              ticks: {
+                font: {
+                  size: 10
+                }
+              }
+            }
+          },
+          interaction: {
+            mode: 'index',
+            intersect: false
+          }
+        }
+      });
+      
+      // 实现任务卡片拖拽功能
+      const taskCards = document.querySelectorAll('.task-card');
+      taskCards.forEach(card => {
+        card.addEventListener('dragstart', (e) => {
+          setTimeout(() => {
+            card.classList.add('opacity-50', 'scale-95');
+          }, 0);
+          e.dataTransfer.setData('text/plain', card.querySelector('h4').textContent);
+        });
+        
+        card.addEventListener('dragend', () => {
+          card.classList.remove('opacity-50', 'scale-95');
+        });
+        
+        card.setAttribute('draggable', true);
+      });
+      
+      // 实现看板列拖拽目标功能
+      const columns = document.querySelectorAll('.kanban-column');
+      columns.forEach(column => {
+        column.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          column.classList.add('bg-gray-50');
+        });
+        
+        column.addEventListener('dragleave', () => {
+          column.classList.remove('bg-gray-50');
+        });
+        
+        column.addEventListener('drop', (e) => {
+          e.preventDefault();
+          column.classList.remove('bg-gray-50');
+          
+          // 更新任务计数
+          const taskCountEl = column.querySelector('.rounded-full.text-xs');
+          const currentCount = parseInt(taskCountEl.textContent);
+          taskCountEl.textContent = currentCount + 1;
+          
+          // 在实际应用中，这里会有API调用更新任务状态
+          const taskName = e.dataTransfer.getData('text/plain');
+          console.log(`任务"${taskName}"已移动到"${column.querySelector('h3').textContent}"`);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

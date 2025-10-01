@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowStack - 个人看板</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            neutral: '#F5F7FA',
+            dark: '#1D2129',
+            success: '#52C41A',
+            warning: '#FAAD14',
+            danger: '#FF4D4F',
+            'warm-yellow': '#FFC857',
+            'light-blue': '#E8F3FF',
+            'light-green': '#E6FFFA',
+            'light-yellow': '#FFF9E8'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #165DFF 0%, #0F2E6B 100%);
+      }
+      .badge-glow {
+        box-shadow: 0 0 15px currentColor;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-inter text-dark min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg gradient-bg flex items-center justify-center">
+            <span class="text-white font-bold text-xl">F</span>
+          </div>
+          <span class="text-xl font-bold text-dark">FlowStack</span>
+        </div>
+        
+        <!-- 中间导航菜单 -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">全域大盘</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">项目管理</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">团队效能</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">发布管控</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">AI决策</a>
+          <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">个人看板</a>
+        </nav>
+        
+        <!-- 右侧用户区域 -->
+        <div class="flex items-center space-x-4">
+          <button class="relative p-2 text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-bell text-lg"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+          </button>
+          <div class="flex items-center space-x-2 cursor-pointer">
+            <img src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像" class="w-8 h-8 rounded-full object-cover border-2 border-gray-200">
+            <span class="hidden md:inline text-sm font-medium">李工程师</span>
+            <i class="fa fa-angle-down text-gray-500"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="flex-grow container mx-auto px-4 py-6">
+    <!-- 页面标题和今日摘要 -->
+    <div class="mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark">个人看板</h1>
+          <p class="text-gray-500 mt-1">人文关怀 · 个人效能 · AI成长</p>
+        </div>
+        <div class="mt-4 md:mt-0 bg-light-blue rounded-lg p-3 inline-flex items-center text-sm">
+          <i class="fa fa-lightbulb-o text-primary mr-2"></i>
+          <span>今日效能摘要：完成2个任务，代码质量分94，帮助同事1次 → <span class="font-medium">表现优秀！</span></span>
+        </div>
+      </div>
+      
+      <!-- 个人状态卡片 -->
+      <div class="bg-white rounded-xl p-5 mt-4 card-shadow flex flex-col md:flex-row md:items-center justify-between">
+        <div class="flex items-center">
+          <img src="https://picsum.photos/id/1012/200/200" alt="李工程师的头像" class="w-16 h-16 rounded-full object-cover border-4 border-light-blue">
+          <div class="ml-4">
+            <h2 class="text-xl font-bold">李工程师</h2>
+            <p class="text-gray-500 text-sm">前端开发 · 产品研发部</p>
+            <div class="flex mt-2 space-x-2">
+              <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">React</span>
+              <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">TypeScript</span>
+              <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Jest</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center space-x-6">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-primary">86</div>
+            <div class="text-xs text-gray-500 mt-1">综合效能分</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-success">82</div>
+            <div class="text-xs text-gray-500 mt-1">成长力分</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-warm-yellow">78</div>
+            <div class="text-xs text-gray-500 mt-1">安全分</div>
+          </div>
+          <button class="bg-primary hover:bg-primary/90 text-white rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center">
+            <i class="fa fa-magic mr-2"></i>AI助手
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 三大核心模块 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 1. 人文关怀中心 -->
+      <div class="bg-white rounded-xl p-6 card-shadow hover-lift">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800 text-lg">人文关怀中心</h3>
+            <p class="text-gray-500 text-sm mt-1">让你感受到被关注与支持</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-light-yellow flex items-center justify-center">
+            <i class="fa fa-heart text-warm-yellow"></i>
+          </div>
+        </div>
+        
+        <!-- 心理安全指数 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-medium text-gray-700">心理安全指数</h4>
+            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">良好</span>
+          </div>
+          
+          <div class="h-64">
+            <canvas id="safetyRadarChart"></canvas>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+            <div>
+              <div class="text-sm font-medium text-gray-700">情绪</div>
+              <div class="text-success font-semibold">82</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-700">支持</div>
+              <div class="text-warning font-semibold">75</div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-700">认可</div>
+              <div class="text-primary font-semibold">78</div>
+            </div>
+          </div>
+          
+          <div class="mt-4 p-3 bg-light-yellow rounded-lg border border-yellow-100">
+            <div class="flex items-start">
+              <i class="fa fa-comment text-warm-yellow mt-0.5 mr-2"></i>
+              <p class="text-sm text-yellow-800">你的安全分比上月下降5%，是否需要和Scrum Master聊聊？</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 工作饱和度与节奏健康度 -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-medium text-gray-700">工作饱和度</h4>
+            <button class="text-primary text-sm hover:underline">查看详情</button>
+          </div>
+          
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-gray-600">本周平均</span>
+            <span class="text-sm font-medium text-warning">108%</span>
+          </div>
+          
+          <!-- 饱和度热力图 -->
+          <div class="grid grid-cols-7 gap-2 mb-6">
+            <div class="flex flex-col items-center">
+              <div class="w-full h-16 bg-success/20 rounded-md flex items-end justify-center">
+                <span class="text-xs font-medium text-success mb-1">92%</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">一</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-full h-16 bg-success/20 rounded-md flex items-end justify-center">
+                <span class="text-xs font-medium text-success mb-1">88%</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">二</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-full h-16 bg-warning/20 rounded-md flex items-end justify-center">
+                <span class="text-xs font-medium text-warning mb-1">105%</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">三</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-full h-16 bg-warning/20 rounded-md flex items-end justify-center">
+                <span class="text-xs font-medium text-warning mb-1">112%</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">四</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-full h-16 bg-danger/20 rounded-md flex items-end justify-center">
+                <span class="text-xs font-medium text-danger mb-1">125%</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">五</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-full h-16 bg-gray-100 rounded-md flex items-end justify-center">
+                <span class="text-xs font-medium text-gray-500 mb-1">0%</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">六</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="w-full h-16 bg-gray-100 rounded-md flex items-end justify-center">
+                <span class="text-xs font-medium text-gray-500 mb-1">0%</span>
+              </div>
+              <span class="text-xs text-gray-500 mt-1">日</span>
+            </div>
+          </div>
+          
+          <div class="p-3 bg-orange-50 rounded-lg border border-orange-100">
+            <div class="flex items-start">
+              <i class="fa fa-exclamation-circle text-orange-500 mt-0.5 mr-2"></i>
+              <p class="text-sm text-orange-800">你连续2天饱和度超过110%，建议调整任务优先级或寻求帮助。</p>
+            </div>
+          </div>
+          
+          <!-- 节奏健康度 -->
+          <div class="mt-6">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">节奏健康度</span>
+              <span class="text-sm font-medium text-success">87%</span>
+            </div>
+            <div class="h-2 bg-gray-200 rounded-full">
+              <div class="h-full bg-success rounded-full" style="width: 87%"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-xs text-gray-500">
+              <span>需改善</span>
+              <span>良好</span>
+              <span>优秀</span>
+            </div>
+          </div>
+          
+          <!-- 快捷操作 -->
+          <div class="mt-6 flex space-x-3">
+            <button class="flex-1 bg-light-yellow hover:bg-yellow-100 text-warm-yellow rounded-lg py-2 text-sm font-medium transition-colors flex items-center justify-center">
+              <i class="fa fa-moon-o mr-2"></i>静默模式
+            </button>
+            <button class="flex-1 bg-light-blue hover:bg-blue-100 text-primary rounded-lg py-2 text-sm font-medium transition-colors flex items-center justify-center">
+              <i class="fa fa-clock-o mr-2"></i>弹性工时
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 2. 个人效能面板 -->
+      <div class="bg-white rounded-xl p-6 card-shadow hover-lift">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800 text-lg">个人效能面板</h3>
+            <p class="text-gray-500 text-sm mt-1">多维度展示你的工作表现</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-light-blue flex items-center justify-center">
+            <i class="fa fa-bar-chart text-primary"></i>
+          </div>
+        </div>
+        
+        <!-- 效能雷达图 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-medium text-gray-700">效能雷达图</h4>
+            <div class="text-xs text-gray-500">
+              <span class="inline-block w-2 h-2 bg-primary/30 rounded-full mr-1"></span>
+              个人
+              <span class="inline-block w-2 h-2 bg-gray-300 rounded-full ml-3 mr-1"></span>
+              团队平均
+            </div>
+          </div>
+          
+          <div class="h-64">
+            <canvas id="performanceRadarChart"></canvas>
+          </div>
+          
+          <div class="mt-4 p-3 bg-light-blue rounded-lg border border-blue-100">
+            <div class="flex items-start">
+              <i class="fa fa-lightbulb-o text-primary mt-0.5 mr-2"></i>
+              <p class="text-sm text-blue-800">你的"协作力"得分最高，在团队中排名前15%，适合担任新人导师。</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 任务贡献热力图 -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-medium text-gray-700">任务贡献热力图</h4>
+            <div class="relative">
+              <select class="appearance-none bg-white border border-gray-300 rounded-lg py-1.5 pl-3 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                <option>按项目</option>
+                <option>按迭代</option>
+                <option>按类型</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                <i class="fa fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-3 mb-6">
+            <div class="bg-primary/10 rounded-lg p-3 hover:bg-primary/20 transition-colors cursor-pointer">
+              <div class="text-xs text-gray-600">支付系统重构</div>
+              <div class="mt-2 grid grid-cols-5 gap-1">
+                <div class="h-2 bg-primary/40 rounded"></div>
+                <div class="h-2 bg-primary/60 rounded"></div>
+                <div class="h-2 bg-primary/80 rounded"></div>
+                <div class="h-2 bg-primary rounded"></div>
+                <div class="h-2 bg-primary/70 rounded"></div>
+              </div>
+              <div class="text-xs text-primary mt-2 font-medium">12个任务 · 高贡献</div>
+            </div>
+            <div class="bg-secondary/10 rounded-lg p-3 hover:bg-secondary/20 transition-colors cursor-pointer">
+              <div class="text-xs text-gray-600">用户增长系统</div>
+              <div class="mt-2 grid grid-cols-5 gap-1">
+                <div class="h-2 bg-secondary/30 rounded"></div>
+                <div class="h-2 bg-secondary/50 rounded"></div>
+                <div class="h-2 bg-secondary/70 rounded"></div>
+                <div class="h-2 bg-secondary/40 rounded"></div>
+                <div class="h-2 bg-secondary/60 rounded"></div>
+              </div>
+              <div class="text-xs text-secondary mt-2 font-medium">8个任务 · 中贡献</div>
+            </div>
+            <div class="bg-success/10 rounded-lg p-3 hover:bg-success/20 transition-colors cursor-pointer">
+              <div class="text-xs text-gray-600">数据中台建设</div>
+              <div class="mt-2 grid grid-cols-5 gap-1">
+                <div class="h-2 bg-success/20 rounded"></div>
+                <div class="h-2 bg-success/30 rounded"></div>
+                <div class="h-2 bg-success/50 rounded"></div>
+                <div class="h-2 bg-success/30 rounded"></div>
+                <div class="h-2 bg-success/40 rounded"></div>
+              </div>
+              <div class="text-xs text-success mt-2 font-medium">5个任务 · 低贡献</div>
+            </div>
+            <div class="bg-warning/10 rounded-lg p-3 hover:bg-warning/20 transition-colors cursor-pointer">
+              <div class="text-xs text-gray-600">移动端新功能</div>
+              <div class="mt-2 grid grid-cols-5 gap-1">
+                <div class="h-2 bg-warning/60 rounded"></div>
+                <div class="h-2 bg-warning/80 rounded"></div>
+                <div class="h-2 bg-warning rounded"></div>
+                <div class="h-2 bg-warning/70 rounded"></div>
+                <div class="h-2 bg-warning/50 rounded"></div>
+              </div>
+              <div class="text-xs text-warning mt-2 font-medium">10个任务 · 高贡献</div>
+            </div>
+          </div>
+          
+          <!-- 最近贡献 -->
+          <h4 class="font-medium text-gray-700 mb-3">最近贡献</h4>
+          <div class="space-y-3">
+            <div class="flex items-start p-3 bg-neutral rounded-lg">
+              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <i class="fa fa-code text-primary text-sm"></i>
+              </div>
+              <div class="ml-3">
+                <div class="text-sm">完成支付模块性能优化</div>
+                <div class="text-xs text-gray-500 mt-1">2小时前 · 质量分96</div>
+              </div>
+            </div>
+            <div class="flex items-start p-3 bg-neutral rounded-lg">
+              <div class="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                <i class="fa fa-check-circle text-success text-sm"></i>
+              </div>
+              <div class="ml-3">
+                <div class="text-sm">帮助王开发解决React Hooks问题</div>
+                <div class="text-xs text-gray-500 mt-1">昨天 · +5协作分</div>
+              </div>
+            </div>
+            <div class="flex items-start p-3 bg-neutral rounded-lg">
+              <div class="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center flex-shrink-0">
+                <i class="fa fa-file-text-o text-warning text-sm"></i>
+              </div>
+              <div class="ml-3">
+                <div class="text-sm">更新组件库使用文档</div>
+                <div class="text-xs text-gray-500 mt-1">2天前 · +3成长分</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 贡献勋章 -->
+          <div class="mt-6">
+            <h4 class="font-medium text-gray-700 mb-3">我的勋章</h4>
+            <div class="flex space-x-3">
+              <div class="text-center">
+                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white text-xl badge-glow mx-auto">
+                  <i class="fa fa-trophy"></i>
+                </div>
+                <div class="text-xs text-gray-600 mt-1">代码精英</div>
+              </div>
+              <div class="text-center">
+                <div class="w-12 h-12 rounded-full bg-success flex items-center justify-center text-white text-xl badge-glow mx-auto">
+                  <i class="fa fa-users"></i>
+                </div>
+                <div class="text-xs text-gray-600 mt-1">协作达人</div>
+              </div>
+              <div class="text-center">
+                <div class="w-12 h-12 rounded-full bg-warning flex items-center justify-center text-white text-xl badge-glow mx-auto">
+                  <i class="fa fa-lightbulb-o"></i>
+                </div>
+                <div class="text-xs text-gray-600 mt-1">创意先锋</div>
+              </div>
+              <div class="text-center">
+                <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xl mx-auto border-2 border-dashed border-gray-300">
+                  <i class="fa fa-lock"></i>
+                </div>
+                <div class="text-xs text-gray-400 mt-1">未解锁</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 3. AI辅助成长引擎 -->
+      <div class="bg-white rounded-xl p-6 card-shadow hover-lift">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800 text-lg">AI辅助成长引擎</h3>
+            <p class="text-gray-500 text-sm mt-1">为你定制专属成长路径</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-light-green flex items-center justify-center">
+            <i class="fa fa-graduation-cap text-secondary"></i>
+          </div>
+        </div>
+        
+        <!-- 成长力评估 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-medium text-gray-700">成长力评估</h4>
+            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">良好</span>
+          </div>
+          
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-gray-600">当前成长力分</span>
+            <span class="text-sm font-medium text-success">82</span>
+          </div>
+          
+          <div class="h-2 bg-gray-200 rounded-full mb-6">
+            <div class="h-full bg-success rounded-full" style="width: 82%"></div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-3 text-center mb-4">
+            <div class="p-3 bg-neutral rounded-lg">
+              <div class="text-xs text-gray-600">代码多样性</div>
+              <div class="text-success font-semibold mt-1">85</div>
+            </div>
+            <div class="p-3 bg-neutral rounded-lg">
+              <div class="text-xs text-gray-600">技术债修复</div>
+              <div class="text-warning font-semibold mt-1">76</div>
+            </div>
+            <div class="p-3 bg-neutral rounded-lg">
+              <div class="text-xs text-gray-600">知识分享</div>
+              <div class="text-primary font-semibold mt-1">88</div>
+            </div>
+          </div>
+          
+          <div class="p-3 bg-light-green rounded-lg border border-green-100">
+            <div class="flex items-start">
+              <i class="fa fa-line-chart text-secondary mt-0.5 mr-2"></i>
+              <p class="text-sm text-green-800">你的成长力分比上月提升8%，继续保持！尤其在知识分享方面表现突出。</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- AI学习助手 -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-medium text-gray-700">AI学习助手</h4>
+            <button class="text-primary text-sm hover:underline">更多资源</button>
+          </div>
+          
+          <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+            <div class="flex items-start">
+              <i class="fa fa-search text-primary mt-0.5 mr-2"></i>
+              <div>
+                <p class="text-sm text-blue-800 font-medium">技能缺口分析</p>
+                <p class="text-sm text-blue-700 mt-1">对比前端高级工程师岗位要求，你在微前端架构和性能优化方面有提升空间。</p>
+              </div>
+            </div>
+          </div>
+          
+          <h5 class="text-sm font-medium text-gray-700 mb-3">推荐学习资源</h5>
+          
+          <div class="space-y-3 mb-4">
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between">
+                <div class="font-medium text-sm">微前端架构实践指南</div>
+                <span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">初级</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-clock-o mr-1"></i> 预计学习时间：2小时
+                <span class="mx-2">•</span>
+                <i class="fa fa-star text-warning mr-1"></i> 4.8
+              </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between">
+                <div class="font-medium text-sm">React性能优化实战</div>
+                <span class="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded-full">中级</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-clock-o mr-1"></i> 预计学习时间：3小时
+                <span class="mx-2">•</span>
+                <i class="fa fa-star text-warning mr-1"></i> 4.9
+              </div>
+            </div>
+            
+            <div class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+              <div class="flex justify-between">
+                <div class="font-medium text-sm">TypeScript高级类型技巧</div>
+                <span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">高级</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <i class="fa fa-clock-o mr-1"></i> 预计学习时间：4小时
+                <span class="mx-2">•</span>
+                <i class="fa fa-star text-warning mr-1"></i> 4.7
+              </div>
+            </div>
+          </div>
+          
+          <!-- 实践任务 -->
+          <div class="p-3 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
+            <div class="flex items-start">
+              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa fa-flask text-primary"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium">推荐实践任务</p>
+                <p class="text-sm text-gray-700 mt-1">为支付模块添加单元测试，提升测试覆盖率至90%以上</p>
+                <button class="mt-2 text-primary text-xs font-medium hover:underline">开始任务</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- AI职业发展顾问 -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-medium text-gray-700">AI职业发展顾问</h4>
+            <button class="text-primary text-sm hover:underline">查看详情</button>
+          </div>
+          
+          <div class="mb-4">
+            <div class="text-sm font-medium text-gray-700 mb-2">晋升路径：前端高级工程师</div>
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-200"></div>
+              </div>
+              <div class="relative flex justify-between">
+                <div class="flex flex-col items-center">
+                  <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs z-10">1</div>
+                  <span class="text-xs text-gray-500 mt-1">当前</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs z-10">2</div>
+                  <span class="text-xs text-gray-500 mt-1">技能提升</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs z-10">3</div>
+                  <span class="text-xs text-gray-500 mt-1">项目主导</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs z-10">4</div>
+                  <span class="text-xs text-gray-500 mt-1">目标</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 text-sm text-gray-700">
+              完成进度：<span class="text-primary font-medium">45%</span>
+            </div>
+          </div>
+          
+          <div class="p-3 bg-light-blue rounded-lg border border-blue-100">
+            <div class="flex items-start">
+              <i class="fa fa-bullseye text-primary mt-0.5 mr-2"></i>
+              <p class="text-sm text-blue-800">绩效预测：若保持当前成长速度，下季度绩效预计为<span class="font-medium">A-</span>，距离晋升要求还需提升技术深度。</p>
+            </div>
+          </div>
+          
+          <button class="mt-6 w-full bg-primary hover:bg-primary/90 text-white rounded-lg py-2.5 text-sm font-medium transition-colors flex items-center justify-center">
+            <i class="fa fa-magic mr-2"></i>生成个性化成长计划
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 py-6 mt-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">F</span>
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-800">FlowStack</span>
+          <span class="ml-4 text-xs text-gray-500">© 2025 FlowStack Inc. 保留所有权利</span>
+        </div>
+        <div class="flex items-center space-x-6 mt-4 md:mt-0">
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">使用文档</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">隐私政策</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">联系我们</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">关于我们</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 初始化图表
+    document.addEventListener('DOMContentLoaded', function() {
+      // 心理安全指数雷达图
+      const safetyCtx = document.getElementById('safetyRadarChart').getContext('2d');
+      const safetyChart = new Chart(safetyCtx, {
+        type: 'radar',
+        data: {
+          labels: ['情绪', '支持', '认可'],
+          datasets: [{
+            label: '个人安全指数',
+            data: [82, 75, 78],
+            backgroundColor: 'rgba(250, 173, 20, 0.2)',
+            borderColor: 'rgba(250, 173, 20, 1)',
+            pointBackgroundColor: 'rgba(250, 173, 20, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(250, 173, 20, 1)'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: {
+                display: true,
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
+              suggestedMin: 50,
+              suggestedMax: 100,
+              ticks: {
+                stepSize: 10,
+                backdropColor: 'transparent',
+                font: {
+                  size: 10
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(29, 33, 41, 0.9)',
+              padding: 10,
+              cornerRadius: 6
+            }
+          }
+        }
+      });
+      
+      // 效能雷达图
+      const performanceCtx = document.getElementById('performanceRadarChart').getContext('2d');
+      const performanceChart = new Chart(performanceCtx, {
+        type: 'radar',
+        data: {
+          labels: ['交付力', '质量力', '协作力', '成长力'],
+          datasets: [{
+            label: '个人',
+            data: [85, 80, 90, 82],
+            backgroundColor: 'rgba(22, 93, 255, 0.2)',
+            borderColor: 'rgba(22, 93, 255, 0.8)',
+            pointBackgroundColor: 'rgba(22, 93, 255, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(22, 93, 255, 1)'
+          }, {
+            label: '团队平均',
+            data: [75, 78, 72, 70],
+            backgroundColor: 'rgba(200, 200, 200, 0.2)',
+            borderColor: 'rgba(200, 200, 200, 0.8)',
+            pointBackgroundColor: 'rgba(200, 200, 200, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(200, 200, 200, 1)'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: {
+                display: true,
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
+              suggestedMin: 50,
+              suggestedMax: 100,
+              ticks: {
+                stepSize: 10,
+                backdropColor: 'transparent',
+                font: {
+                  size: 10
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(29, 33, 41, 0.9)',
+              padding: 10,
+              cornerRadius: 6
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

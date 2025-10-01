@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowStack - 迭代对比分析</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            效能: '#0FC6C2',
+            创新: '#722ED1',
+            协作: '#FF7D00',
+            质量: '#F5222D',
+            neutral: '#F5F7FA',
+            dark: '#1D2129',
+            success: '#52C41A',
+            warning: '#FAAD14',
+            danger: '#FF4D4F',
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #165DFF 0%, #0FC6C2 100%);
+      }
+      .scrollbar-thin {
+        scrollbar-width: thin;
+      }
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 4px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: rgba(15, 198, 194, 0.5);
+        border-radius: 2px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-inter text-dark min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg gradient-bg flex items-center justify-center">
+            <span class="text-white font-bold text-xl">F</span>
+          </div>
+          <span class="text-xl font-bold text-dark">FlowStack</span>
+        </div>
+        
+        <!-- 中间导航菜单 -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">全域大盘</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">项目管理</a>
+          <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">团队效能</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">发布管控</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">AI决策</a>
+          <a href="#" class="text-gray-600 hover:text-primary transition-colors duration-200">个人看板</a>
+        </nav>
+        
+        <!-- 右侧用户区域 -->
+        <div class="flex items-center space-x-4">
+          <button class="relative p-2 text-gray-500 hover:text-primary transition-colors">
+            <i class="fa fa-bell text-lg"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+          </button>
+          <div class="flex items-center space-x-2 cursor-pointer">
+            <img src="https://picsum.photos/id/1005/200/200" alt="张经理的头像" class="w-8 h-8 rounded-full object-cover border-2 border-gray-200">
+            <span class="hidden md:inline text-sm font-medium">张经理</span>
+            <i class="fa fa-angle-down text-gray-500"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 项目导航栏 -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-wrap items-center justify-between py-3">
+        <!-- 项目信息 -->
+        <div class="flex items-center">
+          <h2 class="text-lg font-semibold mr-3">支付系统重构</h2>
+          <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">进行中</span>
+          <span class="ml-4 text-sm text-gray-500 hidden md:inline">
+            <i class="fa fa-refresh mr-1"></i> 迭代分析 · 效能对比
+          </span>
+        </div>
+        
+        <!-- 团队效能导航标签 -->
+        <div class="flex flex-wrap mt-3 sm:mt-0">
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1">效能概览</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1">成员贡献</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-primary border-b-2 border-primary mr-1">迭代分析</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1">质量指标</a>
+          <a href="#" class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors">改进计划</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主内容区 -->
+  <main class="flex-grow container mx-auto px-4 py-6">
+    <!-- 页面操作区 -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      <div>
+        <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark">迭代对比分析</h1>
+        <p class="text-gray-500 mt-1">多维度对比迭代效能 · 识别趋势变化 · 发现改进机会</p>
+      </div>
+      
+      <div class="flex flex-wrap items-center mt-4 md:mt-0">
+        <!-- 迭代选择器 -->
+        <div class="flex flex-wrap items-center bg-white border border-gray-200 rounded-lg p-1 mr-3">
+          <button class="px-3 py-1.5 text-sm rounded-md bg-效能 text-white">迭代 8</button>
+          <button class="px-3 py-1.5 text-sm rounded-md text-gray-700 hover:bg-gray-100 transition-colors">迭代 9</button>
+          <button class="px-3 py-1.5 text-sm rounded-md text-gray-700 hover:bg-gray-100 transition-colors">迭代 10</button>
+          <button class="px-3 py-1.5 text-sm rounded-md text-gray-700 hover:bg-gray-100 transition-colors">迭代 11</button>
+          <button class="px-3 py-1.5 text-sm rounded-md text-gray-700 hover:bg-gray-100 transition-colors">迭代 12</button>
+        </div>
+        
+        <div class="relative mr-3">
+          <select class="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-效能/50 focus:border-效能">
+            <option>所有指标</option>
+            <option>交付速度指标</option>
+            <option>交付质量指标</option>
+            <option>团队协作指标</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+            <i class="fa fa-chevron-down text-xs"></i>
+          </div>
+        </div>
+        
+        <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center mr-3">
+          <i class="fa fa-download mr-2"></i>导出报告
+        </button>
+        
+        <button class="bg-效能 hover:bg-效能/90 text-white rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center">
+          <i class="fa fa-lightbulb-o mr-2"></i>查看改进建议
+        </button>
+      </div>
+    </div>
+    
+    <!-- 迭代概览对比 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+        <div class="flex items-center justify-between">
+          <div class="text-gray-500 text-sm">迭代基本信息</div>
+          <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+            <i class="fa fa-info text-gray-500"></i>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <div class="grid grid-cols-3 gap-2 text-xs mb-3">
+            <div class="text-center text-gray-500 font-medium">迭代</div>
+            <div class="text-center text-gray-500 font-medium">时间范围</div>
+            <div class="text-center text-gray-500 font-medium">团队规模</div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 8</div>
+            <div class="text-center">4月20日 - 5月3日</div>
+            <div class="text-center">8人</div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 9</div>
+            <div class="text-center">5月4日 - 5月17日</div>
+            <div class="text-center">8人</div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 10</div>
+            <div class="text-center">5月18日 - 5月31日</div>
+            <div class="text-center">7人</div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 11</div>
+            <div class="text-center">6月1日 - 6月14日</div>
+            <div class="text-center">8人</div>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2 text-xs py-2 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 12</div>
+            <div class="text-center">6月15日 - 6月28日</div>
+            <div class="text-center">8人</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+        <div class="flex items-center justify-between">
+          <div class="text-gray-500 text-sm">迭代计划与完成</div>
+          <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+            <i class="fa fa-tasks text-gray-500"></i>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <div class="grid grid-cols-4 gap-2 text-xs mb-3">
+            <div class="text-center text-gray-500 font-medium">迭代</div>
+            <div class="text-center text-gray-500 font-medium">计划点</div>
+            <div class="text-center text-gray-500 font-medium">实际点</div>
+            <div class="text-center text-gray-500 font-medium">完成率</div>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 8</div>
+            <div class="text-center">38</div>
+            <div class="text-center">36</div>
+            <div class="text-center text-success">95%</div>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 9</div>
+            <div class="text-center">42</div>
+            <div class="text-center">36</div>
+            <div class="text-center text-warning">86%</div>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 10</div>
+            <div class="text-center">35</div>
+            <div class="text-center">35</div>
+            <div class="text-center text-success">100%</div>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-2 text-xs py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 11</div>
+            <div class="text-center">40</div>
+            <div class="text-center">38</div>
+            <div class="text-center text-success">95%</div>
+          </div>
+          
+          <div class="grid grid-cols-4 gap-2 text-xs py-2 hover:bg-gray-50 transition-colors">
+            <div class="text-center font-medium">迭代 12</div>
+            <div class="text-center">45</div>
+            <div class="text-center">32</div>
+            <div class="text-center text-warning">71%</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+        <div class="flex items-center justify-between">
+          <div class="text-gray-500 text-sm">效能评分趋势</div>
+          <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+            <i class="fa fa-line-chart text-gray-500"></i>
+          </div>
+        </div>
+        
+        <div class="mt-4 h-56">
+          <canvas id="iterationScoreChart"></canvas>
+        </div>
+        
+        <div class="mt-4 text-xs text-gray-600">
+          <p><i class="fa fa-info-circle text-primary mr-1"></i> 效能评分基于交付速度、质量、协作等多维度计算</p>
+          <p class="mt-1"><i class="fa fa-arrow-up text-success mr-1"></i> 近5个迭代平均提升 3.2 分/迭代</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 详细指标对比 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- 交付速度指标 -->
+      <div class="bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">交付速度指标对比</h3>
+            <p class="text-gray-500 text-sm mt-1">迭代周期、完成速度等关键指标趋势</p>
+          </div>
+          <button class="text-效能 text-sm hover:underline">查看详情</button>
+        </div>
+        
+        <div class="space-y-6">
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="text-sm font-medium text-gray-700">迭代周期 (天)</h4>
+              <span class="text-xs text-gray-500">周期越短越好</span>
+            </div>
+            <div class="h-48">
+              <canvas id="iterationCycleChart"></canvas>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="text-sm font-medium text-gray-700">平均故事点完成速度 (点/天)</h4>
+              <span class="text-xs text-gray-500">速度越快越好</span>
+            </div>
+            <div class="h-48">
+              <canvas id="storyPointSpeedChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 交付质量指标 -->
+      <div class="bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">交付质量指标对比</h3>
+            <p class="text-gray-500 text-sm mt-1">缺陷率、返工率等质量相关指标</p>
+          </div>
+          <button class="text-效能 text-sm hover:underline">查看详情</button>
+        </div>
+        
+        <div class="space-y-6">
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="text-sm font-medium text-gray-700">生产环境缺陷率 (%)</h4>
+              <span class="text-xs text-gray-500">比例越低越好</span>
+            </div>
+            <div class="h-48">
+              <canvas id="productionBugRateChart"></canvas>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="text-sm font-medium text-gray-700">代码返工率 (%)</h4>
+              <span class="text-xs text-gray-500">比例越低越好</span>
+            </div>
+            <div class="h-48">
+              <canvas id="codeReworkRateChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 团队活动和改进机会 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 团队活动指标 -->
+      <div class="bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">团队活动指标</h3>
+            <p class="text-gray-500 text-sm mt-1">团队协作与活动情况</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-600">代码审查覆盖率</span>
+            </div>
+            <div class="grid grid-cols-5 gap-2 text-xs mb-1">
+              <div class="text-center">迭代8</div>
+              <div class="text-center">迭代9</div>
+              <div class="text-center">迭代10</div>
+              <div class="text-center">迭代11</div>
+              <div class="text-center">迭代12</div>
+            </div>
+            <div class="flex space-x-2 h-2">
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-效能 rounded-full" style="width: 88%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-效能 rounded-full" style="width: 90%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-效能 rounded-full" style="width: 92%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-效能 rounded-full" style="width: 94%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-效能 rounded-full" style="width: 96%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-600">每日站会参与率</span>
+            </div>
+            <div class="grid grid-cols-5 gap-2 text-xs mb-1">
+              <div class="text-center">迭代8</div>
+              <div class="text-center">迭代9</div>
+              <div class="text-center">迭代10</div>
+              <div class="text-center">迭代11</div>
+              <div class="text-center">迭代12</div>
+            </div>
+            <div class="flex space-x-2 h-2">
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-协作 rounded-full" style="width: 85%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-协作 rounded-full" style="width: 82%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-协作 rounded-full" style="width: 90%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-协作 rounded-full" style="width: 92%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-协作 rounded-full" style="width: 94%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-600">文档完善度</span>
+            </div>
+            <div class="grid grid-cols-5 gap-2 text-xs mb-1">
+              <div class="text-center">迭代8</div>
+              <div class="text-center">迭代9</div>
+              <div class="text-center">迭代10</div>
+              <div class="text-center">迭代11</div>
+              <div class="text-center">迭代12</div>
+            </div>
+            <div class="flex space-x-2 h-2">
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-创新 rounded-full" style="width: 75%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-创新 rounded-full" style="width: 72%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-创新 rounded-full" style="width: 80%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-创新 rounded-full" style="width: 82%"></div>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-创新 rounded-full" style="width: 78%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 迭代内容分布 -->
+      <div class="bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">迭代内容分布</h3>
+            <p class="text-gray-500 text-sm mt-1">不同类型任务的占比分析</p>
+          </div>
+          <div class="relative">
+            <select class="appearance-none bg-white border border-gray-300 rounded-lg py-1.5 pl-3 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-效能/50 focus:border-效能">
+              <option>按故事点</option>
+              <option>按任务数量</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+              <i class="fa fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="h-64">
+          <canvas id="iterationContentChart"></canvas>
+        </div>
+        
+        <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-primary mr-2"></div>
+            <span>新功能开发</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-效能 mr-2"></div>
+            <span>技术优化</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-danger mr-2"></div>
+            <span>缺陷修复</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-3 h-3 rounded-full bg-warning mr-2"></div>
+            <span>文档完善</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 改进机会 -->
+      <div class="bg-white rounded-xl p-6 card-shadow">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="font-semibold text-gray-800">关键改进机会</h3>
+            <p class="text-gray-500 text-sm mt-1">基于迭代对比的效能提升建议</p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="border-l-4 border-danger pl-4 py-1">
+            <h4 class="text-sm font-medium text-gray-800">降低生产环境缺陷率</h4>
+            <p class="text-xs text-gray-600 mt-1">最近2个迭代缺陷率呈上升趋势，建议增加自动化测试覆盖率，特别是核心支付流程</p>
+            <div class="mt-2 flex">
+              <button class="text-xs text-danger hover:underline mr-3">查看详情</button>
+              <button class="text-xs text-primary hover:underline">创建改进计划</button>
+            </div>
+          </div>
+          
+          <div class="border-l-4 border-warning pl-4 py-1">
+            <h4 class="text-sm font-medium text-gray-800">稳定迭代交付速度</h4>
+            <p class="text-xs text-gray-600 mt-1">迭代速度波动较大，建议优化故事点估算方法，提高计划准确性</p>
+            <div class="mt-2 flex">
+              <button class="text-xs text-danger hover:underline mr-3">查看详情</button>
+              <button class="text-xs text-primary hover:underline">创建改进计划</button>
+            </div>
+          </div>
+          
+          <div class="border-l-4 border-success pl-4 py-1">
+            <h4 class="text-sm font-medium text-gray-800">保持高质量的代码审查</h4>
+            <p class="text-xs text-gray-600 mt-1">代码审查覆盖率持续提升，建议将此实践标准化并推广到其他团队</p>
+            <div class="mt-2 flex">
+              <button class="text-xs text-success hover:underline">查看最佳实践</button>
+            </div>
+          </div>
+          
+          <div class="border-l-4 border-primary pl-4 py-1">
+            <h4 class="text-sm font-medium text-gray-800">平衡任务类型分布</h4>
+            <p class="text-xs text-gray-600 mt-1">缺陷修复占比偏高(35%)，建议增加技术优化投入，减少未来的维护成本</p>
+            <div class="mt-2 flex">
+              <button class="text-xs text-danger hover:underline mr-3">查看详情</button>
+              <button class="text-xs text-primary hover:underline">创建改进计划</button>
+            </div>
+          </div>
+        </div>
+        
+        <button class="mt-6 w-full bg-效能 hover:bg-效能/90 text-white rounded-lg py-2 text-sm font-medium transition-colors flex items-center justify-center">
+          <i class="fa fa-tasks mr-2"></i>生成效能改进计划
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 py-6 mt-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">F</span>
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-800">FlowStack</span>
+          <span class="ml-4 text-xs text-gray-500">© 2025 FlowStack Inc. 保留所有权利</span>
+        </div>
+        <div class="flex items-center space-x-6 mt-4 md:mt-0">
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">使用文档</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">隐私政策</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">联系我们</a>
+          <a href="#" class="text-gray-500 hover:text-primary text-sm">关于我们</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 初始化所有图表
+    document.addEventListener('DOMContentLoaded', function() {
+      // 迭代效能评分趋势图
+      const scoreCtx = document.getElementById('iterationScoreChart').getContext('2d');
+      new Chart(scoreCtx, {
+        type: 'line',
+        data: {
+          labels: ['迭代8', '迭代9', '迭代10', '迭代11', '迭代12'],
+          datasets: [{
+            label: '效能评分',
+            data: [76, 82, 92, 88, 85],
+            borderColor: '#0FC6C2',
+            backgroundColor: 'rgba(15, 198, 194, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#0FC6C2',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              min: 60,
+              max: 100,
+              ticks: {
+                stepSize: 10
+              },
+              grid: {
+                display: false
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+      
+      // 迭代周期图表
+      const cycleCtx = document.getElementById('iterationCycleChart').getContext('2d');
+      new Chart(cycleCtx, {
+        type: 'bar',
+        data: {
+          labels: ['迭代8', '迭代9', '迭代10', '迭代11', '迭代12'],
+          datasets: [{
+            label: '迭代周期 (天)',
+            data: [14, 14, 14, 14, 14],
+            backgroundColor: '#165DFF',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '天数'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+      
+      // 故事点完成速度图表
+      const speedCtx = document.getElementById('storyPointSpeedChart').getContext('2d');
+      new Chart(speedCtx, {
+        type: 'line',
+        data: {
+          labels: ['迭代8', '迭代9', '迭代10', '迭代11', '迭代12'],
+          datasets: [{
+            label: '平均速度 (点/天)',
+            data: [2.57, 2.57, 2.50, 2.71, 2.29],
+            borderColor: '#FF7D00',
+            backgroundColor: 'transparent',
+            tension: 0.4,
+            pointBackgroundColor: '#FF7D00',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '点/天'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+      
+      // 生产环境缺陷率图表
+      const bugRateCtx = document.getElementById('productionBugRateChart').getContext('2d');
+      new Chart(bugRateCtx, {
+        type: 'line',
+        data: {
+          labels: ['迭代8', '迭代9', '迭代10', '迭代11', '迭代12'],
+          datasets: [{
+            label: '缺陷率 (%)',
+            data: [2.1, 2.5, 2.8, 3.2, 3.8],
+            borderColor: '#F5222D',
+            backgroundColor: 'transparent',
+            tension: 0.4,
+            pointBackgroundColor: '#F5222D',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '缺陷率 (%)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+      
+      // 代码返工率图表
+      const reworkCtx = document.getElementById('codeReworkRateChart').getContext('2d');
+      new Chart(reworkCtx, {
+        type: 'line',
+        data: {
+          labels: ['迭代8', '迭代9', '迭代10', '迭代11', '迭代12'],
+          datasets: [{
+            label: '返工率 (%)',
+            data: [8.5, 9.2, 7.8, 8.1, 9.5],
+            borderColor: '#FAAD14',
+            backgroundColor: 'transparent',
+            tension: 0.4,
+            pointBackgroundColor: '#FAAD14',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '返工率 (%)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+      
+      // 迭代内容分布图表
+      const contentCtx = document.getElementById('iterationContentChart').getContext('2d');
+      new Chart(contentCtx, {
+        type: 'radar',
+        data: {
+          labels: ['迭代8', '迭代9', '迭代10', '迭代11', '迭代12'],
+          datasets: [{
+            label: '新功能开发',
+            data: [45, 40, 50, 48, 42],
+            backgroundColor: 'rgba(22, 93, 255, 0.2)',
+            borderColor: '#165DFF',
+            pointBackgroundColor: '#165DFF'
+          }, {
+            label: '技术优化',
+            data: [20, 15, 18, 22, 20],
+            backgroundColor: 'rgba(15, 198, 194, 0.2)',
+            borderColor: '#0FC6C2',
+            pointBackgroundColor: '#0FC6C2'
+          }, {
+            label: '缺陷修复',
+            data: [30, 35, 25, 22, 35],
+            backgroundColor: 'rgba(245, 34, 45, 0.2)',
+            borderColor: '#F5222D',
+            pointBackgroundColor: '#F5222D'
+          }, {
+            label: '文档完善',
+            data: [5, 10, 7, 8, 3],
+            backgroundColor: 'rgba(250, 173, 20, 0.2)',
+            borderColor: '#FAAD14',
+            pointBackgroundColor: '#FAAD14'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              min: 0,
+              max: 60,
+              ticks: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+      
+      // 迭代选择器交互
+      const iterationButtons = document.querySelectorAll('.flex.flex-wrap.items-center.bg-white.border.border-gray-200.rounded-lg.p-1 button');
+      iterationButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // 移除所有按钮的选中状态
+          iterationButtons.forEach(btn => {
+            btn.classList.remove('bg-效能', 'text-white');
+            btn.classList.add('text-gray-700', 'hover:bg-gray-100');
+          });
+          
+          // 设置当前按钮为选中状态
+          this.classList.remove('text-gray-700', 'hover:bg-gray-100');
+          this.classList.add('bg-效能', 'text-white');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
