@@ -1,0 +1,146 @@
+❌ 将未加入到路由访问的页面加入到路由中， 如AppAnalyticsDemo
+1❌. 团队成员管理 以成员饱和度卡片进行查看, 同时增加数据修正， 点击查看详情时跳转至团队成员详情页面
+2❌. 添加团队成员查看详情页面：包含当前时间段完成需求数量、工时投入、缺陷率、发布数量、发布频率、代码提交次数、代码提交频率 等多个指标的分析
+❌  团队 / 项目点击查看详情： 包含团队成员、项目报表数据【需求、缺陷、线上问题 等各指标纵览报表查看】、按兵种投入时间分布表 及区间环比， 新增个人时间明细看板
+❌ 权限 / 角色： 管理员、产品经理、开发工程师、测试工程师、运维工程师，每个角色的权限不同，只能查看和操作自己负责的项目和任务。
+❌ 识别个人负载情况，根据工时投入、任务完成情况、缺陷率等指标，评估个人的工作负载情况，及时调整工作分配，避免超期完成任务。
+❌ 计算空转率，即个人在工作时间内未完成任务的时间占比，评估个人的工作效率和工作质量。
+
+❌ 项目分配情况：需求 + 提交代码 + 缺陷 + 测试用例 + 测试用例执行 + 线上问题 等多个角度综合分析
+
+3❌.   个人时间明细看板 补充   <!-- 个人时间明细看板 -->
+        <section class="mb-20">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">个人时间明细看板</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 md:p-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-semibold">张工程师 - 本周时间分配</h3>
+                        <p class="text-neutral">产品研发部 | 高级开发工程师</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex space-x-2">
+                        <button
+                            class="px-4 py-2 bg-light rounded-lg text-neutral hover:bg-primary hover:text-white transition-colors">
+                            周视图
+                        </button>
+                        <button
+                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            日视图
+                        </button>
+                        <button
+                            class="px-4 py-2 bg-light rounded-lg text-neutral hover:bg-primary hover:text-white transition-colors">
+                            月视图
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="bg-light">
+                                <th class="py-3 px-4 text-left font-semibold">项目名称</th>
+                                <th class="py-3 px-4 text-left font-semibold">任务描述</th>
+                                <th class="py-3 px-4 text-left font-semibold">开始时间</th>
+                                <th class="py-3 px-4 text-left font-semibold">结束时间</th>
+                                <th class="py-3 px-4 text-left font-semibold">时长(小时)</th>
+                                <th class="py-3 px-4 text-left font-semibold">类型</th>
+                                <th class="py-3 px-4 text-left font-semibold">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr>
+                                <td class="py-3 px-4">客户管理系统V2.0</td>
+                                <td class="py-3 px-4">用户认证模块开发</td>
+                                <td class="py-3 px-4">09:00</td>
+                                <td class="py-3 px-4">12:00</td>
+                                <td class="py-3 px-4">3</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">开发</span></td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">客户管理系统V2.0</td>
+                                <td class="py-3 px-4">API接口文档编写</td>
+                                <td class="py-3 px-4">13:30</td>
+                                <td class="py-3 px-4">15:00</td>
+                                <td class="py-3 px-4">1.5</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">文档</span>
+                                </td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">数据分析平台</td>
+                                <td class="py-3 px-4">数据可视化bug修复</td>
+                                <td class="py-3 px-4">15:30</td>
+                                <td class="py-3 px-4">18:00</td>
+                                <td class="py-3 px-4">2.5</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">测试</span>
+                                </td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">数据分析平台</td>
+                                <td class="py-3 px-4">性能优化方案讨论</td>
+                                <td class="py-3 px-4">19:00</td>
+                                <td class="py-3 px-4">21:00</td>
+                                <td class="py-3 px-4">2</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">加班</span></td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">今日总工作时长</p>
+                        <p class="text-2xl font-bold text-primary">9小时</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">加班时长</p>
+                        <p class="text-2xl font-bold text-warning">2小时</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">本周累计工作</p>
+                        <p class="text-2xl font-bold text-primary">42小时</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">负载率</p>
+                        <p class="text-2xl font-bold text-success">75%</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+-----
+
+❌ 项目资源分配图支持按工种切换图表
+❌ 评价：人员撤出时业务填写评价并记录跟踪，后续团队预定人员时第一时间查看评价 并通过 AI 自动识别是否匹配某项业务
+❌ 人员技能标签打标
+❌ 设定项目需求、缺陷、线上问题 等各指标纵览报表查看
+❌ 产品人员查看的报表：自行研究指标 并给出指标公式
+✅. 添加分析各应用埋点数据并生成报表大盘，同时支持点击单应用时分析所属应用下所有页面的埋点数据，包含 PV / UV 等， 并设计趋势图 支持筛选时间区间，动态解析埋点概览访问量最大的应用 / 页面
+
+
+
+----
+
+
+团队饱和度分析【管理员查看全部人员】: 按项目分配情况分析团队成员的工作饱和度，包括项目进度、任务完成情况、问题解决效率等。
+兵种饱和度分析【管理员查看全部人员】: 按项目分配情况分析不同兵种成员的工作饱和度，包括项目进度、任务完成情况、问题解决效率等。
+成员饱和度分析【管理员查看全部人员】: 按项目分配情况分析每个成员的工作饱和度，包括项目进度、任务完成情况、问题解决效率等。布局调整为卡片

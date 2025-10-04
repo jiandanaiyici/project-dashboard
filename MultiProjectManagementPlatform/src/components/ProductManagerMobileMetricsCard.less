@@ -1,0 +1,424 @@
+/* 产品经理和管理层关注的应用指标移动端卡片样式 */
+.product-manager-mobile-metrics-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  padding: 16px;
+  transition: all 0.3s ease;
+
+  &.loading,
+  &.error {
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .metrics-loading {
+    text-align: center;
+    .loading-content {
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f0f0f0;
+        border-top: 3px solid #1890ff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+      }
+      .loading-text {
+        color: #999;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .metrics-error {
+    text-align: center;
+    .error-icon {
+      font-size: 48px;
+      color: #ff4d4f;
+      margin-bottom: 16px;
+    }
+    .error-text {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .retry-button {
+      background-color: #1890ff;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      &:hover {
+        background-color: #40a9ff;
+      }
+    }
+  }
+
+  .metrics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+
+    .metrics-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      .title-icon {
+        color: #1890ff;
+      }
+    }
+
+    .metrics-update-time {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #999;
+      .time-icon {
+        font-size: 12px;
+      }
+    }
+  }
+
+  .metrics-section {
+    margin-bottom: 20px;
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      padding-left: 8px;
+      border-left: 4px solid #1890ff;
+    }
+  }
+
+  /* 指标卡片样式 */
+  .metric-card {
+    height: 100%;
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    background-color: #fff;
+    padding: 12px;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border-color: #e6f7ff;
+    }
+
+    &.up {
+      border-left: 3px solid #52c41a;
+    }
+
+    &.down {
+      border-left: 3px solid #ff4d4f;
+    }
+
+    &.stable {
+      border-left: 3px solid #faad14;
+    }
+
+    &.good {
+      border-left: 3px solid #52c41a;
+    }
+
+    &.warning {
+      border-left: 3px solid #faad14;
+    }
+
+    &.critical {
+      border-left: 3px solid #ff4d4f;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .metric-title {
+        font-size: 13px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .metric-status {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+    }
+
+    .metric-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .metric-icon {
+        font-size: 20px;
+      }
+
+      .metric-value-container {
+        flex: 1;
+
+        .metric-stat {
+          .ant-statistic-content {
+            padding: 0;
+          }
+          .ant-statistic-content-value {
+            font-size: 18px !important;
+            font-weight: 600;
+          }
+        }
+
+        .metric-description {
+          font-size: 11px;
+          color: #999;
+          margin-top: 2px;
+        }
+      }
+    }
+
+    .metric-trend {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+
+      .trend-icon {
+        font-size: 12px;
+      }
+    }
+  }
+
+  /* 趋势指标样式 */
+  .trend-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .trend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background-color: #fafafa;
+      border-radius: 6px;
+      border: 1px solid #f0f0f0;
+
+      .trend-label {
+        font-size: 13px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .trend-value {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 14px;
+        font-weight: 600;
+
+        &.positive {
+          color: #52c41a;
+        }
+
+        &.negative {
+          color: #ff4d4f;
+        }
+
+        .trend-icon-small {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  /* 进度条指标样式 */
+  .performance-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .progress-metric {
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+
+        .progress-title {
+          font-size: 13px;
+          color: #666;
+          font-weight: 500;
+        }
+
+        .progress-value {
+          font-size: 13px;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+
+      .metric-progress {
+        height: 6px;
+        border-radius: 3px;
+      }
+    }
+  }
+
+  /* 整体状态样式 */
+  .metrics-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 6px;
+    margin-top: 16px;
+
+    .ant-tag {
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+}
+
+/* 响应式设计 - 移动端优化 */
+@media (max-width: 768px) {
+  .product-manager-mobile-metrics-card {
+    padding: 12px;
+    margin: 0 -12px;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+
+    .metrics-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding-bottom: 8px;
+      
+      .metrics-title {
+        font-size: 16px;
+      }
+      
+      .metrics-update-time {
+        font-size: 11px;
+      }
+    }
+
+    .metrics-section {
+      margin-bottom: 16px;
+      
+      .section-title {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+    }
+
+    .metric-card {
+      padding: 10px;
+      
+      .metric-header {
+        margin-bottom: 6px;
+        
+        .metric-title {
+          font-size: 12px;
+        }
+      }
+      
+      .metric-content {
+        gap: 8px;
+        
+        .metric-icon {
+          font-size: 16px;
+        }
+        
+        .metric-stat {
+          .ant-statistic-content-value {
+            font-size: 16px !important;
+          }
+        }
+      }
+    }
+
+    .trend-metrics {
+      gap: 8px;
+      
+      .trend-item {
+        padding: 10px;
+        
+        .trend-label {
+          font-size: 12px;
+        }
+        
+        .trend-value {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .performance-metrics {
+      gap: 8px;
+      
+      .progress-metric {
+        .progress-header {
+          .progress-title {
+            font-size: 12px;
+          }
+          
+          .progress-value {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .metrics-status {
+      padding: 10px;
+      
+      .ant-tag {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+/* 小屏幕移动端优化 */
+@media (max-width: 480px) {
+  .product-manager-mobile-metrics-card {
+    .metric-card {
+      .metric-content {
+        .metric-stat {
+          .ant-statistic-content-value {
+            font-size: 14px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 加载动画 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

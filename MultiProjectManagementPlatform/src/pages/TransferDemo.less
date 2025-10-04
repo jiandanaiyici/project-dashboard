@@ -1,0 +1,225 @@
+/* 人员调动分析示例页面样式 */
+.transfer-demo-container {
+  padding: 24px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 页面标题 */
+.page-title {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #262626;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title .anticon {
+  font-size: 24px;
+  color: #1890ff;
+}
+
+/* 演示介绍卡片 */
+.demo-intro-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.demo-intro-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.demo-intro-card .ant-card-body {
+  padding: 24px;
+}
+
+.demo-intro-card h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #262626;
+  font-weight: 600;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 0;
+}
+
+.feature-icon {
+  color: #1890ff;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+/* 图表演示区域 */
+.chart-demo-section {
+  margin-bottom: 24px;
+}
+
+/* 使用指南卡片 */
+.usage-guide-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.usage-guide-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.usage-guide-card .ant-card-body {
+  padding: 24px;
+}
+
+.usage-guide-card h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #262626;
+  font-weight: 600;
+}
+
+.usage-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.usage-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.usage-item:last-child {
+  border-bottom: none;
+}
+
+.usage-item p {
+  margin: 0;
+  color: #595959;
+  line-height: 1.6;
+}
+
+.usage-item ul {
+  margin-top: 8px;
+  margin-bottom: 0;
+  padding-left: 24px;
+}
+
+.usage-item li {
+  margin-bottom: 4px;
+  color: #595959;
+}
+
+.usage-item li:last-child {
+  margin-bottom: 0;
+}
+
+/* 代码示例卡片 */
+.code-example-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.code-example-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.code-example-card .ant-card-body {
+  padding: 24px;
+}
+
+.code-example-card h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #262626;
+  font-weight: 600;
+}
+
+.code-block {
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid #e8e8e8;
+}
+
+.code-block pre {
+  margin: 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .transfer-demo-container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .demo-intro-card,
+  .chart-demo-section,
+  .usage-guide-card {
+    margin-bottom: 16px;
+  }
+  
+  .demo-intro-card .ant-card-body,
+  .usage-guide-card .ant-card-body,
+  .code-example-card .ant-card-body {
+    padding: 16px;
+  }
+  
+  .feature-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .feature-icon {
+    margin-bottom: 4px;
+  }
+  
+  .code-block {
+    padding: 12px;
+  }
+  
+  .code-block pre {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .transfer-demo-container {
+    padding: 12px;
+  }
+  
+  .page-title {
+    font-size: 18px;
+  }
+  
+  .demo-intro-card .ant-card-body,
+  .usage-guide-card .ant-card-body,
+  .code-example-card .ant-card-body {
+    padding: 12px;
+  }
+}

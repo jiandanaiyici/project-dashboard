@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>应用管理与人员饱和度分析平台</title>
+  <!-- 引入外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            success: '#52C41A',
+            warning: '#FAAD14',
+            danger: '#FF4D4F',
+            info: '#1890FF',
+            dark: '#1D2129',
+            'gray-light': '#F2F3F5',
+            'gray-medium': '#C9CDD4',
+            'gray-dark': '#86909C'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .sidebar-shadow {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      }
+      .hover-lift {
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30 transition-all duration-300">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <!-- 品牌标识 -->
+        <div class="flex items-center space-x-2">
+          <button id="sidebar-toggle" class="lg:hidden p-2 rounded-md hover:bg-gray-light transition-colors">
+            <i class="fa fa-bars text-gray-dark"></i>
+          </button>
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+              <i class="fa fa-cubes text-white"></i>
+            </div>
+            <h1 class="text-lg font-semibold text-primary hidden sm:block">DevManage</h1>
+          </div>
+        </div>
+        
+        <!-- 搜索栏 -->
+        <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+          <div class="relative w-full">
+            <input type="text" placeholder="搜索应用、项目或成员..." 
+                  class="w-full py-2 pl-10 pr-4 rounded-lg bg-gray-light focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all">
+            <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-dark"></i>
+          </div>
+        </div>
+        
+        <!-- 右侧工具栏 -->
+        <div class="flex items-center space-x-4">
+          <button class="p-2 rounded-full hover:bg-gray-light relative transition-colors">
+            <i class="fa fa-bell-o text-gray-dark"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+          </button>
+          <div class="flex items-center space-x-2 cursor-pointer group">
+            <img src="https://picsum.photos/id/1005/200/200" alt="用户头像" class="w-8 h-8 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-colors">
+            <span class="hidden sm:inline-block text-sm font-medium">张经理</span>
+            <i class="fa fa-angle-down text-xs text-gray-dark hidden sm:block"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1 pt-16">
+    <!-- 侧边栏导航 -->
+    <aside id="sidebar" class="sidebar-shadow w-64 bg-white fixed h-full left-0 top-16 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-20 overflow-y-auto">
+      <nav class="py-4">
+        <div class="px-4 mb-2 text-xs font-semibold text-gray-dark uppercase tracking-wider">主菜单</div>
+        <a href="#" class="flex items-center px-4 py-3 text-primary bg-primary/5 border-r-4 border-primary">
+          <i class="fa fa-dashboard w-5 text-center"></i>
+          <span class="ml-3">仪表盘</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-th-large w-5 text-center"></i>
+          <span class="ml-3">应用管理</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-users w-5 text-center"></i>
+          <span class="ml-3">团队成员</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-tasks w-5 text-center"></i>
+          <span class="ml-3">项目进度</span>
+        </a>
+        
+        <div class="px-4 my-4 text-xs font-semibold text-gray-dark uppercase tracking-wider">分析报表</div>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-bar-chart w-5 text-center"></i>
+          <span class="ml-3">饱和度分析</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-line-chart w-5 text-center"></i>
+          <span class="ml-3">项目趋势</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-pie-chart w-5 text-center"></i>
+          <span class="ml-3">资源分配</span>
+        </a>
+        
+        <div class="px-4 my-4 text-xs font-semibold text-gray-dark uppercase tracking-wider">系统设置</div>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-cog w-5 text-center"></i>
+          <span class="ml-3">系统配置</span>
+        </a>
+        <a href="#" class="flex items-center px-4 py-3 text-gray-dark hover:bg-gray-light transition-colors">
+          <i class="fa fa-user-circle-o w-5 text-center"></i>
+          <span class="ml-3">个人信息</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="flex-1 lg:ml-64 p-4 md:p-6 animate-fade-in">
+      <!-- 页面标题 -->
+      <div class="mb-6">
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">应用管理与人员饱和度分析</h2>
+        <p class="text-gray-dark mt-1">监控项目状态与团队负载，优化资源分配</p>
+      </div>
+      
+      <!-- 统计卡片 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- 应用总数 -->
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-gray-dark text-sm">应用总数</p>
+              <h3 class="text-2xl font-bold mt-1">24</h3>
+              <p class="text-success text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 8% <span class="text-gray-dark ml-1">较上月</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+              <i class="fa fa-cube"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 活跃项目 -->
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-gray-dark text-sm">活跃项目</p>
+              <h3 class="text-2xl font-bold mt-1">16</h3>
+              <p class="text-success text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 3% <span class="text-gray-dark ml-1">较上月</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+              <i class="fa fa-spinner"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 团队成员 -->
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-gray-dark text-sm">团队成员</p>
+              <h3 class="text-2xl font-bold mt-1">32</h3>
+              <p class="text-success text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 5% <span class="text-gray-dark ml-1">较上月</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center text-info">
+              <i class="fa fa-users"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 高负荷成员 -->
+        <div class="bg-white rounded-xl p-5 card-shadow hover-lift">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-gray-dark text-sm">高负荷成员</p>
+              <h3 class="text-2xl font-bold mt-1">7</h3>
+              <p class="text-danger text-sm mt-2 flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 2 <span class="text-gray-dark ml-1">较上周</span>
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-danger/10 flex items-center justify-center text-danger">
+              <i class="fa fa-exclamation-triangle"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 图表区域 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- 人员饱和度趋势 -->
+        <div class="lg:col-span-2 bg-white rounded-xl p-5 card-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold">团队饱和度趋势</h3>
+            <div class="flex space-x-2">
+              <button class="px-3 py-1 text-xs rounded-md bg-primary text-white">周</button>
+              <button class="px-3 py-1 text-xs rounded-md hover:bg-gray-light text-gray-dark">月</button>
+              <button class="px-3 py-1 text-xs rounded-md hover:bg-gray-light text-gray-dark">季</button>
+            </div>
+          </div>
+          <div class="h-80">
+            <canvas id="saturationTrend"></canvas>
+          </div>
+        </div>
+        
+        <!-- 饱和度分布 -->
+        <div class="bg-white rounded-xl p-5 card-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold">成员饱和度分布</h3>
+            <button class="text-gray-dark hover:text-primary transition-colors">
+              <i class="fa fa-ellipsis-v"></i>
+            </button>
+          </div>
+          <div class="h-80 flex items-center justify-center">
+            <canvas id="saturationDistribution"></canvas>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-4">
+            <div class="flex items-center">
+              <span class="w-3 h-3 rounded-full bg-success mr-2"></span>
+              <span class="text-xs text-gray-dark">低负荷 (<60%)</span>
+            </div>
+            <div class="flex items-center">
+              <span class="w-3 h-3 rounded-full bg-warning mr-2"></span>
+              <span class="text-xs text-gray-dark">正常 (60-80%)</span>
+            </div>
+            <div class="flex items-center">
+              <span class="w-3 h-3 rounded-full bg-danger mr-2"></span>
+              <span class="text-xs text-gray-dark">高负荷 (>80%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 应用列表与人员饱和度 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 应用列表 -->
+        <div class="lg:col-span-2 bg-white rounded-xl overflow-hidden card-shadow">
+          <div class="p-5 border-b border-gray-light">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">应用项目列表</h3>
+              <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors flex items-center">
+                <i class="fa fa-plus mr-2"></i> 新增应用
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="px-5 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">应用名称</th>
+                  <th class="px-5 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">负责人</th>
+                  <th class="px-5 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">状态</th>
+                  <th class="px-5 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">进度</th>
+                  <th class="px-5 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">成员数</th>
+                  <th class="px-5 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-light">
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary mr-3">
+                        <i class="fa fa-shopping-cart"></i>
+                      </div>
+                      <span>电商平台</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <img src="https://picsum.photos/id/1012/200/200" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                      <span>李开发</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">进行中</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="w-24 bg-gray-light rounded-full h-2">
+                      <div class="bg-success h-2 rounded-full" style="width: 75%"></div>
+                    </div>
+                    <span class="text-xs text-gray-dark mt-1 block">75%</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">8</td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <button class="text-primary hover:text-primary/80 mr-3 transition-colors">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="text-gray-dark hover:text-danger transition-colors">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 rounded bg-info/10 flex items-center justify-center text-info mr-3">
+                        <i class="fa fa-user-o"></i>
+                      </div>
+                      <span>用户管理系统</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <img src="https://picsum.photos/id/1025/200/200" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                      <span>王设计</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">待测试</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="w-24 bg-gray-light rounded-full h-2">
+                      <div class="bg-warning h-2 rounded-full" style="width: 90%"></div>
+                    </div>
+                    <span class="text-xs text-gray-dark mt-1 block">90%</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">5</td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <button class="text-primary hover:text-primary/80 mr-3 transition-colors">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="text-gray-dark hover:text-danger transition-colors">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 rounded bg-secondary/10 flex items-center justify-center text-secondary mr-3">
+                        <i class="fa fa-line-chart"></i>
+                      </div>
+                      <span>数据分析平台</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <img src="https://picsum.photos/id/1027/200/200" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                      <span>赵数据</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">规划中</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="w-24 bg-gray-light rounded-full h-2">
+                      <div class="bg-primary h-2 rounded-full" style="width: 25%"></div>
+                    </div>
+                    <span class="text-xs text-gray-dark mt-1 block">25%</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">6</td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <button class="text-primary hover:text-primary/80 mr-3 transition-colors">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="text-gray-dark hover:text-danger transition-colors">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 rounded bg-gray-dark/10 flex items-center justify-center text-gray-dark mr-3">
+                        <i class="fa fa-file-text-o"></i>
+                      </div>
+                      <span>文档管理系统</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <img src="https://picsum.photos/id/1074/200/200" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                      <span>陈文档</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded-full bg-gray-dark/10 text-gray-dark">已完成</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <div class="w-24 bg-gray-light rounded-full h-2">
+                      <div class="bg-gray-dark h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                    <span class="text-xs text-gray-dark mt-1 block">100%</span>
+                  </td>
+                  <td class="px-5 py-4 whitespace-nowrap">4</td>
+                  <td class="px-5 py-4 whitespace-nowrap">
+                    <button class="text-primary hover:text-primary/80 mr-3 transition-colors">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button class="text-gray-dark hover:text-danger transition-colors">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="p-4 border-t border-gray-light flex items-center justify-between">
+            <p class="text-sm text-gray-dark">显示 1 到 4，共 24 条</p>
+            <div class="flex space-x-1">
+              <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-light text-gray-dark hover:border-primary hover:text-primary transition-colors">
+                <i class="fa fa-angle-left"></i>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-white">1</button>
+              <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-light hover:border-primary hover:text-primary transition-colors">2</button>
+              <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-light hover:border-primary hover:text-primary transition-colors">3</button>
+              <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-light text-gray-dark hover:border-primary hover:text-primary transition-colors">
+                <i class="fa fa-angle-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 人员饱和度 -->
+        <div class="bg-white rounded-xl overflow-hidden card-shadow">
+          <div class="p-5 border-b border-gray-light">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">成员工作饱和度</h3>
+              <button class="text-gray-dark hover:text-primary transition-colors">
+                <i class="fa fa-refresh"></i>
+              </button>
+            </div>
+          </div>
+          <div class="p-4 max-h-[500px] overflow-y-auto">
+            <div class="space-y-4">
+              <!-- 高负荷成员 -->
+              <div class="p-3 rounded-lg bg-danger/5 border border-danger/20 hover-lift">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <img src="https://picsum.photos/id/1012/200/200" alt="李开发" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                      <h4 class="font-medium">李开发</h4>
+                      <p class="text-sm text-gray-dark">前端开发</p>
+                    </div>
+                  </div>
+                  <span class="text-danger font-semibold">92%</span>
+                </div>
+                <div class="mt-3">
+                  <div class="flex justify-between text-xs mb-1">
+                    <span>工作量饱和度</span>
+                    <span>超载</span>
+                  </div>
+                  <div class="w-full bg-gray-light rounded-full h-2">
+                    <div class="bg-danger h-2 rounded-full" style="width: 92%"></div>
+                  </div>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">负责应用</p>
+                    <p class="font-medium">3个</p>
+                  </div>
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">任务数</p>
+                    <p class="font-medium">12个</p>
+                  </div>
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">加班天数</p>
+                    <p class="font-medium text-danger">5天</p>
+                  </div>
+                </div>
+              </div>
+              <!-- 正常负荷成员 -->
+              <div class="p-3 rounded-lg bg-warning/5 border border-warning/20 hover-lift">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <img src="https://picsum.photos/id/1027/200/200" alt="赵数据" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                      <h4 class="font-medium">赵数据</h4>
+                      <p class="text-sm text-gray-dark">数据分析师</p>
+                    </div>
+                  </div>
+                  <span class="text-warning font-semibold">75%</span>
+                </div>
+                <div class="mt-3">
+                  <div class="flex justify-between text-xs mb-1">
+                    <span>工作量饱和度</span>
+                    <span>正常</span>
+                  </div>
+                  <div class="w-full bg-gray-light rounded-full h-2">
+                    <div class="bg-warning h-2 rounded-full" style="width: 75%"></div>
+                  </div>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">负责应用</p>
+                    <p class="font-medium">2个</p>
+                  </div>
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">任务数</p>
+                    <p class="font-medium">6个</p>
+                  </div>
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">加班天数</p>
+                    <p class="font-medium text-gray-dark">1天</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 低负荷成员 -->
+              <div class="p-3 rounded-lg bg-success/5 border border-success/20 hover-lift">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <img src="https://picsum.photos/id/1074/200/200" alt="陈文档" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                      <h4 class="font-medium">陈文档</h4>
+                      <p class="text-sm text-gray-dark">技术文档</p>
+                    </div>
+                  </div>
+                  <span class="text-success font-semibold">52%</span>
+                </div>
+                <div class="mt-3">
+                  <div class="flex justify-between text-xs mb-1">
+                    <span>工作量饱和度</span>
+                    <span>空闲</span>
+                  </div>
+                  <div class="w-full bg-gray-light rounded-full h-2">
+                    <div class="bg-success h-2 rounded-full" style="width: 52%"></div>
+                  </div>
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">负责应用</p>
+                    <p class="font-medium">1个</p>
+                  </div>
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">任务数</p>
+                    <p class="font-medium">3个</p>
+                  </div>
+                  <div class="bg-white rounded p-2 text-center">
+                    <p class="text-gray-dark">加班天数</p>
+                    <p class="font-medium text-gray-dark">0天</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-4 border-t border-gray-light text-center">
+            <button class="text-primary hover:text-primary/80 text-sm transition-colors">
+              查看全部成员 <i class="fa fa-angle-right ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 遮罩层 -->
+  <div id="overlay" class="fixed inset-0 bg-black/50 z-10 hidden lg:hidden"></div>
+
+  <script>
+    // 侧边栏切换
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      
+      sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      });
+      
+      overlay.addEventListener('click', function() {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      });
+      
+      // 团队饱和度趋势图
+      const saturationTrendCtx = document.getElementById('saturationTrend').getContext('2d');
+      const saturationTrendChart = new Chart(saturationTrendCtx, {
+        type: 'line',
+        data: {
+          labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+          datasets: [
+            {
+              label: '平均饱和度',
+              data: [65, 72, 78, 82, 76, 45, 30],
+              borderColor: '#165DFF',
+              backgroundColor: 'rgba(22, 93, 255, 0.1)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: '高负荷成员',
+              data: [3, 4, 5, 7, 6, 2, 1],
+              borderColor: '#FF4D4F',
+              backgroundColor: 'transparent',
+              tension: 0.4,
+              borderDash: []
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
+          }
+        }
+      });
+      
+      // 饱和度分布饼图
+      const saturationDistributionCtx = document.getElementById('saturationDistribution').getContext('2d');
+      const saturationDistributionChart = new Chart(saturationDistributionCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['低负荷', '正常', '高负荷'],
+          datasets: [{
+            data: [12, 13, 7],
+            backgroundColor: [
+              '#52C41A',
+              '#FAAD14',
+              '#FF4D4F'
+            ],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+      
+      // 页面滚动时导航栏效果
+      window.addEventListener('scroll', function() {
+        const header = document.querySelector('header');
+        if (window.scrollY > 10) {
+          header.classList.add('shadow');
+        } else {
+          header.classList.remove('shadow');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

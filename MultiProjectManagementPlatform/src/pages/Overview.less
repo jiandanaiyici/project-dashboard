@@ -1,0 +1,94 @@
+// 概览页面容器样式
+.overview-container {
+  padding: 0;
+}
+
+// 页面标题样式
+.page-title {
+  margin-bottom: 24px;
+  color: #1f1f1f;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+// 统计卡片行样式
+.stats-row {
+  margin-bottom: 24px;
+
+  .ant-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 图表标签页样式
+.charts-tabs {
+  margin-top: 24px;
+
+  .ant-tabs-card>.ant-tabs-nav {
+    .ant-tabs-tab {
+      border-radius: 8px 8px 0 0;
+      font-weight: 500;
+
+      &.ant-tabs-tab-active {
+        color: #1890ff;
+        border-bottom: 2px solid #1890ff;
+      }
+    }
+  }
+
+  .ant-tabs-content-holder {
+    border: 1px solid #f0f0f0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .ant-card {
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0;
+  }
+}
+
+// 加载状态样式
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .stats-row {
+    margin-bottom: 16px;
+  }
+
+  .charts-tabs {
+    margin-top: 16px;
+
+    .ant-tabs-card>.ant-tabs-nav {
+      overflow-x: auto;
+
+      .ant-tabs-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .loading-container {
+    height: 300px;
+  }
+}

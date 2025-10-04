@@ -1,0 +1,221 @@
+// 增强版应用埋点数据报表演示页面样式
+.app-analytics {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+
+  .demo-header {
+    margin-bottom: 24px;
+    text-align: center;
+
+    .demo-title {
+      color: #333;
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .demo-description {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  }
+
+  .demo-divider {
+    margin-bottom: 24px;
+  }
+
+  .demo-content {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .demo-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+  }
+
+  .demo-intro {
+    padding: 24px;
+    border-bottom: 1px solid #f0f0f0;
+
+    .feature-list {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-item {
+      padding: 16px;
+      background-color: #fafafa;
+      border-radius: 6px;
+      border-left: 3px solid #1890ff;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .ant-typography {
+        margin-bottom: 8px;
+      }
+
+      .ant-typography strong {
+        color: #1890ff;
+        font-weight: 600;
+      }
+
+      .ant-typography p {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 8px 0 0 0;
+      }
+    }
+  }
+
+  .demo-intro-divider {
+    margin: 0;
+  }
+
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  // 响应式设计
+  @media screen and (max-width: 992px) {
+    padding: 16px;
+
+    .demo-header .demo-title {
+      font-size: 24px;
+    }
+
+    .demo-header .demo-description {
+      font-size: 14px;
+    }
+
+    .demo-intro {
+      padding: 16px;
+
+      .feature-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dashboard-container {
+      padding: 8px;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    padding: 12px;
+
+    .demo-header .demo-title {
+      font-size: 20px;
+    }
+
+    .demo-intro {
+      padding: 12px;
+
+      .feature-item {
+        padding: 12px;
+      }
+
+      .feature-item .ant-typography p {
+        font-size: 13px;
+      }
+    }
+
+    .dashboard-container {
+      padding: 4px;
+    }
+  }
+
+  // 深色主题支持
+  :global(.ant-theme-dark) & {
+    background-color: #141414;
+
+    .demo-header .demo-title {
+      color: #fff;
+    }
+
+    .demo-header .demo-description {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .demo-card {
+      background: #1f1f1f;
+      border-color: #303030;
+    }
+
+    .demo-intro {
+      border-bottom-color: #303030;
+
+      .feature-item {
+        background-color: #292929;
+        border-left-color: #40a9ff;
+
+        .ant-typography strong {
+          color: #40a9ff;
+        }
+
+        .ant-typography p {
+          color: rgba(255, 255, 255, 0.65);
+        }
+      }
+    }
+  }
+
+  // 加载状态优化
+  .ant-spin-nested-loading > div > .ant-spin {
+    max-height: 600px;
+    overflow: hidden;
+  }
+
+  // 空状态优化
+  .ant-empty {
+    padding: 60px 0;
+  }
+
+  // 卡片悬停效果
+  .demo-card {
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // 标题样式优化
+  .ant-typography h4 {
+    color: #333;
+    font-weight: 600;
+  }
+
+  // 深色主题下的标题样式
+  :global(.ant-theme-dark) {
+    .ant-typography h4 {
+      color: #fff;
+    }
+  }
+
+  // 分割线样式
+  .ant-divider {
+    background-color: #f0f0f0;
+  }
+
+  // 深色主题下的分割线
+  :global(.ant-theme-dark) {
+    .ant-divider {
+      background-color: #303030;
+    }
+  }
+}

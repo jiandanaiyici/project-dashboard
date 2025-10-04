@@ -1,0 +1,190 @@
+/* 时间管理分析页面样式 */
+.time-analysis-container {
+  padding: 0;
+}
+
+/* 页面头部样式 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* 页面标题样式 */
+.page-title {
+  margin: 0;
+  color: #333333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* 筛选容器样式 */
+.filter-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* 筛选项样式 */
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 筛选标签样式 */
+.filter-label {
+  font-size: 12px;
+  color: #666666;
+  margin-bottom: 2px;
+}
+
+/* 筛选选择器样式 */
+.filter-select {
+  width: 200px;
+}
+
+/* 日期范围选择器样式 */
+.date-range-picker {
+  width: 280px;
+}
+
+/* 重置按钮样式 */
+.reset-button {
+  height: 32px;
+  margin-top: auto;
+}
+
+/* 统计行样式 */
+.stats-row {
+  margin-bottom: 24px;
+}
+
+/* 统计卡片样式 */
+.stat-card {
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 分析标签页样式 */
+.analysis-tabs {
+  margin-bottom: 24px;
+}
+
+/* 图表卡片样式 */
+.chart-card {
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  box-shadow: none;
+  padding: 16px;
+}
+
+/* 图表容器样式 */
+.chart-container {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+}
+
+/* 记录卡片样式 */
+.records-card {
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  box-shadow: none;
+}
+
+/* 项目名称样式 */
+.project-name {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 用户选项样式 */
+.user-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 用户图标样式 */
+.user-icon {
+  font-size: 12px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .filter-container {
+    width: 100%;
+  }
+  
+  .filter-select,
+  .date-range-picker {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .filter-container {
+    width: 100%;
+  }
+  
+  .stats-row {
+    margin-bottom: 16px;
+  }
+  
+  .stat-card {
+    margin-bottom: 16px;
+  }
+  
+  .chart-container {
+    min-height: 300px;
+  }
+  
+  .records-card {
+    margin-bottom: 16px;
+  }
+  
+  .records-card .ant-table {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-item {
+    width: 100%;
+  }
+  
+  .filter-select,
+  .date-range-picker {
+    width: 100%;
+  }
+  
+  .chart-container {
+    min-height: 250px;
+  }
+  
+  .records-card .ant-table {
+    font-size: 11px;
+  }
+}

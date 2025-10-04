@@ -1,0 +1,146 @@
+// 资源分配页面容器样式
+.resource-allocation-container {
+  padding: 0;
+}
+
+// 页面标题样式
+.page-title {
+  margin-bottom: 24px;
+  color: #1f1f1f;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+// 资源标签页样式
+.resource-tabs {
+  .ant-tabs-card > .ant-tabs-nav {
+    .ant-tabs-tab {
+      border-radius: 8px 8px 0 0;
+      font-weight: 500;
+
+      &.ant-tabs-tab-active {
+        color: #1890ff;
+        border-bottom: 2px solid #1890ff;
+      }
+    }
+  }
+
+  .ant-tabs-content-holder {
+    border: 1px solid #f0f0f0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .ant-card {
+    border: none;
+    box-shadow: none;
+    margin-bottom: 0;
+  }
+}
+
+// 筛选区域样式
+.filter-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .filter-label {
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+  }
+}
+
+// 内容包装器样式
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// 图表容器样式
+.chart-container {
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 16px;
+  background: #fff;
+}
+
+// 资源表格样式
+.resource-table {
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+
+  .ant-table-thead > tr > th {
+    background-color: #fafafa;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .ant-table-tbody > tr > td {
+    border-color: #f0f0f0;
+  }
+}
+
+// 加载状态样式
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .resource-tabs {
+    margin-top: 16px;
+
+    .ant-tabs-card > .ant-tabs-nav {
+      overflow-x: auto;
+
+      .ant-tabs-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    }
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .filter-label {
+      text-align: center;
+    }
+  }
+  
+  .content-wrapper {
+    gap: 16px;
+  }
+  
+  .chart-container {
+    padding: 12px;
+  }
+  
+  .loading-container {
+    height: 300px;
+  }
+  
+  .resource-table {
+    .ant-table {
+      font-size: 12px;
+    }
+  }
+}

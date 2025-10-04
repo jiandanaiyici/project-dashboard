@@ -1,0 +1,1115 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlowStack - AI决策</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+    <!-- Tailwind配置 -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#165DFF",
+              secondary: "#36CFC9",
+              ai: "#722ED1",
+              neutral: "#F5F7FA",
+              dark: "#1D2129",
+              success: "#52C41A",
+              warning: "#FAAD14",
+              danger: "#FF4D4F",
+            },
+            fontFamily: {
+              inter: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .content-auto {
+          content-visibility: auto;
+        }
+        .card-shadow {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .hover-lift {
+          transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        .gradient-bg {
+          background: linear-gradient(135deg, #165dff 0%, #722ed1 100%);
+        }
+        .ai-gradient {
+          background: linear-gradient(135deg, #722ed1 0%, #165dff 100%);
+        }
+        .pulse-animation {
+          animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+          0% {
+            box-shadow: 0 0 0 0 rgba(114, 46, 209, 0.4);
+          }
+          70% {
+            box-shadow: 0 0 0 10px rgba(114, 46, 209, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(114, 46, 209, 0);
+          }
+        }
+        .scrollbar-thin {
+          scrollbar-width: thin;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 4px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background-color: rgba(114, 46, 209, 0.5);
+          border-radius: 2px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 font-inter text-dark min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+          <!-- 左侧Logo和名称 -->
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-10 h-10 rounded-lg gradient-bg flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-xl">F</span>
+            </div>
+            <span class="text-xl font-bold text-dark">FlowStack</span>
+          </div>
+
+          <!-- 中间导航菜单 -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a
+              href="dashboard.html"
+              class="text-gray-600 hover:text-primary transition-colors duration-200"
+              >全域大盘</a
+            >
+            <a
+              href="project-management-enhanced.html"
+              class="text-gray-600 hover:text-primary transition-colors duration-200"
+              >项目管理</a
+            >
+            <a
+              href="complete-team-performance.html"
+              class="text-gray-600 hover:text-primary transition-colors duration-200"
+              >团队效能</a
+            >
+            <a
+              href="release-management.html"
+              class="text-gray-600 hover:text-primary transition-colors duration-200"
+              >发布管控</a
+            >
+            <a
+              href="ai-decision.html"
+              class="text-primary font-medium border-b-2 border-primary pb-1"
+              >AI决策</a
+            >
+            <a
+              href="personal-dashboard.html"
+              class="text-gray-600 hover:text-primary transition-colors duration-200"
+              >个人看板</a
+            >
+          </nav>
+
+          <!-- 右侧用户区域 -->
+          <div class="flex items-center space-x-4">
+            <button
+              class="relative p-2 text-gray-500 hover:text-primary transition-colors"
+            >
+              <i class="fa fa-bell text-lg"></i>
+              <span
+                class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"
+              ></span>
+            </button>
+            <div class="flex items-center space-x-2 cursor-pointer">
+              <img
+                src="https://picsum.photos/id/1005/200/200"
+                alt="张经理的头像"
+                class="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+              />
+              <span class="hidden md:inline text-sm font-medium">张经理</span>
+              <i class="fa fa-angle-down text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 项目导航栏 -->
+    <div class="bg-white border-b border-gray-200">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-wrap items-center justify-between py-3">
+          <!-- 项目信息 -->
+          <div class="flex items-center">
+            <h2 class="text-lg font-semibold mr-3">支付系统重构</h2>
+            <span
+              class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full"
+              >进行中</span
+            >
+            <span class="ml-4 text-sm text-gray-500 hidden md:inline">
+              <i class="fa fa-lightbulb-o mr-1"></i> AI决策支持 v3.2
+            </span>
+          </div>
+
+          <!-- AI决策导航标签 -->
+          <div class="flex flex-wrap mt-3 sm:mt-0">
+            <a
+              href="#"
+              class="px-3 py-1.5 text-sm text-primary border-b-2 border-primary mr-1"
+              >智能概览</a
+            >
+            <a
+              href="#"
+              class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1"
+              >风险预测</a
+            >
+            <a
+              href="#"
+              class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1"
+              >资源优化</a
+            >
+            <a
+              href="#"
+              class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors mr-1"
+              >发布建议</a
+            >
+            <a
+              href="#"
+              class="px-3 py-1.5 text-sm text-gray-600 hover:text-primary transition-colors"
+              >模型配置</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+      <!-- 页面操作区 -->
+      <div
+        class="flex flex-col md:flex-row md:items-center md:justify-between mb-6"
+      >
+        <div>
+          <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark">
+            AI智能决策中心
+          </h1>
+          <p class="text-gray-500 mt-1">基于机器学习的项目风险预测与决策支持</p>
+        </div>
+
+        <div class="flex items-center mt-4 md:mt-0">
+          <div class="relative mr-3">
+            <select
+              class="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-ai/50 focus:border-ai"
+            >
+              <option>当前项目</option>
+              <option>所有项目</option>
+              <option>支付系统重构</option>
+              <option>用户中心升级</option>
+              <option>订单系统优化</option>
+            </select>
+            <div
+              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500"
+            >
+              <i class="fa fa-chevron-down text-xs"></i>
+            </div>
+          </div>
+
+          <button
+            class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center mr-3"
+          >
+            <i class="fa fa-refresh mr-2"></i>刷新分析
+          </button>
+
+          <button
+            class="bg-ai hover:bg-ai/90 text-white rounded-lg py-2 px-4 text-sm font-medium transition-colors flex items-center"
+          >
+            <i class="fa fa-magic mr-2"></i>生成决策报告
+          </button>
+        </div>
+      </div>
+
+      <!-- AI决策概览 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div
+          class="bg-white rounded-xl p-5 card-shadow hover-lift border-l-4 border-ai"
+        >
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">项目健康评分</div>
+            <div
+              class="w-10 h-10 rounded-full bg-ai/10 flex items-center justify-center"
+            >
+              <i class="fa fa-heartbeat text-ai"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-2xl font-bold">
+            82<span class="text-base font-normal text-gray-500 ml-1">/100</span>
+          </div>
+          <div class="mt-1 text-xs text-success">
+            <i class="fa fa-arrow-up mr-1"></i>较上周提升 3 分
+          </div>
+          <div class="mt-3 text-xs text-gray-600">
+            <span class="font-medium">主要优势：</span>
+            任务完成率高，团队活跃度良好
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-5 card-shadow hover-lift border-l-4 border-warning"
+        >
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">风险指数</div>
+            <div
+              class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center"
+            >
+              <i class="fa fa-exclamation-triangle text-warning"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-2xl font-bold">中等</div>
+          <div class="mt-1 text-xs text-danger">
+            <i class="fa fa-arrow-up mr-1"></i>较上周上升 12%
+          </div>
+          <div class="mt-3 text-xs text-gray-600">
+            <span class="font-medium">主要风险：</span> 核心模块开发进度滞后
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-5 card-shadow hover-lift border-l-4 border-success"
+        >
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">预计交付日期</div>
+            <div
+              class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center"
+            >
+              <i class="fa fa-calendar-check-o text-success"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-xl font-bold">6月30日</div>
+          <div class="mt-1 text-xs text-success">
+            <i class="fa fa-check-circle mr-1"></i>与计划一致
+          </div>
+          <div class="mt-3 text-xs text-gray-600">
+            <span class="font-medium">可信度：</span> 85% 基于当前进度
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-5 card-shadow hover-lift border-l-4 border-primary"
+        >
+          <div class="flex items-center justify-between">
+            <div class="text-gray-500 text-sm">资源利用率</div>
+            <div
+              class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"
+            >
+              <i class="fa fa-users text-primary"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-2xl font-bold">78%</div>
+          <div class="mt-1 text-xs text-warning">
+            <i class="fa fa-arrow-up mr-1"></i>接近最佳负载
+          </div>
+          <div class="mt-3 text-xs text-gray-600">
+            <span class="font-medium">优化建议：</span> 调整2名开发人员任务分配
+          </div>
+        </div>
+      </div>
+
+      <!-- 风险预测和资源优化 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- 风险预测 -->
+        <div class="lg:col-span-2 bg-white rounded-xl p-6 card-shadow">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="font-semibold text-gray-800">项目风险预测</h3>
+              <p class="text-gray-500 text-sm mt-1">
+                基于历史数据和当前趋势的AI风险评估
+              </p>
+            </div>
+            <div class="relative">
+              <select
+                class="appearance-none bg-white border border-gray-300 rounded-lg py-1.5 pl-3 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-ai/50 focus:border-ai"
+              >
+                <option>未来2周</option>
+                <option>未来1个月</option>
+                <option>整个迭代周期</option>
+              </select>
+              <div
+                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500"
+              >
+                <i class="fa fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- 风险趋势图 -->
+          <div class="h-64 mb-6">
+            <canvas id="riskTrendChart"></canvas>
+          </div>
+
+          <!-- 主要风险列表 -->
+          <div>
+            <h4 class="font-medium text-gray-700 mb-4">高优先级风险项</h4>
+            <div class="space-y-4">
+              <div
+                class="border border-danger/30 rounded-lg p-4 bg-danger/5 hover:border-danger transition-colors"
+              >
+                <div class="flex items-start">
+                  <div
+                    class="w-8 h-8 rounded-full bg-danger/10 flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <i class="fa fa-exclamation-triangle text-danger"></i>
+                  </div>
+                  <div class="ml-3 flex-1">
+                    <div class="flex flex-wrap justify-between">
+                      <p class="text-sm font-medium">支付核心模块开发滞后</p>
+                      <span
+                        class="px-2 py-0.5 bg-danger/10 text-danger text-xs rounded-full mt-0.5"
+                        >高风险</span
+                      >
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">
+                      根据当前进度，该模块可能无法按时完成，影响整体发布计划。风险概率：78%
+                    </p>
+
+                    <div class="mt-3">
+                      <div class="text-xs text-gray-500 mb-1">
+                        AI推荐缓解措施：
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <span
+                          class="px-2 py-1 bg-white border border-gray-200 text-gray-700 text-xs rounded-full flex items-center"
+                        >
+                          <i class="fa fa-user-plus text-primary mr-1"></i>
+                          增加1名开发人员
+                        </span>
+                        <span
+                          class="px-2 py-1 bg-white border border-gray-200 text-gray-700 text-xs rounded-full flex items-center"
+                        >
+                          <i class="fa fa-tasks text-primary mr-1"></i>
+                          拆分任务优先级
+                        </span>
+                        <span
+                          class="px-2 py-1 bg-white border border-gray-200 text-gray-700 text-xs rounded-full flex items-center"
+                        >
+                          <i class="fa fa-calendar text-primary mr-1"></i>
+                          调整交付时间
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="border border-warning/30 rounded-lg p-4 bg-warning/5 hover:border-warning transition-colors"
+              >
+                <div class="flex items-start">
+                  <div
+                    class="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <i class="fa fa-exclamation-circle text-warning"></i>
+                  </div>
+                  <div class="ml-3 flex-1">
+                    <div class="flex flex-wrap justify-between">
+                      <p class="text-sm font-medium">
+                        第三方支付接口兼容性问题
+                      </p>
+                      <span
+                        class="px-2 py-0.5 bg-warning/10 text-warning text-xs rounded-full mt-0.5"
+                        >中风险</span
+                      >
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">
+                      新接口与部分老旧设备存在兼容性风险，可能影响用户支付体验。风险概率：45%
+                    </p>
+
+                    <div class="mt-3">
+                      <div class="text-xs text-gray-500 mb-1">
+                        AI推荐缓解措施：
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <span
+                          class="px-2 py-1 bg-white border border-gray-200 text-gray-700 text-xs rounded-full flex items-center"
+                        >
+                          <i class="fa fa-flask text-primary mr-1"></i>
+                          增加兼容性测试
+                        </span>
+                        <span
+                          class="px-2 py-1 bg-white border border-gray-200 text-gray-700 text-xs rounded-full flex items-center"
+                        >
+                          <i class="fa fa-code-fork text-primary mr-1"></i>
+                          保留旧接口兼容层
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="border border-primary/30 rounded-lg p-4 bg-primary/5 hover:border-primary transition-colors"
+              >
+                <div class="flex items-start">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <i class="fa fa-info-circle text-primary"></i>
+                  </div>
+                  <div class="ml-3 flex-1">
+                    <div class="flex flex-wrap justify-between">
+                      <p class="text-sm font-medium">数据库性能瓶颈</p>
+                      <span
+                        class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full mt-0.5"
+                        >低风险</span
+                      >
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">
+                      高并发场景下可能出现数据库性能瓶颈，影响支付处理速度。风险概率：22%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 资源优化 -->
+        <div class="bg-white rounded-xl p-6 card-shadow">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="font-semibold text-gray-800">资源优化建议</h3>
+              <p class="text-gray-500 text-sm mt-1">AI驱动的团队资源分配优化</p>
+            </div>
+            <button class="text-ai text-sm hover:underline">查看详情</button>
+          </div>
+
+          <!-- 资源负载分析 -->
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-700 mb-3">团队成员负载分析</h4>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <div class="flex items-center">
+                    <img
+                      class="w-5 h-5 rounded-full mr-2"
+                      src="https://picsum.photos/id/1012/200/200"
+                      alt="李工程师的头像"
+                    />
+                    <span class="text-gray-600">李工程师</span>
+                  </div>
+                  <span class="text-gray-600">115%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full">
+                  <div
+                    class="h-full bg-danger rounded-full"
+                    style="width: 115%"
+                  ></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <div class="flex items-center">
+                    <img
+                      class="w-5 h-5 rounded-full mr-2"
+                      src="https://picsum.photos/id/1066/200/200"
+                      alt="陈开发的头像"
+                    />
+                    <span class="text-gray-600">95%</span>
+                  </div>
+                  <span class="text-gray-600">95%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full">
+                  <div
+                    class="h-full bg-warning rounded-full"
+                    style="width: 95%"
+                  ></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <div class="flex items-center">
+                    <img
+                      class="w-5 h-5 rounded-full mr-2"
+                      src="https://picsum.photos/id/1027/200/200"
+                      alt="王测试的头像"
+                    />
+                    <span class="text-gray-600">65%</span>
+                  </div>
+                  <span class="text-gray-600">65%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full">
+                  <div
+                    class="h-full bg-success rounded-full"
+                    style="width: 65%"
+                  ></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <div class="flex items-center">
+                    <img
+                      class="w-5 h-5 rounded-full mr-2"
+                      src="https://picsum.photos/id/1025/200/200"
+                      alt="赵架构的头像"
+                    />
+                    <span class="text-gray-600">45%</span>
+                  </div>
+                  <span class="text-gray-600">45%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full">
+                  <div
+                    class="h-full bg-primary rounded-full"
+                    style="width: 45%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 优化建议 -->
+          <div class="border-t border-gray-200 pt-4">
+            <h4 class="font-medium text-gray-700 mb-3">AI优化建议</h4>
+            <div class="space-y-3">
+              <div class="flex items-start">
+                <div
+                  class="w-6 h-6 rounded-full bg-ai/10 flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <i class="fa fa-exchange text-ai text-xs"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm">
+                    将"支付宝接口对接"任务从李工程师分配给赵架构
+                  </p>
+                  <p class="text-xs text-gray-500 mt-1">
+                    预计平衡负载：李工程师 85%，赵架构 65%
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start">
+                <div
+                  class="w-6 h-6 rounded-full bg-ai/10 flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <i class="fa fa-calendar text-ai text-xs"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm">将陈开发的3个低优先级任务延期至下一迭代</p>
+                  <p class="text-xs text-gray-500 mt-1">
+                    预计平衡负载：陈开发 70%
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start">
+                <div
+                  class="w-6 h-6 rounded-full bg-ai/10 flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <i class="fa fa-user-plus text-ai text-xs"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm">临时增加1名开发人员支持核心模块开发</p>
+                  <p class="text-xs text-gray-500 mt-1">
+                    预计可将整体进度提前 3-5 天
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="mt-4 w-full bg-ai/10 hover:bg-ai/20 text-ai rounded-lg py-2 text-sm font-medium transition-colors flex items-center justify-center"
+            >
+              <i class="fa fa-magic mr-2"></i>应用优化建议
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 发布建议和AI助手 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 发布窗口建议 -->
+        <div class="bg-white rounded-xl p-6 card-shadow">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="font-semibold text-gray-800">最佳发布窗口</h3>
+              <p class="text-gray-500 text-sm mt-1">
+                基于用户活跃度和系统负载的AI推荐
+              </p>
+            </div>
+            <div class="relative">
+              <select
+                class="appearance-none bg-white border border-gray-300 rounded-lg py-1.5 pl-3 pr-8 text-xs focus:outline-none focus:ring-2 focus:ring-ai/50 focus:border-ai"
+              >
+                <option>生产环境</option>
+                <option>预发布环境</option>
+                <option>测试环境</option>
+              </select>
+              <div
+                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500"
+              >
+                <i class="fa fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- 推荐发布时间 -->
+          <div
+            class="bg-gradient-to-br from-ai/5 to-primary/5 rounded-xl p-4 mb-6"
+          >
+            <div class="text-center">
+              <div class="text-xs text-gray-500">推荐发布窗口</div>
+              <div class="text-xl font-bold mt-1">6月30日 23:00 - 01:00</div>
+              <div class="text-xs text-ai mt-1">
+                <i class="fa fa-check-circle mr-1"></i> 最佳匹配度 92%
+              </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
+              <div class="bg-white p-2 rounded-lg">
+                <div class="text-gray-500">用户活跃度</div>
+                <div class="font-medium mt-1 text-success">低 (7% 平均)</div>
+              </div>
+              <div class="bg-white p-2 rounded-lg">
+                <div class="text-gray-500">系统负载</div>
+                <div class="font-medium mt-1 text-success">低 (22% 平均)</div>
+              </div>
+              <div class="bg-white p-2 rounded-lg">
+                <div class="text-gray-500">恢复窗口</div>
+                <div class="font-medium mt-1 text-success">2小时 (足够)</div>
+              </div>
+              <div class="bg-white p-2 rounded-lg">
+                <div class="text-gray-500">成功率预测</div>
+                <div class="font-medium mt-1 text-success">96%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 备选发布时间 -->
+          <div>
+            <h4 class="font-medium text-gray-700 mb-3 text-sm">备选发布窗口</h4>
+            <div class="space-y-3">
+              <div
+                class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer"
+              >
+                <div class="flex justify-between">
+                  <div class="text-sm font-medium">7月1日 03:00 - 05:00</div>
+                  <span
+                    class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full"
+                    >匹配度 85%</span
+                  >
+                </div>
+                <div class="mt-2 flex items-center text-xs text-gray-500">
+                  <i class="fa fa-user-o mr-1"></i> 低活跃度
+                  <span class="mx-2">•</span>
+                  <i class="fa fa-server mr-1"></i> 低负载
+                </div>
+              </div>
+
+              <div
+                class="border border-gray-200 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer"
+              >
+                <div class="flex justify-between">
+                  <div class="text-sm font-medium">7月2日 22:00 - 00:00</div>
+                  <span
+                    class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full"
+                    >匹配度 80%</span
+                  >
+                </div>
+                <div class="mt-2 flex items-center text-xs text-gray-500">
+                  <i class="fa fa-user-o mr-1"></i> 中低活跃度
+                  <span class="mx-2">•</span>
+                  <i class="fa fa-server mr-1"></i> 中负载
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 智能问答助手 -->
+        <div class="lg:col-span-2 bg-white rounded-xl p-6 card-shadow">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="font-semibold text-gray-800">AI智能助手</h3>
+              <p class="text-gray-500 text-sm mt-1">
+                基于项目数据的智能问答与分析
+              </p>
+            </div>
+            <div class="flex space-x-2">
+              <button
+                class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-1.5 px-3 text-sm font-medium transition-colors flex items-center"
+              >
+                <i class="fa fa-history mr-2"></i>历史记录
+              </button>
+              <button
+                class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg py-1.5 px-3 text-sm font-medium transition-colors flex items-center"
+              >
+                <i class="fa fa-star-o mr-2"></i>收藏
+              </button>
+            </div>
+          </div>
+
+          <!-- 问答界面 -->
+          <div
+            class="border border-gray-200 rounded-lg overflow-hidden flex flex-col h-80"
+          >
+            <!-- 问答内容区 -->
+            <div
+              class="flex-grow p-4 overflow-y-auto scrollbar-thin"
+              id="ai-chat-container"
+            >
+              <!-- 系统提示 -->
+              <div class="bg-gray-50 rounded-lg p-3 mb-4 max-w-3xl">
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-6 h-6 rounded-full bg-ai flex items-center justify-center text-white text-xs"
+                  >
+                    <i class="fa fa-robot"></i>
+                  </div>
+                  <span class="ml-2 text-xs font-medium text-gray-700"
+                    >AI助手</span
+                  >
+                </div>
+                <p class="text-sm text-gray-600">
+                  您好！我是项目智能助手，可以为您提供项目风险分析、资源优化建议和发布计划支持。请问有什么可以帮助您的？
+                </p>
+              </div>
+
+              <!-- 用户问题 -->
+              <div class="flex justify-end mb-4">
+                <div class="bg-primary/5 rounded-lg p-3 max-w-3xl">
+                  <div class="flex items-center justify-end mb-2">
+                    <span class="mr-2 text-xs font-medium text-gray-700"
+                      >您</span
+                    >
+                    <div
+                      class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs overflow-hidden"
+                    >
+                      <img
+                        src="https://picsum.photos/id/1005/200/200"
+                        alt="您的头像"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-600">
+                    我们能按时完成v2.0.0版本的发布吗？如果有风险，主要原因是什么？
+                  </p>
+                </div>
+              </div>
+
+              <!-- AI回答 -->
+              <div class="bg-gray-50 rounded-lg p-3 mb-4 max-w-3xl">
+                <div class="flex items-center mb-2">
+                  <div
+                    class="w-6 h-6 rounded-full bg-ai flex items-center justify-center text-white text-xs"
+                  >
+                    <i class="fa fa-robot"></i>
+                  </div>
+                  <span class="ml-2 text-xs font-medium text-gray-700"
+                    >AI助手</span
+                  >
+                </div>
+                <p class="text-sm text-gray-600 mb-3">
+                  根据当前项目进度和历史数据预测，按时完成v2.0.0版本发布的概率为65%，存在一定风险。
+                </p>
+                <p class="text-sm text-gray-600 mb-3">主要风险原因：</p>
+                <ul class="text-sm text-gray-600 list-disc pl-5 mb-3 space-y-1">
+                  <li>支付核心模块开发进度滞后计划约4天</li>
+                  <li>李工程师当前负载过高(115%)，可能影响交付质量</li>
+                  <li>第三方支付接口兼容性测试尚未完成</li>
+                </ul>
+                <p class="text-sm text-gray-600">
+                  建议采取资源优化措施，平衡团队负载，优先保障核心模块开发。
+                </p>
+              </div>
+            </div>
+
+            <!-- 输入区 -->
+            <div class="border-t border-gray-200 p-3">
+              <div class="flex">
+                <input
+                  type="text"
+                  placeholder="输入您的问题..."
+                  class="flex-grow border border-gray-300 rounded-l-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ai/50 focus:border-ai"
+                />
+                <button
+                  class="bg-ai hover:bg-ai/90 text-white rounded-r-lg py-2 px-4 text-sm font-medium transition-colors flex items-center pulse-animation"
+                >
+                  <i class="fa fa-paper-plane"></i>
+                </button>
+              </div>
+              <div class="flex justify-center mt-3 space-x-4">
+                <button
+                  class="text-gray-500 hover:text-ai text-xs transition-colors"
+                >
+                  <i class="fa fa-lightbulb-o mr-1"></i> 推荐问题
+                </button>
+                <button
+                  class="text-gray-500 hover:text-ai text-xs transition-colors"
+                >
+                  <i class="fa fa-file-text-o mr-1"></i> 生成报告
+                </button>
+                <button
+                  class="text-gray-500 hover:text-ai text-xs transition-colors"
+                >
+                  <i class="fa fa-microphone mr-1"></i> 语音输入
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-8">
+      <div class="container mx-auto px-4">
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-sm">F</span>
+            </div>
+            <span class="ml-2 text-sm font-medium text-gray-800"
+              >FlowStack</span
+            >
+            <span class="ml-4 text-xs text-gray-500"
+              >© 2025 FlowStack Inc. 保留所有权利</span
+            >
+          </div>
+          <div class="flex items-center space-x-6 mt-4 md:mt-0">
+            <a href="#" class="text-gray-500 hover:text-primary text-sm"
+              >使用文档</a
+            >
+            <a href="#" class="text-gray-500 hover:text-primary text-sm"
+              >隐私政策</a
+            >
+            <a href="#" class="text-gray-500 hover:text-primary text-sm"
+              >联系我们</a
+            >
+            <a href="#" class="text-gray-500 hover:text-primary text-sm"
+              >关于我们</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+      // 初始化风险趋势图表
+      document.addEventListener("DOMContentLoaded", function () {
+        // 风险趋势图表
+        const riskCtx = document
+          .getElementById("riskTrendChart")
+          .getContext("2d");
+        const riskChart = new Chart(riskCtx, {
+          type: "line",
+          data: {
+            labels: [
+              "5/28",
+              "5/30",
+              "6/1",
+              "6/3",
+              "6/5",
+              "6/7",
+              "6/9",
+              "6/11",
+              "6/13",
+              "6/15",
+            ],
+            datasets: [
+              {
+                label: "总体风险指数",
+                data: [45, 42, 40, 43, 48, 52, 58, 62, 65, 68],
+                borderColor: "#722ED1",
+                backgroundColor: "rgba(114, 46, 209, 0.05)",
+                tension: 0.4,
+                fill: true,
+              },
+              {
+                label: "进度风险",
+                data: [30, 28, 25, 27, 35, 42, 48, 55, 60, 65],
+                borderColor: "#FAAD14",
+                backgroundColor: "transparent",
+                tension: 0.4,
+                borderDash: [5, 5],
+              },
+              {
+                label: "质量风险",
+                data: [20, 18, 15, 16, 18, 20, 22, 25, 28, 30],
+                borderColor: "#FF4D4F",
+                backgroundColor: "transparent",
+                tension: 0.4,
+                borderDash: [2, 2],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: "index",
+              intersect: false,
+            },
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  boxWidth: 10,
+                  usePointStyle: true,
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                title: {
+                  display: true,
+                  text: "风险指数",
+                },
+                grid: {
+                  color: "rgba(0, 0, 0, 0.05)",
+                },
+              },
+              x: {
+                grid: {
+                  display: false,
+                },
+              },
+            },
+          },
+        });
+
+        // 导航标签切换功能
+        const navTabs = document.querySelectorAll(
+          ".flex.flex-wrap.mt-3.sm\\:mt-0 a"
+        );
+        navTabs.forEach((tab) => {
+          tab.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            // 更新导航标签样式
+            navTabs.forEach((t) => {
+              t.classList.remove(
+                "text-primary",
+                "border-b-2",
+                "border-primary"
+              );
+              t.classList.add("text-gray-600", "hover:text-primary");
+            });
+            this.classList.remove("text-gray-600", "hover:text-primary");
+            this.classList.add("text-primary", "border-b-2", "border-primary");
+          });
+        });
+
+        // AI助手交互模拟
+        const chatInput = document
+          .querySelector("#ai-chat-container")
+          .nextElementSibling.querySelector("input");
+        const sendButton = document
+          .querySelector("#ai-chat-container")
+          .nextElementSibling.querySelector("button");
+        const chatContainer = document.getElementById("ai-chat-container");
+
+        sendButton.addEventListener("click", function () {
+          sendMessage();
+        });
+
+        chatInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
+        });
+
+        function sendMessage() {
+          const message = chatInput.value.trim();
+          if (!message) return;
+
+          // 添加用户消息
+          const userMessageHtml = `
+          <div class="flex justify-end mb-4">
+            <div class="bg-primary/5 rounded-lg p-3 max-w-3xl">
+              <div class="flex items-center justify-end mb-2">
+                <span class="mr-2 text-xs font-medium text-gray-700">您</span>
+                <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs overflow-hidden">
+                  <img src="https://picsum.photos/id/1005/200/200" alt="您的头像" class="w-full h-full object-cover">
+                </div>
+              </div>
+              <p class="text-sm text-gray-600">${message}</p>
+            </div>
+          </div>
+        `;
+          chatContainer.insertAdjacentHTML("beforeend", userMessageHtml);
+
+          // 清空输入框
+          chatInput.value = "";
+
+          // 滚动到底部
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+
+          // 模拟AI回复
+          setTimeout(() => {
+            const aiResponses = [
+              "根据分析，您提出的问题涉及多个因素。我建议优先关注核心模块的开发进度，并适当调整资源分配以降低风险。具体方案可以参考资源优化区域的建议。",
+              "您的问题需要结合当前项目的多个维度进行分析。从数据来看，主要挑战在于时间约束和资源负载。我可以生成一份详细的分析报告供您参考。",
+              "基于历史数据和当前趋势，我认为通过合理的资源调整，项目可以按计划推进。建议重点关注高风险任务的进展，并增加每日站会的沟通频率。",
+            ];
+
+            const randomResponse =
+              aiResponses[Math.floor(Math.random() * aiResponses.length)];
+
+            const aiMessageHtml = `
+            <div class="bg-gray-50 rounded-lg p-3 mb-4 max-w-3xl">
+              <div class="flex items-center mb-2">
+                <div class="w-6 h-6 rounded-full bg-ai flex items-center justify-center text-white text-xs">
+                  <i class="fa fa-robot"></i>
+                </div>
+                <span class="ml-2 text-xs font-medium text-gray-700">AI助手</span>
+              </div>
+              <p class="text-sm text-gray-600">${randomResponse}</p>
+            </div>
+          `;
+            chatContainer.insertAdjacentHTML("beforeend", aiMessageHtml);
+
+            // 滚动到底部
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }, 1500);
+        }
+      });
+    </script>
+  </body>
+</html>

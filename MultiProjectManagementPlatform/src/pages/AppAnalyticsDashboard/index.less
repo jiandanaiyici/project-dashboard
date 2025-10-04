@@ -1,0 +1,357 @@
+// 应用埋点数据报表大盘样式
+.app-analytics-dashboard {
+  padding: 16px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+
+  // 头部样式
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    h2 {
+      margin: 0;
+      color: #333;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .time-range-picker {
+        width: 300px;
+      }
+
+      .refresh-btn,
+      .export-btn {
+        transition: all 0.3s;
+      }
+
+      .refresh-btn:hover,
+      .export-btn:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // 总览统计卡片样式
+  .overview-stats {
+    margin-bottom: 24px;
+
+    .stat-card {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+      background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+      border-radius: 8px;
+      overflow: hidden;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+      }
+
+      .ant-statistic {
+        padding: 16px 0;
+
+        .ant-statistic-title {
+          color: #666;
+          font-size: 14px;
+          margin-bottom: 8px;
+        }
+
+        .ant-statistic-content {
+          .ant-statistic-content-value {
+            font-size: 24px;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  // 应用埋点概览卡片样式
+  .analytics-overview-card {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    .ant-card-head {
+      background-color: #fafafa;
+      border-bottom: 1px solid #e8e8e8;
+
+      .ant-card-head-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
+
+    .overview-table {
+      .ant-table-tbody {
+        .ant-table-row {
+          transition: background-color 0.3s;
+
+          &:hover {
+            background-color: #f5f5f5;
+          }
+
+          td {
+            border-bottom: 1px solid #f0f0f0;
+          }
+        }
+      }
+
+      .ant-table-column-sorters {
+        font-weight: 600;
+      }
+    }
+  }
+
+  // 图表区域样式
+  .charts-section {
+    margin-bottom: 24px;
+
+    .chart-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: all 0.3s;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      }
+
+      .ant-card-head {
+        background-color: #fafafa;
+        border-bottom: 1px solid #e8e8e8;
+
+        .ant-card-head-title {
+          font-size: 16px;
+          font-weight: 600;
+        }
+      }
+
+      .ant-card-body {
+        padding: 20px;
+      }
+    }
+  }
+
+  // 应用详情区域样式
+  .app-detail-section {
+    margin-top: 24px;
+
+    .app-detail-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+
+      .ant-card-head {
+        background-color: #f0f8ff;
+        border-bottom: 1px solid #e6f7ff;
+
+        .ant-card-head-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1890ff;
+        }
+
+        .ant-card-extra {
+          padding: 0;
+
+          .ant-btn-link {
+            color: #1890ff;
+            font-weight: 500;
+          }
+        }
+      }
+
+      .ant-card-body {
+        padding: 24px;
+      }
+
+      // 应用趋势分析部分
+      .app-trend-section {
+        margin-bottom: 32px;
+
+        h3 {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 16px;
+          padding-bottom: 8px;
+          border-bottom: 2px solid #1890ff;
+          display: inline-block;
+        }
+      }
+
+      // 应用页面分析部分
+      .app-pages-section {
+        h3 {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 16px;
+          padding-bottom: 8px;
+          border-bottom: 2px solid #52c41a;
+          display: inline-block;
+        }
+
+        .pages-table {
+          .ant-table-tbody {
+            .ant-table-row {
+              transition: background-color 0.3s;
+
+              &:hover {
+                background-color: #f5f5f5;
+              }
+
+              td {
+                border-bottom: 1px solid #f0f0f0;
+              }
+            }
+          }
+
+          .ant-table-column-sorters {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  // 响应式设计
+  @media (max-width: 1200px) {
+    .dashboard-header {
+      .header-actions {
+        .time-range-picker {
+          width: 250px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px;
+
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .header-actions {
+        width: 100%;
+
+        .time-range-picker {
+          width: 100%;
+        }
+      }
+    }
+
+    .stat-card {
+      .ant-statistic {
+        .ant-statistic-title {
+          font-size: 12px;
+        }
+
+        .ant-statistic-content {
+          .ant-statistic-content-value {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+
+    .chart-card {
+      .ant-card-body {
+        padding: 16px 12px;
+      }
+    }
+
+    .app-detail-card {
+      .ant-card-body {
+        padding: 16px;
+      }
+
+      h3 {
+        font-size: 14px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .dashboard-header {
+      h2 {
+        font-size: 18px;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+
+    .overview-table,
+    .pages-table {
+      .ant-table {
+        .ant-table-container {
+          .ant-table-content {
+            overflow-x: auto;
+          }
+        }
+      }
+    }
+  }
+
+  // 图表容器的最小高度设置，确保图表渲染正常
+  .recharts-responsive-container {
+    min-height: 280px;
+  }
+
+  // 加载状态样式
+  .ant-card-loading {
+    min-height: 300px;
+  }
+
+  // 空状态样式
+  .ant-empty {
+    margin: 40px 0;
+  }
+
+  // 表格排序图标颜色
+  .ant-table-column-sorter-up,
+  .ant-table-column-sorter-down {
+    color: #1890ff;
+  }
+
+  // 按钮悬停效果增强
+  .ant-btn {
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  // 表格单元格内容过长时的省略处理
+  .ant-table-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

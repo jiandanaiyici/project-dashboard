@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多项目管理平台设计方案</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        accent: '#722ED1',
+                        neutral: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#1D2129',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #165DFF 0%, #722ED1 100%);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- 导航栏 -->
+    <nav id="navbar" class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-tasks text-primary text-2xl"></i>
+                <span class="font-bold text-xl text-primary">项目管理平台</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#overview" class="text-neutral hover:text-primary transition-colors">概述</a>
+                <a href="#goals" class="text-neutral hover:text-primary transition-colors">核心目标</a>
+                <a href="#modules" class="text-neutral hover:text-primary transition-colors">功能模块</a>
+                <a href="#advantages" class="text-neutral hover:text-primary transition-colors">平台优势</a>
+                <a href="#tech" class="text-neutral hover:text-primary transition-colors">技术实现</a>
+            </div>
+            <button class="md:hidden text-neutral hover:text-primary" id="menu-toggle">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#overview" class="py-2 text-neutral hover:text-primary transition-colors">概述</a>
+                <a href="#goals" class="py-2 text-neutral hover:text-primary transition-colors">核心目标</a>
+                <a href="#modules" class="py-2 text-neutral hover:text-primary transition-colors">功能模块</a>
+                <a href="#advantages" class="py-2 text-neutral hover:text-primary transition-colors">平台优势</a>
+                <a href="#tech" class="py-2 text-neutral hover:text-primary transition-colors">技术实现</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 头部横幅 -->
+    <header class="gradient-bg pt-28 pb-16 md:pt-36 md:pb-24">
+        <div class="container mx-auto px-4 text-center text-white">
+            <h1 class="text-3xl md:text-5xl font-bold mb-6 text-shadow">多项目管理平台设计方案</h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto opacity-90">
+                一款综合考虑人员负载、资源调动和加班情况的智能管理平台，
+                解决多项目并行时的资源冲突、效率低下等核心问题
+            </p>
+            <div class="mt-10">
+                <a href="#modules"
+                    class="inline-block bg-white text-primary font-medium px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all">
+                    探索功能模块 <i class="fa fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+        <!-- 概述部分 -->
+        <section id="overview" class="mb-20">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4">平台概述</h2>
+                    <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6 md:p-8">
+                    <p class="text-lg leading-relaxed">
+                        作为资深项目经理，设计的这款多项目管理平台致力于解决企业在多项目并行时面临的资源分配不均、
+                        人员负载失衡、响应变化迟缓等挑战。平台通过整合项目进度跟踪、资源智能调度、负载实时监控和
+                        加班科学管理等功能，为项目管理团队提供全方位的决策支持，实现资源最优配置和团队可持续发展。
+                    </p>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-light rounded-lg p-5 flex items-start">
+                            <div class="bg-primary/10 p-3 rounded-full mr-4">
+                                <i class="fa fa-line-chart text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2">数据驱动决策</h3>
+                                <p class="text-neutral">基于实时数据和历史分析，为资源分配提供科学依据</p>
+                            </div>
+                        </div>
+                        <div class="bg-light rounded-lg p-5 flex items-start">
+                            <div class="bg-primary/10 p-3 rounded-full mr-4">
+                                <i class="fa fa-balance-scale text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg mb-2">资源平衡优化</h3>
+                                <p class="text-neutral">避免个别人员过度工作而其他人闲置的情况</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心目标 -->
+        <section id="goals" class="mb-20">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">平台核心目标</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 目标卡片 1 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa fa-dashboard text-primary text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl mb-3">实时掌握状态</h3>
+                    <p class="text-neutral">实时掌握各项目进度与资源分配情况，提高管理透明度</p>
+                </div>
+
+                <!-- 目标卡片 2 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa fa-users text-primary text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl mb-3">优化人员负载</h3>
+                    <p class="text-neutral">避免过度分配或资源闲置，实现人员负载的最佳平衡</p>
+                </div>
+
+                <!-- 目标卡片 3 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa fa-refresh text-primary text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl mb-3">智能调度资源</h3>
+                    <p class="text-neutral">应对项目优先级变化，实现资源的动态、智能调度</p>
+                </div>
+
+                <!-- 目标卡片 4 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa fa-clock-o text-primary text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl mb-3">合理管理加班</h3>
+                    <p class="text-neutral">监控并合理管理加班情况，保障团队可持续发展</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能模块 -->
+        <section id="modules" class="mb-20">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">核心功能模块</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+                <p class="mt-4 text-neutral max-w-2xl mx-auto">
+                    平台包含六大核心功能模块，相互协作形成完整的多项目管理生态系统
+                </p>
+            </div>
+
+            <!-- 模块1：项目总览 -->
+            <div class="mb-12 bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="md:flex">
+                    <div class="md:w-1/3 gradient-bg p-8 text-white flex flex-col justify-center">
+                        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa fa-eye text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">项目总览模块</h3>
+                        <p class="opacity-90">全局视角掌握所有项目状态和资源分布情况</p>
+                    </div>
+                    <div class="md:w-2/3 p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-light rounded-lg p-4">
+                                <h4 class="font-semibold mb-2 flex items-center">
+                                    <i class="fa fa-tachometer text-primary mr-2"></i>多项目仪表盘
+                                </h4>
+                                <p class="text-sm text-neutral">实时显示所有项目的进度、风险等级、关键里程碑</p>
+                            </div>
+                            <div class="bg-light rounded-lg p-4">
+                                <h4 class="font-semibold mb-2 flex items-center">
+                                    <i class="fa fa-fire text-warning mr-2"></i>资源热力图
+                                </h4>
+                                <p class="text-sm text-neutral">直观展示各部门/团队的资源占用情况</p>
+                            </div>
+                            <div class="bg-light rounded-lg p-4">
+                                <h4 class="font-semibold mb-2 flex items-center">
+                                    <i class="fa fa-flag text-accent mr-2"></i>优先级管理
+                                </h4>
+                                <p class="text-sm text-neutral">支持动态调整项目优先级并自动影响资源分配</p>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="projectOverviewChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块2：资源管理 -->
+            <div class="mb-12 bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="md:flex flex-row-reverse">
+                    <div class="md:w-1/3 bg-accent p-8 text-white flex flex-col justify-center">
+                        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa fa-cubes text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3">资源管理模块</h3>
+                        <p class="opacity-90">全面管理企业资源，实现资源信息的集中化管控</p>
+                    </div>
+                    <div class="md:w-2/3 p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-light rounded-lg p-4">
+                                <h4 class="font-semibold mb-2 flex items-center">
+                                    <i class="fa fa-user text-primary mr-2"></i>人员档案库
+                                </h4>
+                                <p class="text-sm text-neutral">记录员工技能、可用时间、当前负载、历史项目经验</p>
+                            </div>
+                            <div class="bg-light rounded-lg p-4">
+                                <h4 class="font-semibold mb-2 flex items-center">
+                                    <i class="fa fa-tags text-warning mr-2"></i>资源池管理
+                                </h4>
+                                <p class="text-sm text-neutral">按技能、部门、角色分类管理可调配资源</p>
+                            </div>
+                            <div class="bg-light rounded-lg p-4">
+                                <h4 class="font-semibold mb-2 flex items-center">
+                                    <i class="fa fa-binoculars text-accent mr-2"></i>需求预测
+                                </h4>
+                                <p class="text-sm text-neutral">基于项目计划自动预测未来资源需求</p>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="resourceManagementChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模块3-6 简要展示 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 模块3：负载监控 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fa fa-balance-scale text-secondary text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl">负载监控模块</h3>
+                    </div>
+                    <ul class="space-y-3 text-neutral">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>个人负载视图：显示每位员工的任务分配和时间占用率</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>团队负载分析：部门/团队级别的资源负载平衡情况</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>负载预警机制：当人员负载超过阈值（如80%）时自动提醒</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>负载平衡建议：基于当前分配提供人员调整优化方案</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 模块4：资源调度 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fa fa-random text-primary text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl">资源调度模块</h3>
+                    </div>
+                    <ul class="space-y-3 text-neutral">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>智能分配算法：根据技能匹配度、当前负载、项目优先级自动推荐</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>资源冲突解决：识别并提示资源分配冲突，提供替代方案</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>跨项目资源调动：支持在不同项目间灵活调配资源</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                            <span>临时资源请求与审批流程：规范临时资源调配的申请和审批</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 模块5：加班管理 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-warning/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fa fa-clock-o text-warning text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl">加班管理模块</h3>
+                    </div>
+                    <ul class="space-y-3 text-neutral">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                            <span>加班记录与统计：自动记录和统计个人/团队加班时长</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                            <span>加班原因分析：分类统计加班原因（计划外任务、需求变更等）</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                            <span>加班预警：当某人员/团队连续加班或累计加班超时自动预警</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                            <span>加班成本分析：计算加班对项目成本的影响</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 模块6：报表与分析 -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <div
+                            class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fa fa-bar-chart text-accent text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-xl">报表与分析模块</h3>
+                    </div>
+                    <ul class="space-y-3 text-neutral">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                            <span>资源利用率报表：各时段资源利用效率分析</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                            <span>项目人力成本分析：按项目、阶段、团队维度统计人力成本</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                            <span>加班趋势分析：识别加班模式和潜在问题</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                            <span>资源预测模型：基于历史数据预测未来资源需求</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 个人时间明细看板 -->
+        <section class="mb-20">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">个人时间明细看板</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 md:p-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-semibold">张工程师 - 本周时间分配</h3>
+                        <p class="text-neutral">产品研发部 | 高级开发工程师</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex space-x-2">
+                        <button
+                            class="px-4 py-2 bg-light rounded-lg text-neutral hover:bg-primary hover:text-white transition-colors">
+                            周视图
+                        </button>
+                        <button
+                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            日视图
+                        </button>
+                        <button
+                            class="px-4 py-2 bg-light rounded-lg text-neutral hover:bg-primary hover:text-white transition-colors">
+                            月视图
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="bg-light">
+                                <th class="py-3 px-4 text-left font-semibold">项目名称</th>
+                                <th class="py-3 px-4 text-left font-semibold">任务描述</th>
+                                <th class="py-3 px-4 text-left font-semibold">开始时间</th>
+                                <th class="py-3 px-4 text-left font-semibold">结束时间</th>
+                                <th class="py-3 px-4 text-left font-semibold">时长(小时)</th>
+                                <th class="py-3 px-4 text-left font-semibold">类型</th>
+                                <th class="py-3 px-4 text-left font-semibold">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr>
+                                <td class="py-3 px-4">客户管理系统V2.0</td>
+                                <td class="py-3 px-4">用户认证模块开发</td>
+                                <td class="py-3 px-4">09:00</td>
+                                <td class="py-3 px-4">12:00</td>
+                                <td class="py-3 px-4">3</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">开发</span></td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">客户管理系统V2.0</td>
+                                <td class="py-3 px-4">API接口文档编写</td>
+                                <td class="py-3 px-4">13:30</td>
+                                <td class="py-3 px-4">15:00</td>
+                                <td class="py-3 px-4">1.5</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">文档</span>
+                                </td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">数据分析平台</td>
+                                <td class="py-3 px-4">数据可视化bug修复</td>
+                                <td class="py-3 px-4">15:30</td>
+                                <td class="py-3 px-4">18:00</td>
+                                <td class="py-3 px-4">2.5</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">测试</span>
+                                </td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">数据分析平台</td>
+                                <td class="py-3 px-4">性能优化方案讨论</td>
+                                <td class="py-3 px-4">19:00</td>
+                                <td class="py-3 px-4">21:00</td>
+                                <td class="py-3 px-4">2</td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">加班</span></td>
+                                <td class="py-3 px-4"><span
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已完成</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">今日总工作时长</p>
+                        <p class="text-2xl font-bold text-primary">9小时</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">加班时长</p>
+                        <p class="text-2xl font-bold text-warning">2小时</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">本周累计工作</p>
+                        <p class="text-2xl font-bold text-primary">42小时</p>
+                    </div>
+                    <div class="bg-light rounded-lg p-4">
+                        <p class="text-neutral text-sm">负载率</p>
+                        <p class="text-2xl font-bold text-success">75%</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 平台优势 -->
+        <section id="advantages" class="mb-20">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">平台优势</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- 优势1 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fa fa-bar-chart text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">数据驱动决策</h3>
+                    <p class="text-neutral text-sm">通过实时数据和历史分析，为资源分配提供科学依据</p>
+                </div>
+
+                <!-- 优势2 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fa fa-balance-scale text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">平衡资源负载</h3>
+                    <p class="text-neutral text-sm">避免个别人员过度工作而其他人闲置的情况</p>
+                </div>
+
+                <!-- 优势3 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fa fa-bolt text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">提高资源灵活性</h3>
+                    <p class="text-neutral text-sm">快速响应项目变化，实现资源的最优配置</p>
+                </div>
+
+                <!-- 优势4 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fa fa-heart text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">可持续团队管理</h3>
+                    <p class="text-neutral text-sm">合理控制加班，减少人员 burnout，提高团队稳定性</p>
+                </div>
+
+                <!-- 优势5 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fa fa-trophy text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">提升项目成功率</h3>
+                    <p class="text-neutral text-sm">通过有效的资源管理，提高并行项目的整体成功率</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术实现建议 -->
+        <section id="tech" class="mb-20">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">技术实现建议</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <!-- 技术1 -->
+                    <div class="border border-gray-100 rounded-lg p-5 hover:border-primary transition-colors">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fa fa-cubes text-primary"></i>
+                            </div>
+                            <h3 class="font-semibold">微服务架构</h3>
+                        </div>
+                        <p class="text-neutral text-sm">采用微服务架构，确保各模块独立扩展，提高系统灵活性和可维护性</p>
+                    </div>
+
+                    <!-- 技术2 -->
+                    <div class="border border-gray-100 rounded-lg p-5 hover:border-primary transition-colors">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fa fa-bolt text-primary"></i>
+                            </div>
+                            <h3 class="font-semibold">实时数据处理</h3>
+                        </div>
+                        <p class="text-neutral text-sm">实时数据处理，保证负载和资源状态的即时性，支持动态决策</p>
+                    </div>
+
+                    <!-- 技术3 -->
+                    <div class="border border-gray-100 rounded-lg p-5 hover:border-primary transition-colors">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fa fa-lightbulb-o text-primary"></i>
+                            </div>
+                            <h3 class="font-semibold">AI辅助决策</h3>
+                        </div>
+                        <p class="text-neutral text-sm">引入AI辅助决策，优化资源分配建议，提高决策效率和准确性</p>
+                    </div>
+
+                    <!-- 技术4 -->
+                    <div class="border border-gray-100 rounded-lg p-5 hover:border-primary transition-colors">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fa fa-mobile text-primary"></i>
+                            </div>
+                            <h3 class="font-semibold">移动端支持</h3>
+                        </div>
+                        <p class="text-neutral text-sm">移动端支持，方便现场资源调度和状态更新，提高管理便捷性</p>
+                    </div>
+
+                    <!-- 技术5 -->
+                    <div class="border border-gray-100 rounded-lg p-5 hover:border-primary transition-colors">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fa fa-plug text-primary"></i>
+                            </div>
+                            <h3 class="font-semibold">系统集成</h3>
+                        </div>
+                        <p class="text-neutral text-sm">与现有系统集成（如HR系统、财务系统、版本控制系统）</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 总结 -->
+        <section class="mb-10">
+            <div class="bg-white rounded-xl shadow-md p-8 border-l-4 border-primary">
+                <h2 class="text-2xl font-bold mb-4">总结</h2>
+                <p class="text-neutral leading-relaxed">
+                    此平台设计充分考虑了多项目环境下的复杂性，通过系统化的资源管理和负载监控，
+                    将帮助项目管理团队实现更高效、更可持续的项目交付。平台不仅关注项目的成功交付，
+                    也重视团队的健康发展，通过科学管理资源和加班情况，实现项目与团队的双赢。
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fa fa-tasks text-primary text-2xl"></i>
+                        <span class="font-bold text-xl">多项目管理平台</span>
+                    </div>
+                    <p class="text-gray-400 max-w-md">
+                        智能、高效、可持续的多项目资源管理解决方案，助力企业提升项目成功率
+                    </p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i class="fa fa-question-circle text-xl"></i>
+                        <span class="ml-1">帮助中心</span>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i class="fa fa-envelope text-xl"></i>
+                        <span class="ml-1">联系我们</span>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>© 2023 多项目管理平台设计方案. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top"
+        class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function () {
+            const navbar = document.getElementById('navbar');
+            const backToTop = document.getElementById('back-to-top');
+
+            if (window.scrollY > 100) {
+                navbar.classList.add('py-2', 'shadow');
+                navbar.classList.remove('py-3');
+
+                backToTop.classList.remove('opacity-0', 'invisible');
+                backToTop.classList.add('opacity-100', 'visible');
+            } else {
+                navbar.classList.add('py-3');
+                navbar.classList.remove('py-2', 'shadow');
+
+                backToTop.classList.add('opacity-0', 'invisible');
+                backToTop.classList.remove('opacity-100', 'visible');
+            }
+        });
+
+        // 返回顶部功能
+        document.getElementById('back-to-top').addEventListener('click', function () {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // 关闭移动菜单（如果打开）
+                document.getElementById('mobile-menu').classList.add('hidden');
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 项目总览图表
+        const projectCtx = document.getElementById('projectOverviewChart').getContext('2d');
+        new Chart(projectCtx, {
+            type: 'bar',
+            data: {
+                labels: ['项目A', '项目B', '项目C', '项目D', '项目E'],
+                datasets: [
+                    {
+                        label: '进度(%)',
+                        data: [65, 45, 80, 30, 75],
+                        backgroundColor: '#165DFF',
+                        borderRadius: 6
+                    },
+                    {
+                        label: '资源利用率(%)',
+                        data: [78, 62, 90, 45, 70],
+                        backgroundColor: '#36CFC9',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '项目进度与资源利用情况'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // 资源管理图表
+        const resourceCtx = document.getElementById('resourceManagementChart').getContext('2d');
+        new Chart(resourceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['开发人员', '测试人员', '设计人员', '产品经理', '其他'],
+                datasets: [{
+                    data: [45, 20, 15, 12, 8],
+                    backgroundColor: [
+                        '#165DFF',
+                        '#36CFC9',
+                        '#722ED1',
+                        '#FF7D00',
+                        '#86909C'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '资源类型分布'
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    </script>
+</body>
+
+</html>

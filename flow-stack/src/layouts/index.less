@@ -1,0 +1,42 @@
+// 通用布局样式
+.navs {
+  ul {
+    padding: 0;
+    list-style: none;
+    display: flex;
+  }
+  li {
+    margin-right: 1em;
+  }
+}
+
+// 顶部导航栏样式
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+// 主内容区域样式
+main {
+  min-height: calc(100vh - 200px);
+}
+
+// 页脚样式
+footer {
+  margin-top: auto;
+}
+
+// 一级菜单样式
+.ant-tabs {
+  &-nav {
+    padding-left: 0;
+  }
+  &-tab {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  &-tab-active {
+    color: #165dff;
+  }
+}

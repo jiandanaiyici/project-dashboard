@@ -1,0 +1,474 @@
+// 增强版应用埋点数据报表样式
+.enhanced-app-analytics-dashboard {
+  padding: 16px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 16px 0;
+
+    h2 {
+      margin: 0;
+      color: #333;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+
+      .time-range-picker {
+        width: 300px;
+      }
+
+      .refresh-btn,
+      .export-btn {
+        margin-left: 8px;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+
+      .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+
+        .time-range-picker {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .dashboard-tabs {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  // 核心指标卡片样式
+  .core-metrics {
+    margin-bottom: 16px;
+
+    .stat-card {
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: #fff;
+      transition: all 0.3s ease;
+      border: 1px solid #f0f0f0;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-color: #e6f7ff;
+      }
+
+      .ant-statistic-content-value {
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .ant-statistic-title {
+        color: #666;
+        font-size: 14px;
+      }
+    }
+  }
+
+  // 趋势图表区域
+  .trend-section {
+    margin-bottom: 16px;
+  }
+
+  // 环比分析区域
+  .comparison-section {
+    margin-bottom: 16px;
+  }
+
+  // 概览表格区域
+  .overview-section {
+    margin-bottom: 16px;
+  }
+
+  // 流量来源分析区域
+  .source-section {
+    margin-bottom: 16px;
+  }
+
+  // 设备分布分析区域
+  .device-section {
+    margin-bottom: 16px;
+  }
+
+  // 地域分布分析区域
+  .geo-section {
+    margin-bottom: 16px;
+
+    .geo-notice {
+      text-align: center;
+      margin-top: 16px;
+      color: #999;
+      font-size: 12px;
+    }
+  }
+
+  // 用户留存分析区域
+  .retention-section {
+    margin-bottom: 16px;
+  }
+
+  // 热门应用和页面区域
+  .top-items-section {
+    margin-bottom: 16px;
+  }
+
+  // 图表卡片通用样式
+  .chart-card {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    background: #fff;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 16px;
+    }
+
+    .ant-card-head-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  // 概览表格样式
+  .analytics-overview-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+
+    .overview-table {
+      .ant-table-thead > tr > th {
+        background-color: #fafafa;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // 环比分析表格样式
+  .comparison-table {
+    .ant-table-thead > tr > th {
+      background-color: #fafafa;
+      font-weight: 600;
+    }
+
+    .ant-table-tbody > tr > td {
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+
+  // 应用详情区域样式
+  .app-detail-section {
+    margin-top: 16px;
+
+    .app-detail-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: 1px solid #f0f0f0;
+
+      .ant-card-head {
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 16px;
+      }
+
+      .ant-card-head-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+      }
+    }
+  }
+
+  // 应用趋势分析区域样式
+  .app-trend-section {
+    margin-bottom: 24px;
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      border-left: 3px solid #1890ff;
+      padding-left: 8px;
+    }
+  }
+
+  // 应用页面分析区域样式
+  .app-pages-section {
+    h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      border-left: 3px solid #1890ff;
+      padding-left: 8px;
+    }
+
+    .pages-table {
+      .ant-table-thead > tr > th {
+        background-color: #fafafa;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // 响应式设计
+  @media screen and (max-width: 992px) {
+    .dashboard-header .header-actions {
+      flex-wrap: wrap;
+    }
+
+    .core-metrics {
+      .stat-card {
+        .ant-statistic-content-value {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    padding: 8px;
+
+    .dashboard-header h2 {
+      font-size: 20px;
+    }
+
+    .core-metrics {
+      .stat-card {
+        .ant-statistic-content-value {
+          font-size: 18px;
+        }
+      }
+    }
+
+    .chart-card {
+      padding: 16px;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .dashboard-header h2 {
+      font-size: 18px;
+    }
+
+    .core-metrics {
+      .stat-card {
+        .ant-statistic-content-value {
+          font-size: 16px;
+        }
+
+        .ant-statistic-title {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  // 深色主题支持
+  :global(.ant-theme-dark) & {
+    background-color: #141414;
+
+    .dashboard-header h2 {
+      color: #fff;
+    }
+
+    .dashboard-tabs {
+      background: #1f1f1f;
+    }
+
+    .stat-card,
+    .chart-card,
+    .analytics-overview-card,
+    .app-detail-card {
+      background: #1f1f1f;
+      border-color: #303030;
+      color: #fff;
+
+      .ant-statistic-title {
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .ant-card-head {
+        border-bottom-color: #303030;
+
+        .ant-card-head-title {
+          color: #fff;
+        }
+      }
+    }
+
+    .overview-table,
+    .comparison-table,
+    .pages-table {
+      .ant-table-thead > tr > th {
+        background-color: #292929;
+        color: #fff;
+        border-color: #303030;
+      }
+
+      .ant-table-tbody > tr > td {
+        border-color: #303030;
+        color: rgba(255, 255, 255, 0.65);
+      }
+    }
+
+    .geo-notice p {
+      color: rgba(255, 255, 255, 0.45);
+    }
+  }
+
+  // 加载状态样式优化
+  .ant-spin-nested-loading > div > .ant-spin {
+    max-height: 400px;
+    overflow: hidden;
+  }
+
+  // 空状态优化
+  .ant-empty {
+    padding: 40px 0;
+  }
+
+  // 表格行悬停效果
+  .ant-table-tbody > tr:hover > td {
+    background-color: #fafafa;
+  }
+
+  // 饼图和柱状图样式优化
+  :global(.recharts-sector):hover {
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
+
+  :global(.recharts-bar):hover {
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
+
+  // 图表标题样式
+  :global(.recharts-cartesian-grid-horizontal line),
+  :global(.recharts-cartesian-grid-vertical line) {
+    stroke-dasharray: 3 3;
+    stroke: #f0f0f0;
+  }
+
+  // 图表轴标签样式
+  :global(.recharts-axis-tick) {
+    font-size: 12px;
+  }
+
+  // 滚动条样式优化
+  :global(.ant-table-body)::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  :global(.ant-table-body)::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  :global(.ant-table-body)::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  :global(.ant-table-body)::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  // 深色主题下的滚动条
+  :global(.ant-theme-dark) {
+    :global(.ant-table-body)::-webkit-scrollbar-track {
+      background: #292929;
+    }
+
+    :global(.ant-table-body)::-webkit-scrollbar-thumb {
+      background: #434343;
+    }
+
+    :global(.ant-table-body)::-webkit-scrollbar-thumb:hover {
+      background: #595959;
+    }
+  }
+
+  // 按钮样式优化
+  .ant-btn {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .ant-btn-primary {
+    border-color: #1890ff;
+    background-color: #1890ff;
+  }
+
+  .ant-btn-primary:hover,
+  .ant-btn-primary:focus {
+    border-color: #40a9ff;
+    background-color: #40a9ff;
+  }
+
+  // 下拉选择框样式
+  .ant-select {
+    border-radius: 6px;
+  }
+
+  .ant-select-selector {
+    border-radius: 6px !important;
+  }
+
+  // 日期选择器样式
+  .ant-picker {
+    border-radius: 6px;
+  }
+
+  // 标签页样式优化
+  .ant-tabs-tab {
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s ease;
+  }
+
+  .ant-tabs-tab-active {
+    background-color: #f0f2f5;
+    border-bottom: 2px solid #1890ff;
+  }
+
+  .ant-tabs-tab:hover {
+    color: #1890ff;
+  }
+}

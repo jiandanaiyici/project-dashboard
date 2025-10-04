@@ -1,0 +1,155 @@
+.app-management-container {
+  padding: 0;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .page-title {
+      margin: 0;
+      color: #1f1f1f;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 300px;
+
+        .search-icon {
+          position: absolute;
+          left: 12px;
+          color: rgba(0, 0, 0, 0.25);
+        }
+
+        .search-input {
+          padding-left: 36px;
+          border-radius: 6px;
+        }
+      }
+    }
+  }
+
+  .apps-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    .card-header-actions {
+      margin-bottom: 16px;
+      text-align: right;
+    }
+  }
+
+  .app-form {
+    .ant-form-item {
+      margin-bottom: 16px;
+
+      .ant-form-item-label > label {
+        color: #333;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .app-management-container {
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+
+      .page-title {
+        font-size: 20px;
+      }
+
+      .header-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+
+        .search-box {
+          width: 100%;
+        }
+      }
+    }
+
+    .apps-card {
+      margin-bottom: 16px;
+
+      .ant-table {
+        font-size: 12px;
+
+        .ant-table-tbody > tr > td:last-child .ant-space {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .ant-table-tbody > tr > td:last-child .ant-btn {
+          padding: 4px;
+        }
+      }
+    }
+  }
+}
+
+/* 饱和度分析相关样式 */
+.saturation-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.saturation-card {
+  flex: 1;
+  min-width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.saturation-chart {
+  height: 300px;
+  padding: 16px;
+}
+
+.saturation-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.saturation-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saturation-legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+/* 颜色映射 */
+.saturation-high {
+  background-color: #f5222d;
+}
+
+.saturation-medium {
+  background-color: #faad14;
+}
+
+.saturation-low {
+  background-color: #52c41a;
+}

@@ -1,0 +1,338 @@
+// 个人工作负载评估演示页面样式
+.workload-assessment-demo {
+  padding: 24px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+
+  // 页面头部
+  .demo-header {
+    margin-bottom: 24px;
+    text-align: center;
+
+    .demo-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.85);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+
+      .title-icon {
+        font-size: 32px;
+        color: #1890ff;
+      }
+    }
+
+    .demo-description {
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.65);
+      margin: 0;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  }
+
+  // 工具栏
+  .demo-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left {
+      flex: 1;
+    }
+  }
+
+  // 状态标签页
+  .status-tabs {
+    margin-bottom: 24px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  // 统计卡片
+  .stat-cards {
+    margin-bottom: 24px;
+
+    .stat-card {
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .stat-card-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px;
+      }
+
+      .stat-icon {
+        padding: 12px;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 50%;
+      }
+
+      .stat-info {
+        text-align: right;
+
+        .stat-value {
+          font-size: 32px;
+          font-weight: 600;
+          color: rgba(0, 0, 0, 0.85);
+          margin-bottom: 4px;
+        }
+
+        .stat-label {
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.45);
+        }
+      }
+    }
+
+    .high-load {
+      border-left: 4px solid #ff4d4f;
+    }
+
+    .medium-load {
+      border-left: 4px solid #fa8c16;
+    }
+
+    .low-load {
+      border-left: 4px solid #52c41a;
+    }
+  }
+
+  // 用户列表
+  .user-list {
+    .user-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      // 不同负载状态的卡片样式
+      &.high {
+        border-top: 4px solid #ff4d4f;
+      }
+
+      &.medium {
+        border-top: 4px solid #fa8c16;
+      }
+
+      &.normal {
+        border-top: 4px solid #52c41a;
+      }
+
+      .user-card-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 16px;
+        background-color: #fafafa;
+        position: relative;
+
+        .user-card-avatar {
+          margin-bottom: 12px;
+          border: 2px solid #fff;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card-info {
+          text-align: center;
+          margin-bottom: 12px;
+
+          .user-card-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.85);
+            margin: 0 0 4px 0;
+          }
+
+          .user-card-role,
+          .user-card-dept {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.45);
+            margin: 0;
+          }
+        }
+
+        .user-card-status {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+        }
+      }
+
+      .ant-card-body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+
+  // 用户详情视图
+  .user-detail-view {
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  // 使用说明
+  .usage-guide {
+    margin-top: 32px;
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .guide-content {
+      h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.85);
+        margin-bottom: 16px;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          position: relative;
+          padding-left: 24px;
+          margin-bottom: 12px;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.65);
+
+          &::before {
+            content: '•';
+            position: absolute;
+            left: 8px;
+            color: #1890ff;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+
+  // 响应式设计
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .demo-header {
+      .demo-title {
+        font-size: 24px;
+      }
+    }
+
+    .demo-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+
+      .toolbar-left,
+      .toolbar-right {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .ant-input-search {
+        width: 100% !important;
+      }
+
+      .ant-select {
+        width: 100% !important;
+      }
+    }
+
+    .stat-cards {
+      .stat-card {
+        .stat-card-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 16px;
+
+          .stat-info {
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    .user-list {
+      .ant-col {
+        margin-bottom: 16px !important;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .demo-header {
+      .demo-title {
+        font-size: 20px;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .demo-description {
+        font-size: 14px;
+      }
+    }
+
+    .stat-cards {
+      .stat-card {
+        .stat-card-content {
+          .stat-value {
+            font-size: 24px;
+          }
+        }
+      }
+    }
+
+    .usage-guide {
+      .guide-content {
+        ul {
+          li {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

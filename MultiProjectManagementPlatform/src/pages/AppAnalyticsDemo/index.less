@@ -1,0 +1,406 @@
+// 应用埋点数据报表演示页面样式
+.app-analytics {
+  min-height: 100vh;
+
+  .content {
+    padding: 24px;
+    background-color: #f5f5f5;
+
+    // 页面头部样式
+    .page-header {
+      margin-bottom: 32px;
+      text-align: center;
+
+      .ant-typography {
+        color: #333;
+      }
+
+      .ant-typography-title {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: #1890ff;
+      }
+
+      .page-description {
+        max-width: 800px;
+        margin: 0 auto;
+        font-size: 16px;
+        line-height: 1.8;
+        color: #666;
+      }
+    }
+
+    // 功能说明卡片样式
+    .feature-cards {
+      margin-bottom: 32px;
+
+      .feature-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+        overflow: hidden;
+        background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+
+        &:hover {
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+          transform: translateY(-2px);
+        }
+
+        .ant-card-head {
+          background-color: #f0f8ff;
+          border-bottom: 1px solid #e6f7ff;
+
+          .ant-card-head-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1890ff;
+          }
+        }
+
+        .ant-card-body {
+          padding: 16px;
+
+          .ant-typography {
+            margin-bottom: 0;
+            line-height: 1.6;
+          }
+
+          .ant-typography-text {
+            font-weight: 600;
+            color: #1890ff;
+          }
+        }
+      }
+    }
+
+    // 分割线样式
+    .ant-divider {
+      margin: 32px 0;
+      background-color: #e8e8e8;
+    }
+
+    // 数据报表大盘区域样式
+    .dashboard-section {
+      margin-bottom: 40px;
+
+      .ant-typography-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #333;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #1890ff;
+        display: inline-block;
+      }
+
+      // 确保仪表盘组件内部的样式正确应用
+      :global {
+        .app-analytics-dashboard {
+          background-color: transparent;
+          padding: 0;
+        }
+      }
+    }
+
+    // 常见问题解答区域样式
+    .faq-section {
+      margin-bottom: 32px;
+
+      .ant-typography-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: #333;
+      }
+
+      .faq-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        background-color: #ffffff;
+
+        .ant-card-body {
+          padding: 24px;
+        }
+
+        .faq-item {
+          padding: 0 16px;
+
+          .ant-typography-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            border-bottom: none;
+            padding-bottom: 0;
+          }
+
+          .ant-typography {
+            color: #666;
+            line-height: 1.6;
+          }
+        }
+
+        .faq-divider {
+          display: none;
+        }
+      }
+    }
+
+    // 注意事项区域样式
+    .notes-section {
+      margin-bottom: 24px;
+
+      .ant-typography-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: #333;
+      }
+
+      .notes-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        background-color: #f6ffed;
+        border: 1px solid #b7eb8f;
+
+        .ant-card-body {
+          padding: 16px 24px;
+
+          .ant-typography {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            color: #333;
+          }
+
+          .ant-typography:last-child {
+            margin-bottom: 0;
+          }
+
+          .ant-typography-text {
+            font-weight: 600;
+          }
+
+          .ant-typography-text-warning {
+            color: #faad14;
+          }
+
+          .ant-typography-text-success {
+            color: #52c41a;
+          }
+
+          .ant-typography-text-info {
+            color: #1890ff;
+          }
+        }
+      }
+    }
+  }
+
+  // 响应式设计
+  @media (max-width: 1200px) {
+    .content {
+      padding: 20px;
+
+      .page-header {
+        .ant-typography-title {
+          font-size: 28px;
+        }
+
+        .page-description {
+          font-size: 15px;
+        }
+      }
+
+      .dashboard-section {
+        .ant-typography-title {
+          font-size: 22px;
+        }
+      }
+
+      .faq-section {
+        .ant-typography-title {
+          font-size: 19px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .content {
+      padding: 16px;
+
+      .page-header {
+        .ant-typography-title {
+          font-size: 24px;
+        }
+
+        .page-description {
+          font-size: 14px;
+        }
+      }
+
+      .feature-card {
+        .ant-card-body {
+          .ant-typography {
+            font-size: 14px;
+          }
+        }
+      }
+
+      .dashboard-section {
+        .ant-typography-title {
+          font-size: 20px;
+        }
+      }
+
+      .faq-section {
+        .ant-typography-title {
+          font-size: 18px;
+        }
+
+        .faq-card {
+          .faq-item {
+            padding: 0;
+            margin-bottom: 20px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .ant-typography-title {
+              font-size: 15px;
+            }
+
+            .ant-typography {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+
+      .notes-section {
+        .ant-typography-title {
+          font-size: 17px;
+        }
+
+        .notes-card {
+          .ant-card-body {
+            .ant-typography {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .content {
+      padding: 12px;
+
+      .page-header {
+        .ant-typography-title {
+          font-size: 20px;
+        }
+
+        .page-description {
+          font-size: 13px;
+        }
+      }
+
+      .feature-card {
+        .ant-card-head {
+          .ant-card-head-title {
+            font-size: 15px;
+          }
+        }
+
+        .ant-card-body {
+          .ant-typography {
+            font-size: 13px;
+          }
+        }
+      }
+
+      .dashboard-section {
+        .ant-typography-title {
+          font-size: 18px;
+        }
+      }
+
+      .faq-section {
+        .ant-typography-title {
+          font-size: 17px;
+        }
+
+        .faq-card {
+          .faq-item {
+            .ant-typography-title {
+              font-size: 14px;
+            }
+
+            .ant-typography {
+              font-size: 13px;
+            }
+          }
+        }
+      }
+
+      .notes-section {
+        .ant-typography-title {
+          font-size: 16px;
+        }
+
+        .notes-card {
+          .ant-card-body {
+            .ant-typography {
+              font-size: 13px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 卡片悬停效果增强
+  .ant-card {
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  // 标题样式统一样式
+  .ant-typography {
+    &-title {
+      margin-top: 0;
+    }
+  }
+
+  // 确保布局的响应式调整
+  @media (min-width: 768px) {
+    .faq-card {
+      .ant-card-body {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .faq-item {
+        flex: 1;
+        min-width: 250px;
+        margin-bottom: 0;
+      }
+
+      .faq-divider {
+        display: block;
+        height: 100px;
+        align-self: center;
+      }
+    }
+  }
+}

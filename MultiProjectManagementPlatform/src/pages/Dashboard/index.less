@@ -1,0 +1,99 @@
+// 仪表盘容器样式
+.dashboard-container {
+  padding: 0;
+}
+
+// 页面标题样式
+.page-title {
+  margin-bottom: 24px;
+  color: #1f1f1f;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+// 统计卡片行样式
+.stats-row {
+  margin-bottom: 24px;
+
+  .ant-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 主要内容区域样式
+.main-content {
+  .ant-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0;
+
+      .ant-card-head-title {
+        color: #333;
+        font-weight: 500;
+        font-size: 16px;
+      }
+    }
+  }
+
+  // 表格样式
+  .ant-table {
+    font-size: 14px;
+
+    .ant-table-thead > tr > th {
+      background-color: #fafafa;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .ant-table-tbody > tr > td {
+      border-color: #f0f0f0;
+    }
+  }
+}
+
+// 饱和度指示器样式
+.saturation-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .saturation-text {
+    font-weight: 500;
+    font-size: 14px;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .stats-row {
+    margin-bottom: 16px;
+  }
+  
+  .main-content {
+    .ant-card {
+      margin-bottom: 16px;
+
+      .ant-card-head-title {
+        font-size: 14px;
+      }
+    }
+
+    .ant-table {
+      font-size: 12px;
+    }
+  }
+}

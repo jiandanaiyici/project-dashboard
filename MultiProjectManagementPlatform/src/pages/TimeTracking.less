@@ -1,0 +1,184 @@
+// 工时记录页面容器样式
+.time-tracking-container {
+  padding: 0;
+}
+
+// 页面头部样式
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+// 页面标题样式
+.page-title {
+  margin: 0;
+  color: #1f1f1f;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+// 头部操作区域样式
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+// 过滤框样式
+.filter-box {
+  display: flex;
+  align-items: center;
+
+  .date-filter {
+    width: 180px;
+  }
+}
+
+// 统计卡片行样式
+.stats-row {
+  margin-bottom: 24px;
+
+  .ant-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 汇总卡片样式
+.summary-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .summary-hint {
+    font-size: 12px;
+    color: #999;
+  }
+}
+
+// 每日汇总样式
+.daily-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+
+  .summary-item {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px;
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 6px;
+    text-align: center;
+
+    .summary-date {
+      font-size: 14px;
+      color: #52c41a;
+      margin-bottom: 4px;
+    }
+
+    .summary-hours {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1890ff;
+    }
+  }
+}
+
+// 记录卡片样式
+.records-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+// 项目名称样式
+.project-name {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// 工时记录表单样式
+.time-record-form {
+  .ant-form-item {
+    margin-bottom: 16px;
+
+    .ant-form-item-label > label {
+      color: #333;
+      font-weight: 500;
+    }
+  }
+
+  .w-full {
+    width: 100%;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+
+    .date-filter {
+      width: 100%;
+    }
+  }
+  
+  .stats-row {
+    margin-bottom: 16px;
+  }
+  
+  .summary-card {
+    margin-bottom: 16px;
+  }
+  
+  .daily-summary {
+    flex-direction: column;
+
+    .summary-item {
+      min-width: auto;
+    }
+  }
+  
+  .records-card {
+    margin-bottom: 16px;
+
+    .ant-table {
+      font-size: 12px;
+    }
+  }
+  
+  // 在小屏幕上简化表格操作按钮
+  .ant-table-tbody > tr > td:last-child {
+    .ant-space {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ant-btn {
+      padding: 4px;
+    }
+  }
+}

@@ -1,0 +1,276 @@
+// Ant Design 主题样式已通过 babel-plugin-import 自动注入
+
+.application-health-dashboard {
+  padding: 16px;
+  background: #f0f2f5;
+}
+
+.health-dashboard-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.overall-health-section {
+  margin-bottom: 16px;
+}
+
+.overall-health-card {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border: none;
+  color: white;
+}
+
+.overall-health-card .ant-card-body {
+  padding: 0;
+}
+
+.overall-health-card .ant-statistic-title {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.overall-health-card .ant-statistic-content-value {
+  color: white;
+}
+
+.health-content {
+  margin-bottom: 16px;
+}
+
+.health-chart-col {
+  & > .ant-card {
+    height: 100%;
+  }
+}
+
+.health-chart-card {
+  border-radius: 8px;
+  overflow: hidden;
+  .ant-card-body {
+    padding: 16px;
+  }
+  .ant-card-head {
+    padding: 12px 16px;
+    background: #fafafa;
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
+
+.health-details-section {
+  margin-top: 16px;
+}
+
+.health-details-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.health-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 16px;
+}
+
+/* 应用卡片样式 */
+.health-app-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.health-app-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 应用卡片操作区域 */
+.app-card-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 报表模态框样式 */
+.report-app-info {
+  margin-bottom: 16px;
+}
+
+.report-app-info p {
+  margin: 4px 0;
+}
+
+.report-content {
+  margin-top: 16px;
+}
+
+.report-summary {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.report-summary h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.app-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-card-extra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-type-icon {
+  cursor: help;
+  padding: 4px;
+  border-radius: 4px;
+  &:hover {
+    background: #f0f0f0;
+  }
+}
+
+.app-metric {
+  margin-bottom: 12px;
+  .metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .metric-label {
+    display: inline-block;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.65);
+  }
+  .metric-change {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    &.positive {
+      color: #52c41a;
+      background: rgba(82, 196, 26, 0.1);
+    }
+    &.negative {
+      color: #ff4d4f;
+      background: rgba(255, 77, 79, 0.1);
+    }
+    &.neutral {
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+  .metric-value {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .last-checked {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+  }
+}
+
+.empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .application-health-dashboard {
+    padding: 8px;
+  }
+  
+  .health-apps-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ant-card-body {
+    padding: 12px;
+  }
+  
+  .ant-statistic {
+    margin-bottom: 12px;
+  }
+  
+  .metric-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 2px;
+  }
+}
+
+// 渐入动画
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.health-chart-col, .health-app-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+// 进度条样式优化
+.ant-progress {
+  height: 8px !important;
+  border-radius: 4px;
+}
+
+.ant-progress-bg {
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+// 统计卡片样式调整
+.ant-statistic-content {
+  font-size: 24px;
+}
+
+.ant-statistic-title {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+// 状态卡片背景色
+.status-normal {
+  background: rgba(82, 196, 26, 0.05) !important;
+}
+
+.status-warning {
+  background: rgba(250, 140, 22, 0.05) !important;
+}
+
+.status-error {
+  background: rgba(255, 77, 79, 0.05) !important;
+}
+
+// 标签样式
+.ant-tag {
+  margin-right: 8px;
+}

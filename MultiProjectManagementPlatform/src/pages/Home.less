@@ -1,0 +1,715 @@
+// 全局样式重置
+.home-container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+// 头部横幅样式
+.hero-section {
+  background: linear-gradient(135deg, #165DFF 0%, #36CFC9 100%);
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+
+  .hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 28px;
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    margin-bottom: 40px;
+    opacity: 0.9;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      gap: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+
+      .stat-number {
+        display: block;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+// 通用section样式
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+
+  .section-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1f1f1f;
+    margin-bottom: 12px;
+  }
+
+  .section-divider {
+    width: 80px;
+    height: 4px;
+    background-color: #165DFF;
+    margin: 0 auto;
+    border-radius: 2px;
+  }
+}
+
+.overview-section,
+.features-section,
+.personal-board-section,
+.advantages-section,
+.tech-section,
+.summary-section {
+  padding: 60px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  @media (max-width: 768px) {
+    padding: 40px 0;
+  }
+}
+
+// 平台概述部分
+.feature-card {
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  padding: 24px;
+  text-align: center;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+  }
+
+  .feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: rgba(22, 93, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+
+    .icon-large {
+      font-size: 32px;
+      color: #165DFF;
+    }
+  }
+
+  .feature-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #1f1f1f;
+  }
+
+  .feature-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+  }
+}
+
+.core-goals {
+  margin-top: 40px;
+
+  .goals-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1f1f1f;
+    text-align: center;
+  }
+
+  .goal-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .goal-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: rgba(22, 93, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+
+      .icon-medium {
+        font-size: 24px;
+        color: #165DFF;
+      }
+    }
+
+    .goal-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #1f1f1f;
+    }
+
+    .goal-description {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+  }
+}
+
+// 核心功能模块
+.features-row {
+  margin-bottom: 24px;
+}
+
+.feature-card-large {
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .module-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f1f1f;
+
+    .module-icon {
+      margin-right: 8px;
+      color: #165DFF;
+    }
+  }
+
+  .module-content {
+    .module-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+
+      .stat-card {
+        flex: 1;
+        min-width: 120px;
+        background-color: #fafafa;
+        border-radius: 8px;
+        padding: 12px;
+      }
+    }
+
+    .module-description {
+      p {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+      }
+    }
+  }
+}
+
+.feature-card-small {
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  padding: 20px;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .module-title-small {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #1f1f1f;
+
+    .module-icon-small {
+      margin-right: 6px;
+      color: #165DFF;
+    }
+  }
+
+  .module-description-small {
+    p {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+  }
+}
+
+// 个人时间明细看板
+.personal-board-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  .personal-info {
+    display: flex;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid #f0f0f0;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .user-avatar-large {
+      width: 64px;
+      height: 64px;
+      font-size: 24px;
+      background-color: #165DFF;
+      margin-right: 16px;
+
+      @media (max-width: 768px) {
+        margin-right: 0;
+      }
+    }
+
+    .user-details {
+      flex: 1;
+
+      .user-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1f1f1f;
+        margin-bottom: 4px;
+      }
+
+      .user-role {
+        font-size: 14px;
+        color: #666;
+      }
+    }
+
+    .user-stats {
+      display: flex;
+      gap: 20px;
+
+      @media (max-width: 768px) {
+        justify-content: center;
+      }
+
+      .stat-item-small {
+        text-align: center;
+
+        .stat-value {
+          display: block;
+          font-size: 18px;
+          font-weight: bold;
+          color: #165DFF;
+          margin-bottom: 2px;
+        }
+
+        .stat-label-small {
+          font-size: 12px;
+          color: #666;
+        }
+      }
+    }
+  }
+
+  .time-allocations {
+    padding: 24px;
+
+    .allocation-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f1f1f;
+      margin-bottom: 16px;
+    }
+
+    .allocation-list {
+      .allocation-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .allocation-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .project-name {
+            font-size: 14px;
+            color: #333;
+          }
+        }
+
+        .allocation-progress {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .ant-progress {
+            width: 100px;
+          }
+
+          .allocation-hours {
+            font-size: 12px;
+            color: #666;
+            min-width: 30px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 平台优势
+.advantages-section {
+  background-color: white;
+  margin: 60px auto;
+  border-radius: 12px;
+  padding: 60px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  @media (max-width: 768px) {
+    padding: 40px 16px;
+    margin: 40px auto;
+  }
+}
+
+.advantage-card {
+  text-align: center;
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .advantage-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(22, 93, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+
+    .icon-medium {
+      font-size: 24px;
+      color: #165DFF;
+    }
+  }
+
+  .advantage-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1f1f1f;
+  }
+
+  .advantage-description {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+  }
+}
+
+// 技术实现建议
+.tech-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  height: 100%;
+}
+
+.tech-item {
+  padding: 20px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #165DFF;
+  }
+
+  .tech-icon {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .icon-small {
+      font-size: 16px;
+      color: #165DFF;
+      margin-right: 8px;
+    }
+  }
+
+  .tech-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1f1f1f;
+  }
+
+  .tech-description {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+}
+
+// 总结部分
+.summary-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 32px;
+  border-left: 4px solid #165DFF;
+
+  .summary-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f1f1f;
+  }
+
+  .summary-content {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// 页脚样式
+.home-footer {
+  background-color: #1f1f1f;
+  color: white;
+  padding: 40px 0;
+  margin-top: 60px;
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+    }
+
+    .footer-left {
+      flex: 1;
+      min-width: 300px;
+
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .logo-icon {
+          font-size: 24px;
+          color: #165DFF;
+          margin-right: 8px;
+        }
+
+        .logo-text {
+          font-size: 18px;
+          font-weight: 600;
+        }
+      }
+
+      .footer-description {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.5;
+        max-width: 400px;
+      }
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+
+      @media (max-width: 768px) {
+        gap: 20px;
+      }
+
+      .footer-link {
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: #165DFF;
+        }
+
+        .link-icon {
+          margin-right: 6px;
+          font-size: 16px;
+        }
+
+        .link-text {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    margin-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+
+    p {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      margin: 0;
+    }
+  }
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+  .ant-card {
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 24px !important;
+  }
+
+  .hero-section {
+    padding: 60px 0;
+  }
+
+  .ant-col {
+    margin-bottom: 16px !important;
+  }
+
+  .ant-row {
+    margin-bottom: -16px !important;
+  }
+}
+
+// 加载动画
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+// 动画效果
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-header,
+.feature-card,
+.goal-card,
+.feature-card-large,
+.feature-card-small,
+.personal-board-card,
+.advantage-card,
+.tech-item,
+.summary-card {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.feature-card,
+.goal-card,
+.feature-card-small,
+.advantage-card {
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover,
+.goal-card:hover,
+.feature-card-small:hover,
+.advantage-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}

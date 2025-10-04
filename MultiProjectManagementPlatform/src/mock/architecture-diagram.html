@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>示例架构图</title>
+</head>
+<body style="margin: 20px; font-family: Arial, sans-serif;">
+    <h2 style="text-align: center; margin-bottom: 30px;">示例系统架构图</h2>
+    
+    <!-- 第一层：用户层 -->
+    <div style="background-color: #e6f7ff; padding: 15px; margin-bottom: 10px; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #1890ff;">用户层</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">网站用户</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">移动应用用户</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">第三方系统</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">管理员</div>
+        </div>
+    </div>
+    
+    <!-- 第二层：接入层 -->
+    <div style="background-color: #fff7e6; padding: 15px; margin-bottom: 10px; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #fa8c16;">接入层</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">负载均衡</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">API网关</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">CDN</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">安全防护</div>
+        </div>
+    </div>
+    
+    <!-- 第三层：应用层 -->
+    <div style="background-color: #f6ffed; padding: 15px; margin-bottom: 10px; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #52c41a;">应用层</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">用户服务</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">商品服务</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">订单服务</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">支付服务</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">搜索服务</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">推荐服务</div>
+        </div>
+    </div>
+    
+    <!-- 第四层：数据层 -->
+    <div style="background-color: #fff0f0; padding: 15px; margin-bottom: 10px; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #f5222d;">数据层</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">关系型数据库</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">NoSQL数据库</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">缓存系统</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">消息队列</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">数据仓库</div>
+        </div>
+    </div>
+    
+    <!-- 第五层：基础设施层 -->
+    <div style="background-color: #f0f2f5; padding: 15px; margin-bottom: 10px; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #1890ff;">基础设施层</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">服务器集群</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">容器平台</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">监控系统</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">日志系统</div>
+            <div style="border: 1px solid #d9d9d9; padding: 10px; min-width: 120px; text-align: center; background-color: rgba(255,255,255,0.7);">CI/CD平台</div>
+        </div>
+    </div>
+</body>
+</html>

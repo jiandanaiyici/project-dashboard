@@ -1,0 +1,156 @@
+/* 布局容器样式 */
+.layout-container {
+  min-height: 100vh;
+}
+
+/* 侧边栏样式 - 简约版 */
+.sidebar {
+  background: #fff;
+  border-right: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+
+  /* 收缩状态下的菜单项样式 - 简约版 */
+  &.collapsed .main-menu .ant-menu-item {
+    justify-content: center;
+    margin: 0;
+  }
+}
+
+/* Logo容器样式 - 简约版 */
+.logo-container {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Logo文本样式 - 简约版 */
+.logo-text {
+  color: #1890ff;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-align: center;
+
+  &.collapsed {
+    font-size: 0;
+  }
+}
+
+/* 主菜单样式 - 简约版 */
+.main-menu {
+  border-right: none;
+  margin-top: 0;
+
+  /* 菜单项基础样式 - 简约版 */
+  .ant-menu-item {
+    transition: all 0.2s ease;
+    border-radius: 0;
+    margin: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    color: #666;
+
+    /* 菜单项悬停效果 - 简约版 */
+    &:hover {
+      background-color: #f5f5f5;
+      color: #1890ff;
+    }
+
+    /* 选中菜单项样式 - 简约版 */
+    &.ant-menu-item-selected {
+      background: #e6f7ff !important;
+      color: #1890ff !important;
+      border-right: 3px solid #1890ff;
+    }
+
+    /* 菜单项文字样式 - 简约版 */
+    > span {
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    /* 菜单项图标样式 - 简约版 */
+    .anticon {
+      font-size: 14px;
+      margin-right: 10px;
+    }
+  }
+}
+
+/* 主布局样式 */
+.main-layout {
+  transition: margin-left 0.3s ease;
+}
+
+/* 顶部标题栏样式 */
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+/* 菜单切换按钮样式 */
+.menu-toggle {
+  margin-right: 16px;
+}
+
+/* 标题栏右侧样式 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 用户头像样式 */
+.user-avatar {
+  cursor: pointer;
+  background: #1890ff;
+}
+
+/* 用户名样式 */
+.user-name {
+  font-size: 14px;
+  color: #333;
+  min-width: 60px;
+}
+
+/* 退出按钮样式 */
+.logout-btn {
+  color: #999;
+
+  &:hover {
+    color: #1890ff;
+  }
+}
+
+/* 内容容器样式 */
+.content-container {
+  margin: 24px;
+  padding: 24px;
+  background: #fff;
+  min-height: calc(100vh - 128px);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .content-container {
+    margin: 12px;
+    padding: 16px;
+  }
+  
+  .logo-text {
+    font-size: 16px;
+  }
+}

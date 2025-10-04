@@ -1,0 +1,229 @@
+/* 成员详情页面样式 */
+.member-detail-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* 加载状态 */
+.loading-container {
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 成员头部信息卡片 */
+.member-header-card {
+  margin-bottom: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.member-basic-info {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+  .member-basic-info {
+    text-align: left;
+    margin-bottom: 0;
+  }
+}
+
+.avatar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+@media (min-width: 768px) {
+  .avatar-container {
+    justify-content: flex-start;
+  }
+}
+
+.avatar-icon {
+  font-size: 48px;
+  margin-right: 16px;
+  color: #1890ff;
+}
+
+.member-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.member-role {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* 指标标签页 */
+.metrics-tabs {
+  .ant-tabs-tab {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .ant-tabs-tab-active {
+    color: #1890ff !important;
+  }
+  
+  .ant-tabs-ink-bar {
+    background-color: #1890ff;
+  }
+}
+
+/* 指标卡片 */
+.metrics-card {
+  margin-bottom: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.metric-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 16px;
+}
+
+/* 指标项 */
+.metric-item {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.metric-header span:first-child {
+  font-size: 14px;
+  color: #595959;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+/* 项目分配 */
+.projects-allocation {
+  margin-top: 16px;
+}
+
+.project-allocation-item {
+  margin-bottom: 16px;
+}
+
+.project-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.project-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+}
+
+.project-percentage {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+/* 质量指标 */
+.quality-metric {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fafafa;
+  border-left: 4px solid #1890ff;
+}
+
+.metric-icon {
+  font-size: 48px;
+  color: #1890ff;
+  margin-right: 16px;
+}
+
+.metric-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.metric-value-large {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1890ff;
+  margin-bottom: 4px;
+}
+
+.metric-description {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* 时间详情卡片 */
+.time-details-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.time-summary {
+  margin-bottom: 16px;
+}
+
+.time-summary h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 16px;
+}
+
+.time-breakdown {
+  margin-top: 16px;
+}
+
+.time-breakdown h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 16px;
+}
+
+/* 响应式调整 */
+@media (max-width: 767px) {
+  .member-detail-container {
+    padding: 16px;
+  }
+  
+  .metrics-card {
+    padding: 16px;
+  }
+  
+  .time-details-card {
+    padding: 16px;
+  }
+}

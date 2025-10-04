@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>技术开发个人效能面板</title>
+    <!-- 外部资源引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+    <!-- Tailwind 配置 -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#165DFF',
+              secondary: '#36CFC9',
+              success: '#52C41A',
+              warning: '#FAAD14',
+              danger: '#FF4D4F',
+              dark: '#1D2129',
+              'dark-2': '#4E5969',
+              'light-1': '#F2F3F5',
+              'light-2': '#E5E6EB',
+              'light-3': '#C9CDD4',
+            },
+            fontFamily: {
+              inter: ['Inter', 'system-ui', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .content-auto {
+          content-visibility: auto;
+        }
+        .card-shadow {
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .card-hover {
+          transition: all 0.3s ease;
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        .card-hover:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        .gradient-bg {
+          background: linear-gradient(135deg, #165dff 0%, #0040c9 100%);
+        }
+        .progress-ring {
+          transform: rotate(-90deg);
+          transform-origin: 50% 50%;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-inter bg-gray-50 text-dark min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header
+      class="bg-white shadow-sm sticky top-0 z-50 transition-all duration-300"
+    >
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <div class="flex items-center space-x-2">
+          <i class="fa fa-dashboard text-primary text-2xl"></i>
+          <h1 class="text-xl font-bold text-dark">开发者效能面板</h1>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <!-- 时间范围选择器 -->
+          <div class="relative">
+            <button
+              id="timeRangeBtn"
+              class="flex items-center space-x-1 bg-light-1 px-4 py-2 rounded-lg hover:bg-light-2 transition-colors"
+            >
+              <span id="currentRange">本月</span>
+              <i class="fa fa-chevron-down text-xs"></i>
+            </button>
+            <div
+              id="timeRangeDropdown"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden transform origin-top-right transition-all duration-200 opacity-0 scale-95"
+            >
+              <a
+                href="#"
+                class="time-option block px-4 py-2 hover:bg-light-1 transition-colors"
+                data-range="day"
+                >今日</a
+              >
+              <a
+                href="#"
+                class="time-option block px-4 py-2 hover:bg-light-1 transition-colors"
+                data-range="week"
+                >本周</a
+              >
+              <a
+                href="#"
+                class="time-option block px-4 py-2 hover:bg-light-1 transition-colors"
+                data-range="month"
+                >本月</a
+              >
+              <a
+                href="#"
+                class="time-option block px-4 py-2 hover:bg-light-1 transition-colors"
+                data-range="quarter"
+                >本季度</a
+              >
+              <a
+                href="#"
+                class="time-option block px-4 py-2 hover:bg-light-1 transition-colors"
+                data-range="year"
+                >本年</a
+              >
+            </div>
+          </div>
+
+          <!-- 用户信息 -->
+          <div class="flex items-center space-x-2">
+            <img
+              src="https://picsum.photos/id/1005/40/40"
+              alt="用户头像"
+              class="w-8 h-8 rounded-full object-cover ring-2 ring-primary/20"
+            />
+            <span class="font-medium">张开发</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6">
+      <!-- 概览卡片区域 - 基础指标 -->
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">效能概览</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- 代码提交次数卡片 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-dark-2 text-sm">代码提交次数</p>
+                <h3 class="text-3xl font-bold mt-1" id="commitCount">128</h3>
+              </div>
+              <div
+                class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary"
+              >
+                <i class="fa fa-code"></i>
+              </div>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="text-success flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 12.5%
+              </span>
+              <span class="text-dark-2 ml-2">较上月</span>
+            </div>
+          </div>
+
+          <!-- 提交代码量卡片 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-dark-2 text-sm">提交代码量</p>
+                <h3 class="text-3xl font-bold mt-1" id="codeLines">4,856</h3>
+              </div>
+              <div
+                class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary"
+              >
+                <i class="fa fa-file-code-o"></i>
+              </div>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="text-success flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 8.3%
+              </span>
+              <span class="text-dark-2 ml-2">较上月</span>
+            </div>
+          </div>
+
+          <!-- 环比增长卡片 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-dark-2 text-sm">环比增长</p>
+                <h3 class="text-3xl font-bold mt-1" id="growthRate">15.7%</h3>
+              </div>
+              <div
+                class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-success"
+              >
+                <i class="fa fa-line-chart"></i>
+              </div>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="text-success flex items-center">
+                <i class="fa fa-arrow-up mr-1"></i> 3.2%
+              </span>
+              <span class="text-dark-2 ml-2">较上周期</span>
+            </div>
+          </div>
+
+          <!-- 工作时长卡片 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <p class="text-dark-2 text-sm">工作时长</p>
+                <h3 class="text-3xl font-bold mt-1" id="workHours">168</h3>
+              </div>
+              <div
+                class="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center text-warning"
+              >
+                <i class="fa fa-clock-o"></i>
+              </div>
+            </div>
+            <div class="flex items-center text-sm">
+              <span class="text-danger flex items-center">
+                <i class="fa fa-arrow-down mr-1"></i> 2.1%
+              </span>
+              <span class="text-dark-2 ml-2">较上月</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 趋势图区域 -->
+      <section class="mb-8">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3"
+        >
+          <h2 class="text-lg font-semibold">效能趋势</h2>
+          <div class="flex flex-wrap gap-2">
+            <button
+              class="trend-option px-3 py-1 text-sm rounded-md bg-primary text-white"
+              data-type="commits"
+            >
+              提交次数
+            </button>
+            <button
+              class="trend-option px-3 py-1 text-sm rounded-md bg-light-1 text-dark-2 hover:bg-light-2 transition-colors"
+              data-type="lines"
+            >
+              代码量
+            </button>
+            <button
+              class="trend-option px-3 py-1 text-sm rounded-md bg-light-1 text-dark-2 hover:bg-light-2 transition-colors"
+              data-type="hours"
+            >
+              工作时长
+            </button>
+            <button
+              class="trend-option px-3 py-1 text-sm rounded-md bg-light-1 text-dark-2 hover:bg-light-2 transition-colors"
+              data-type="quality"
+            >
+              代码质量
+            </button>
+          </div>
+        </div>
+        <div
+          class="bg-white rounded-xl p-6 card-shadow transform transition-all duration-300 hover:shadow-lg"
+        >
+          <canvas id="trendChart" height="250"></canvas>
+        </div>
+      </section>
+
+      <!-- 代码质量分析区域 -->
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">代码质量分析</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 质量指标卡片 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <!-- 测试覆盖率 -->
+              <div class="text-center">
+                <div class="relative w-24 h-24 mx-auto mb-2">
+                  <svg class="w-full h-full" viewBox="0 0 36 36">
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#F2F3F5"
+                      stroke-width="3"
+                    />
+                    <circle
+                      id="coverageCircle"
+                      class="progress-ring"
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#52C41A"
+                      stroke-width="3"
+                      stroke-dasharray="100"
+                      stroke-dashoffset="25"
+                    />
+                  </svg>
+                  <div
+                    class="absolute inset-0 flex items-center justify-center"
+                  >
+                    <span class="text-lg font-bold" id="testCoverage">75%</span>
+                  </div>
+                </div>
+                <p class="text-dark-2 text-sm">测试覆盖率</p>
+              </div>
+
+              <!-- 代码重复率 -->
+              <div class="text-center">
+                <div class="relative w-24 h-24 mx-auto mb-2">
+                  <svg class="w-full h-full" viewBox="0 0 36 36">
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#F2F3F5"
+                      stroke-width="3"
+                    />
+                    <circle
+                      id="duplicationCircle"
+                      class="progress-ring"
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#FAAD14"
+                      stroke-width="3"
+                      stroke-dasharray="100"
+                      stroke-dashoffset="95"
+                    />
+                  </svg>
+                  <div
+                    class="absolute inset-0 flex items-center justify-center"
+                  >
+                    <span class="text-lg font-bold" id="codeDuplication"
+                      >5%</span
+                    >
+                  </div>
+                </div>
+                <p class="text-dark-2 text-sm">代码重复率</p>
+              </div>
+
+              <!-- 技术债务指数 -->
+              <div class="text-center">
+                <div class="relative w-24 h-24 mx-auto mb-2">
+                  <svg class="w-full h-full" viewBox="0 0 36 36">
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#F2F3F5"
+                      stroke-width="3"
+                    />
+                    <circle
+                      id="debtCircle"
+                      class="progress-ring"
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      stroke="#FF4D4F"
+                      stroke-width="3"
+                      stroke-dasharray="100"
+                      stroke-dashoffset="70"
+                    />
+                  </svg>
+                  <div
+                    class="absolute inset-0 flex items-center justify-center"
+                  >
+                    <span class="text-lg font-bold" id="techDebt">30%</span>
+                  </div>
+                </div>
+                <p class="text-dark-2 text-sm">技术债务</p>
+              </div>
+
+              <!-- 静态分析问题 -->
+              <div class="text-center">
+                <div
+                  class="w-24 h-24 mx-auto mb-2 flex items-center justify-center bg-light-1 rounded-full"
+                >
+                  <span
+                    class="text-2xl font-bold text-primary"
+                    id="staticIssues"
+                    >12</span
+                  >
+                </div>
+                <p class="text-dark-2 text-sm">静态分析问题</p>
+              </div>
+
+              <!-- 缺陷逃逸率 -->
+              <div class="text-center">
+                <div
+                  class="w-24 h-24 mx-auto mb-2 flex items-center justify-center bg-light-1 rounded-full"
+                >
+                  <span class="text-2xl font-bold text-success" id="escapeRate"
+                    >8%</span
+                  >
+                </div>
+                <p class="text-dark-2 text-sm">缺陷逃逸率</p>
+              </div>
+
+              <!-- 重构占比 -->
+              <div class="text-center">
+                <div
+                  class="w-24 h-24 mx-auto mb-2 flex items-center justify-center bg-light-1 rounded-full"
+                >
+                  <span
+                    class="text-2xl font-bold text-secondary"
+                    id="refactorRatio"
+                    >22%</span
+                  >
+                </div>
+                <p class="text-dark-2 text-sm">重构占比</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 质量分布雷达图 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <h3 class="text-base font-medium mb-4">代码质量多维度评估</h3>
+            <canvas id="qualityRadarChart" height="250"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- 协作效能区域 -->
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">协作效能</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- PR指标 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <h3 class="text-base font-medium mb-4">PR指标分析</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>PR通过率</span>
+                  <span id="prPassRate" class="font-medium">85%</span>
+                </div>
+                <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="bg-primary h-2 rounded-full transition-all duration-1000"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>平均审查响应时间</span>
+                  <span id="reviewResponseTime" class="font-medium"
+                    >3.2小时</span
+                  >
+                </div>
+                <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="bg-secondary h-2 rounded-full transition-all duration-1000 delay-100"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>平均合并时间</span>
+                  <span id="mergeTime" class="font-medium">8.5小时</span>
+                </div>
+                <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="bg-warning h-2 rounded-full transition-all duration-1000 delay-200"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="text-dark-2 text-sm font-medium mb-3">PR数量分布</h4>
+              <canvas id="prDistributionChart" height="160"></canvas>
+            </div>
+          </div>
+
+          <!-- 任务效率 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <h3 class="text-base font-medium mb-4">任务处理效率</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-dark-2 text-sm">平均任务周期</p>
+                  <p class="text-xl font-bold mt-1" id="taskCycle">2.3天</p>
+                </div>
+                <div
+                  class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"
+                >
+                  <i class="fa fa-tasks"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-dark-2 text-sm">专注时间占比</p>
+                  <p class="text-xl font-bold mt-1" id="focusTimeRatio">68%</p>
+                </div>
+                <div
+                  class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success"
+                >
+                  <i class="fa fa-clock-o"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-dark-2 text-sm">上下文切换次数</p>
+                  <p class="text-xl font-bold mt-1" id="contextSwitches">
+                    4次/天
+                  </p>
+                </div>
+                <div
+                  class="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center text-warning"
+                >
+                  <i class="fa fa-exchange"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-dark-2 text-sm">阻塞时间占比</p>
+                  <p class="text-xl font-bold mt-1" id="blockTimeRatio">12%</p>
+                </div>
+                <div
+                  class="w-12 h-12 rounded-lg bg-danger/10 flex items-center justify-center text-danger"
+                >
+                  <i class="fa fa-ban"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 文档与知识分享 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <h3 class="text-base font-medium mb-4">文档与知识传递</h3>
+
+            <div class="mb-6">
+              <div class="flex justify-between text-sm mb-1">
+                <span>文档完善度</span>
+                <span id="docCompletion" class="font-medium">88%</span>
+              </div>
+              <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                <div
+                  class="bg-primary h-2 rounded-full transition-all duration-1000"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+
+            <h4 class="text-dark-2 text-sm font-medium mb-3">知识分享记录</h4>
+            <div class="space-y-3">
+              <div class="flex items-start p-3 bg-light-1 rounded-lg">
+                <div
+                  class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0 mt-0.5"
+                >
+                  <i class="fa fa-file-text-o"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium">技术博客发布</p>
+                  <p class="text-dark-2 text-xs mt-0.5">《前端性能优化实践》</p>
+                  <p class="text-dark-2 text-xs mt-1">2023-06-10</p>
+                </div>
+              </div>
+
+              <div class="flex items-start p-3 bg-light-1 rounded-lg">
+                <div
+                  class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-secondary shrink-0 mt-0.5"
+                >
+                  <i class="fa fa-comments-o"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium">团队技术分享</p>
+                  <p class="text-dark-2 text-xs mt-0.5">React新特性实践</p>
+                  <p class="text-dark-2 text-xs mt-1">2023-06-02</p>
+                </div>
+              </div>
+
+              <div class="flex items-start p-3 bg-light-1 rounded-lg">
+                <div
+                  class="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center text-success shrink-0 mt-0.5"
+                >
+                  <i class="fa fa-book"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium">技术文档更新</p>
+                  <p class="text-dark-2 text-xs mt-0.5">API接口文档 v2.3</p>
+                  <p class="text-dark-2 text-xs mt-1">2023-05-28</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 学习成长与创新区域 -->
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">学习成长与技术创新</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 技能发展 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <h3 class="text-base font-medium mb-4">技能发展追踪</h3>
+
+            <div class="mb-6">
+              <h4 class="text-dark-2 text-sm font-medium mb-3">
+                新技术使用占比
+              </h4>
+              <div class="flex items-center">
+                <div
+                  class="w-full bg-light-1 rounded-full h-3 overflow-hidden mr-3"
+                >
+                  <div
+                    id="newTechBar"
+                    class="bg-primary h-3 rounded-full transition-all duration-1500"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <span id="newTechRatio" class="font-medium whitespace-nowrap"
+                  >18%</span
+                >
+              </div>
+            </div>
+
+            <h4 class="text-dark-2 text-sm font-medium mb-3">技能矩阵更新</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>微前端架构</span>
+                  <span>从入门到熟练</span>
+                </div>
+                <div
+                  class="w-full bg-light-1 rounded-full h-1.5 overflow-hidden"
+                >
+                  <div
+                    class="bg-primary h-1.5 rounded-full"
+                    style="width: 70%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Docker容器化</span>
+                  <span>从了解到掌握</span>
+                </div>
+                <div
+                  class="w-full bg-light-1 rounded-full h-1.5 overflow-hidden"
+                >
+                  <div
+                    class="bg-danger h-1.5 rounded-full"
+                    style="width: 60%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>GraphQL</span>
+                  <span>新学习技能</span>
+                </div>
+                <div
+                  class="w-full bg-light-1 rounded-full h-1.5 overflow-hidden"
+                >
+                  <div
+                    class="bg-success h-1.5 rounded-full"
+                    style="width: 30%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>性能优化</span>
+                  <span>持续提升中</span>
+                </div>
+                <div
+                  class="w-full bg-light-1 rounded-full h-1.5 overflow-hidden"
+                >
+                  <div
+                    class="bg-secondary h-1.5 rounded-full"
+                    style="width: 80%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="text-dark-2 text-sm font-medium mb-3">问题解决能力</h4>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <span class="text-sm mr-2">独立解决</span>
+                  <span class="w-2 h-2 rounded-full bg-primary"></span>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-sm mr-2">团队协作</span>
+                  <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                </div>
+                <div class="flex items-center">
+                  <span class="text-sm mr-2">外部支持</span>
+                  <span class="w-2 h-2 rounded-full bg-warning"></span>
+                </div>
+              </div>
+              <canvas
+                id="problemSolvingChart"
+                height="120"
+                class="mt-2"
+              ></canvas>
+            </div>
+          </div>
+
+          <!-- 创新与优化 -->
+          <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+            <h3 class="text-base font-medium mb-4">技术创新与优化成果</h3>
+
+            <div class="space-y-4 mb-6">
+              <div
+                class="flex items-center justify-between p-3 border border-light-2 rounded-lg"
+              >
+                <div>
+                  <p class="font-medium text-sm">构建流程优化</p>
+                  <p class="text-dark-2 text-xs mt-0.5">CI/CD构建时间减少42%</p>
+                </div>
+                <span
+                  class="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full"
+                  >已落地</span
+                >
+              </div>
+
+              <div
+                class="flex items-center justify-between p-3 border border-light-2 rounded-lg"
+              >
+                <div>
+                  <p class="font-medium text-sm">组件库重构</p>
+                  <p class="text-dark-2 text-xs mt-0.5">
+                    代码量减少35%，复用率提升60%
+                  </p>
+                </div>
+                <span
+                  class="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full"
+                  >已落地</span
+                >
+              </div>
+
+              <div
+                class="flex items-center justify-between p-3 border border-light-2 rounded-lg"
+              >
+                <div>
+                  <p class="font-medium text-sm">自动化测试脚本</p>
+                  <p class="text-dark-2 text-xs mt-0.5">
+                    节省团队测试时间约80小时/月
+                  </p>
+                </div>
+                <span
+                  class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full"
+                  >推广中</span
+                >
+              </div>
+            </div>
+
+            <h4 class="text-dark-2 text-sm font-medium mb-3">资源优化效果</h4>
+            <canvas id="resourceOptimizationChart" height="180"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- 项目与安全合规区域 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- 荷载率 -->
+        <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+          <h2 class="text-lg font-semibold mb-4">荷载率</h2>
+          <div class="flex flex-col items-center">
+            <div class="relative w-48 h-48 mb-4">
+              <canvas id="loadRateChart"></canvas>
+              <div
+                class="absolute inset-0 flex items-center justify-center flex-col"
+              >
+                <span class="text-3xl font-bold" id="loadRateValue">78%</span>
+                <span class="text-dark-2 text-sm">当前荷载</span>
+              </div>
+            </div>
+            <div class="w-full grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p class="text-dark-2 text-xs">低负荷</p>
+                <p class="text-success font-medium">20%</p>
+              </div>
+              <div>
+                <p class="text-dark-2 text-xs">正常</p>
+                <p class="text-primary font-medium">50%</p>
+              </div>
+              <div>
+                <p class="text-dark-2 text-xs">高负荷</p>
+                <p class="text-danger font-medium">30%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 使用技能 -->
+        <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+          <h2 class="text-lg font-semibold mb-4">使用技能</h2>
+          <div class="flex flex-wrap gap-3">
+            <div
+              class="skill-tag flex items-center bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm"
+            >
+              <span class="w-2 h-2 rounded-full bg-primary mr-2"></span>
+              JavaScript
+              <span class="ml-2 bg-primary/20 px-1.5 py-0.5 rounded text-xs"
+                >45%</span
+              >
+            </div>
+            <div
+              class="skill-tag flex items-center bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm"
+            >
+              <span class="w-2 h-2 rounded-full bg-secondary mr-2"></span>
+              Python
+              <span class="ml-2 bg-secondary/20 px-1.5 py-0.5 rounded text-xs"
+                >30%</span
+              >
+            </div>
+            <div
+              class="skill-tag flex items-center bg-warning/10 text-warning px-3 py-1.5 rounded-full text-sm"
+            >
+              <span class="w-2 h-2 rounded-full bg-warning mr-2"></span>
+              HTML/CSS
+              <span class="ml-2 bg-warning/20 px-1.5 py-0.5 rounded text-xs"
+                >15%</span
+              >
+            </div>
+            <div
+              class="skill-tag flex items-center bg-success/10 text-success px-3 py-1.5 rounded-full text-sm"
+            >
+              <span class="w-2 h-2 rounded-full bg-success mr-2"></span>
+              SQL
+              <span class="ml-2 bg-success/20 px-1.5 py-0.5 rounded text-xs"
+                >10%</span
+              >
+            </div>
+            <div
+              class="skill-tag flex items-center bg-dark/10 text-dark px-3 py-1.5 rounded-full text-sm"
+            >
+              <span class="w-2 h-2 rounded-full bg-dark mr-2"></span>
+              Git
+              <span class="ml-2 bg-dark/20 px-1.5 py-0.5 rounded text-xs"
+                >8%</span
+              >
+            </div>
+            <div
+              class="skill-tag flex items-center bg-danger/10 text-danger px-3 py-1.5 rounded-full text-sm"
+            >
+              <span class="w-2 h-2 rounded-full bg-danger mr-2"></span>
+              Docker
+              <span class="ml-2 bg-danger/20 px-1.5 py-0.5 rounded text-xs"
+                >5%</span
+              >
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="text-dark-2 font-medium text-sm mb-3">技能熟练度分布</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>前端开发</span>
+                  <span>85%</span>
+                </div>
+                <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="bg-primary h-2 rounded-full transition-all duration-1000 ease-out"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>后端开发</span>
+                  <span>65%</span>
+                </div>
+                <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="bg-secondary h-2 rounded-full transition-all duration-1000 ease-out delay-100"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>数据库</span>
+                  <span>70%</span>
+                </div>
+                <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="bg-success h-2 rounded-full transition-all duration-1000 ease-out delay-200"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span>DevOps</span>
+                  <span>40%</span>
+                </div>
+                <div class="w-full bg-light-1 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="bg-warning h-2 rounded-full transition-all duration-1000 ease-out delay-300"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 安全与合规 -->
+        <div class="bg-white rounded-xl p-6 card-shadow card-hover">
+          <h2 class="text-lg font-semibold mb-4">安全与合规</h2>
+
+          <div class="space-y-4 mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-dark-2 text-sm">高危漏洞修复时效</p>
+                <p class="text-xl font-bold mt-1" id="vulnFixTime">12小时</p>
+              </div>
+              <div
+                class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success"
+              >
+                <i class="fa fa-shield"></i>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-dark-2 text-sm">合规代码占比</p>
+                <p class="text-xl font-bold mt-1" id="complianceRatio">96%</p>
+              </div>
+              <div
+                class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"
+              >
+                <i class="fa fa-check-circle-o"></i>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="text-dark-2 text-sm font-medium mb-3">安全审计记录</h4>
+          <div class="space-y-2">
+            <div
+              class="flex justify-between items-center p-2 border-l-4 border-success bg-success/5 rounded-r"
+            >
+              <span class="text-sm">代码安全审计</span>
+              <span class="text-xs text-success">通过</span>
+            </div>
+            <div
+              class="flex justify-between items-center p-2 border-l-4 border-success bg-success/5 rounded-r"
+            >
+              <span class="text-sm">数据加密合规检查</span>
+              <span class="text-xs text-success">通过</span>
+            </div>
+            <div
+              class="flex justify-between items-center p-2 border-l-4 border-warning bg-warning/5 rounded-r"
+            >
+              <span class="text-sm">依赖安全扫描</span>
+              <span class="text-xs text-warning">需更新2个依赖</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 参与项目汇总 -->
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">参与项目汇总</h2>
+        <div class="bg-white rounded-xl p-6 card-shadow">
+          <div class="space-y-4">
+            <div
+              class="project-item p-3 border border-light-2 rounded-lg hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+            >
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium">电商平台重构</h3>
+                  <p class="text-dark-2 text-sm mt-1">前端负责人</p>
+                </div>
+                <span
+                  class="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full"
+                  >进行中</span
+                >
+              </div>
+              <div class="mt-3 flex justify-between items-center">
+                <div class="flex items-center text-xs text-dark-2">
+                  <span class="flex items-center mr-3">
+                    <i class="fa fa-calendar-o mr-1"></i> 60天
+                  </span>
+                  <span class="flex items-center">
+                    <i class="fa fa-code-fork mr-1"></i> 42次提交
+                  </span>
+                  <span class="flex items-center ml-3">
+                    <i class="fa fa-bug mr-1"></i> 3个缺陷
+                  </span>
+                </div>
+                <div class="w-16 bg-light-1 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    class="bg-success h-1.5 rounded-full transition-all duration-1500"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="project-item p-3 border border-light-2 rounded-lg hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+            >
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium">数据分析平台</h3>
+                  <p class="text-dark-2 text-sm mt-1">全栈开发</p>
+                </div>
+                <span
+                  class="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full"
+                  >进行中</span
+                >
+              </div>
+              <div class="mt-3 flex justify-between items-center">
+                <div class="flex items-center text-xs text-dark-2">
+                  <span class="flex items-center mr-3">
+                    <i class="fa fa-calendar-o mr-1"></i> 45天
+                  </span>
+                  <span class="flex items-center">
+                    <i class="fa fa-code-fork mr-1"></i> 28次提交
+                  </span>
+                  <span class="flex items-center ml-3">
+                    <i class="fa fa-bug mr-1"></i> 5个缺陷
+                  </span>
+                </div>
+                <div class="w-16 bg-light-1 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    class="bg-success h-1.5 rounded-full transition-all duration-1500 delay-100"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="project-item p-3 border border-light-2 rounded-lg hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+            >
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium">用户管理系统</h3>
+                  <p class="text-dark-2 text-sm mt-1">后端开发</p>
+                </div>
+                <span
+                  class="px-2 py-0.5 bg-dark-2/10 text-dark-2 text-xs rounded-full"
+                  >已完成</span
+                >
+              </div>
+              <div class="mt-3 flex justify-between items-center">
+                <div class="flex items-center text-xs text-dark-2">
+                  <span class="flex items-center mr-3">
+                    <i class="fa fa-calendar-o mr-1"></i> 30天
+                  </span>
+                  <span class="flex items-center">
+                    <i class="fa fa-code-fork mr-1"></i> 35次提交
+                  </span>
+                  <span class="flex items-center ml-3">
+                    <i class="fa fa-bug mr-1"></i> 2个缺陷
+                  </span>
+                </div>
+                <div class="w-16 bg-light-1 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    class="bg-dark-2 h-1.5 rounded-full transition-all duration-1500 delay-200"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="w-full mt-2 py-2 text-sm text-primary border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors flex items-center justify-center"
+            >
+              查看所有项目 <i class="fa fa-angle-right ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-white border-t border-light-2 py-6 mt-auto">
+      <div class="container mx-auto px-4 text-center text-dark-2 text-sm">
+        <p>开发者效能面板 © 2023 | 数据更新时间: 2023-06-15</p>
+      </div>
+    </footer>
+
+    <script>
+      // 时间范围选择器交互
+      const timeRangeBtn = document.getElementById('timeRangeBtn');
+      const timeRangeDropdown = document.getElementById('timeRangeDropdown');
+      const currentRange = document.getElementById('currentRange');
+      const timeOptions = document.querySelectorAll('.time-option');
+
+      timeRangeBtn.addEventListener('click', () => {
+        timeRangeDropdown.classList.toggle('hidden');
+        // 添加动画效果
+        if (!timeRangeDropdown.classList.contains('hidden')) {
+          setTimeout(() => {
+            timeRangeDropdown.classList.remove('opacity-0', 'scale-95');
+            timeRangeDropdown.classList.add('opacity-100', 'scale-100');
+          }, 10);
+        } else {
+          timeRangeDropdown.classList.remove('opacity-100', 'scale-100');
+          timeRangeDropdown.classList.add('opacity-0', 'scale-95');
+        }
+      });
+
+      timeOptions.forEach((option) => {
+        option.addEventListener('click', (e) => {
+          e.preventDefault();
+          const range = e.target.dataset.range;
+          // 更新显示文本
+          currentRange.textContent = {
+            'day': '今日',
+            'week': '本周',
+            'month': '本月',
+            'quarter': '本季度',
+            'year': '本年',
+          }[range];
+          // 关闭下拉菜单
+          timeRangeDropdown.classList.add('hidden', 'opacity-0', 'scale-95');
+          timeRangeDropdown.classList.remove('opacity-100', 'scale-100');
+          // 更新仪表板数据
+          updateDashboard(range);
+        });
+      });
+
+      // 点击外部关闭下拉菜单
+      document.addEventListener('click', (e) => {
+        if (
+          !timeRangeBtn.contains(e.target) &&
+          !timeRangeDropdown.contains(e.target)
+        ) {
+          timeRangeDropdown.classList.add('hidden', 'opacity-0', 'scale-95');
+          timeRangeDropdown.classList.remove('opacity-100', 'scale-100');
+        }
+      });
+
+      // 趋势图选项切换
+      const trendOptions = document.querySelectorAll('.trend-option');
+      trendOptions.forEach((option) => {
+        option.addEventListener('click', () => {
+          // 更新按钮样式
+          trendOptions.forEach((opt) => {
+            opt.classList.remove('bg-primary', 'text-white');
+            opt.classList.add('bg-light-1', 'text-dark-2', 'hover:bg-light-2');
+          });
+          option.classList.remove(
+            'bg-light-1',
+            'text-dark-2',
+            'hover:bg-light-2'
+          );
+          option.classList.add('bg-primary', 'text-white');
+
+          // 更新图表数据
+          const type = option.dataset.type;
+          updateTrendChart(type);
+        });
+      });
+
+      // 初始化图表
+      let trendChart,
+        loadRateChart,
+        qualityRadarChart,
+        prDistributionChart,
+        problemSolvingChart,
+        resourceOptimizationChart;
+
+      // 初始化趋势图
+      function initTrendChart() {
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        const labels = ['1日', '5日', '10日', '15日', '20日', '25日', '30日'];
+
+        trendChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: '提交次数',
+                data: [8, 12, 15, 10, 18, 22, 28],
+                borderColor: '#165DFF',
+                backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#165DFF',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(29, 33, 41, 0.9)',
+                padding: 10,
+                bodyFont: {
+                  size: 12,
+                },
+                titleFont: {
+                  size: 12,
+                  weight: 'bold',
+                },
+                cornerRadius: 6,
+                displayColors: false,
+              },
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: '#4E5969',
+                },
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)',
+                },
+                ticks: {
+                  color: '#4E5969',
+                },
+              },
+            },
+            interaction: {
+              mode: 'nearest',
+              axis: 'x',
+              intersect: false,
+            },
+            animation: {
+              duration: 1500,
+              easing: 'easeOutQuart',
+            },
+          },
+        });
+      }
+
+      // 更新趋势图数据
+      function updateTrendChart(type) {
+        let data, label, color;
+
+        switch (type) {
+          case 'commits':
+            data = [8, 12, 15, 10, 18, 22, 28];
+            label = '提交次数';
+            color = '#165DFF';
+            break;
+          case 'lines':
+            data = [350, 520, 480, 650, 720, 850, 920];
+            label = '代码量(行)';
+            color = '#36CFC9';
+            break;
+          case 'hours':
+            data = [5.2, 6.8, 7.5, 6.2, 8.1, 7.3, 6.5];
+            label = '工作时长(小时)';
+            color = '#FAAD14';
+            break;
+          case 'quality':
+            data = [70, 65, 72, 80, 75, 82, 85];
+            label = '代码质量评分';
+            color = '#52C41A';
+            break;
+        }
+
+        // 更新图表数据并添加过渡动画
+        trendChart.data.datasets[0] = {
+          label: label,
+          data: data,
+          borderColor: color,
+          backgroundColor: `${color}33`,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: color,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        };
+
+        trendChart.update('none'); // 先清除动画状态
+        trendChart.update({
+          duration: 1000,
+          easing: 'easeOutQuart',
+        });
+      }
+
+      // 初始化荷载率图表
+      function initLoadRateChart() {
+        const ctx = document.getElementById('loadRateChart').getContext('2d');
+
+        loadRateChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            datasets: [
+              {
+                data: [78, 22],
+                backgroundColor: ['#165DFF', '#F2F3F5'],
+                borderWidth: 0,
+                cutout: '80%',
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                enabled: false,
+              },
+            },
+            animation: {
+              animateRotate: true,
+              animateScale: true,
+              duration: 1500,
+              easing: 'easeOutQuart',
+            },
+          },
+        });
+      }
+
+      // 初始化质量雷达图
+      function initQualityRadarChart() {
+        const ctx = document
+          .getElementById('qualityRadarChart')
+          .getContext('2d');
+
+        qualityRadarChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: [
+              '代码规范',
+              '测试覆盖',
+              '性能优化',
+              '可维护性',
+              '安全性',
+              '文档完整性',
+            ],
+            datasets: [
+              {
+                label: '当前评分',
+                data: [85, 75, 80, 70, 90, 88],
+                backgroundColor: 'rgba(22, 93, 255, 0.2)',
+                borderColor: '#165DFF',
+                pointBackgroundColor: '#165DFF',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#165DFF',
+              },
+              {
+                label: '上月评分',
+                data: [80, 68, 72, 65, 85, 82],
+                backgroundColor: 'rgba(230, 230, 230, 0.2)',
+                borderColor: '#C9CDD4',
+                pointBackgroundColor: '#C9CDD4',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#C9CDD4',
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                angleLines: {
+                  color: 'rgba(0, 0, 0, 0.05)',
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)',
+                },
+                pointLabels: {
+                  color: '#4E5969',
+                  font: {
+                    size: 11,
+                  },
+                },
+                ticks: {
+                  backdropColor: 'transparent',
+                  color: '#4E5969',
+                },
+                suggestedMin: 50,
+                suggestedMax: 100,
+              },
+            },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  boxWidth: 12,
+                  padding: 15,
+                  font: {
+                    size: 11,
+                  },
+                },
+              },
+            },
+            animation: {
+              duration: 1500,
+              easing: 'easeOutQuart',
+            },
+          },
+        });
+      }
+
+      // 初始化PR分布图表
+      function initPrDistributionChart() {
+        const ctx = document
+          .getElementById('prDistributionChart')
+          .getContext('2d');
+
+        prDistributionChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['功能开发', '缺陷修复', '代码重构', '文档更新'],
+            datasets: [
+              {
+                data: [45, 25, 20, 10],
+                backgroundColor: ['#165DFF', '#36CFC9', '#FAAD14', '#52C41A'],
+                borderWidth: 0,
+                cutout: '70%',
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  boxWidth: 10,
+                  padding: 12,
+                  font: {
+                    size: 11,
+                  },
+                },
+              },
+            },
+            animation: {
+              duration: 1500,
+              easing: 'easeOutQuart',
+            },
+          },
+        });
+      }
+
+      // 初始化问题解决能力图表
+      function initProblemSolvingChart() {
+        const ctx = document
+          .getElementById('problemSolvingChart')
+          .getContext('2d');
+
+        problemSolvingChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['本月', '上月', '上两月'],
+            datasets: [
+              {
+                label: '独立解决',
+                data: [70, 65, 60],
+                backgroundColor: '#165DFF',
+                barPercentage: 0.6,
+                categoryPercentage: 0.7,
+              },
+              {
+                label: '团队协作',
+                data: [20, 25, 28],
+                backgroundColor: '#36CFC9',
+                barPercentage: 0.6,
+                categoryPercentage: 0.7,
+              },
+              {
+                label: '外部支持',
+                data: [10, 10, 12],
+                backgroundColor: '#FAAD14',
+                barPercentage: 0.6,
+                categoryPercentage: 0.7,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+              },
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: '#4E5969',
+                  font: {
+                    size: 10,
+                  },
+                },
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)',
+                },
+                ticks: {
+                  color: '#4E5969',
+                  font: {
+                    size: 10,
+                  },
+                  callback: function (value) {
+                    return value + '%';
+                  },
+                },
+              },
+            },
+            animation: {
+              duration: 1500,
+              easing: 'easeOutQuart',
+            },
+          },
+        });
+      }
+
+      // 初始化资源优化图表
+      function initResourceOptimizationChart() {
+        const ctx = document
+          .getElementById('resourceOptimizationChart')
+          .getContext('2d');
+
+        resourceOptimizationChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+            datasets: [
+              {
+                label: '构建时间(分钟)',
+                data: [18, 17, 15, 12, 9, 7],
+                borderColor: '#165DFF',
+                backgroundColor: 'transparent',
+                tension: 0.4,
+                yAxisID: 'y',
+              },
+              {
+                label: '资源消耗(%)',
+                data: [100, 95, 90, 82, 75, 68],
+                borderColor: '#FF4D4F',
+                backgroundColor: 'transparent',
+                tension: 0.4,
+                yAxisID: 'y1',
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  boxWidth: 12,
+                  padding: 15,
+                  font: {
+                    size: 11,
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: '#4E5969',
+                },
+              },
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                  display: true,
+                  text: '构建时间(分钟)',
+                  color: '#165DFF',
+                  font: {
+                    size: 10,
+                  },
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)',
+                },
+                ticks: {
+                  color: '#4E5969',
+                },
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: '资源消耗(%)',
+                  color: '#FF4D4F',
+                  font: {
+                    size: 10,
+                  },
+                },
+                grid: {
+                  drawOnChartArea: false,
+                },
+                ticks: {
+                  color: '#4E5969',
+                },
+              },
+            },
+            animation: {
+              duration: 1500,
+              easing: 'easeOutQuart',
+            },
+          },
+        });
+      }
+
+      // 更新仪表板数据
+      function updateDashboard(range) {
+        // 模拟不同时间范围的数据
+        const data = {
+          day: {
+            commitCount: 8,
+            codeLines: 356,
+            growthRate: '5.2%',
+            workHours: 7.5,
+            loadRate: 65,
+            testCoverage: 70,
+            codeDuplication: 6,
+            techDebt: 32,
+            staticIssues: 2,
+            escapeRate: 5,
+            refactorRatio: 15,
+            prPassRate: 90,
+            reviewResponseTime: 2.5,
+            mergeTime: 6.2,
+            taskCycle: 1.2,
+            focusTimeRatio: 72,
+            contextSwitches: 3,
+            blockTimeRatio: 8,
+            docCompletion: 90,
+            newTechRatio: 12,
+            vulnFixTime: 8,
+            complianceRatio: 98,
+          },
+          week: {
+            commitCount: 42,
+            codeLines: 1856,
+            growthRate: '8.7%',
+            workHours: 42,
+            loadRate: 72,
+            testCoverage: 72,
+            codeDuplication: 5.5,
+            techDebt: 31,
+            staticIssues: 5,
+            escapeRate: 6,
+            refactorRatio: 18,
+            prPassRate: 88,
+            reviewResponseTime: 2.8,
+            mergeTime: 7.5,
+            taskCycle: 1.8,
+            focusTimeRatio: 70,
+            contextSwitches: 3.5,
+            blockTimeRatio: 10,
+            docCompletion: 89,
+            newTechRatio: 15,
+            vulnFixTime: 10,
+            complianceRatio: 97,
+          },
+          month: {
+            commitCount: 128,
+            codeLines: 4856,
+            growthRate: '15.7%',
+            workHours: 168,
+            loadRate: 78,
+            testCoverage: 75,
+            codeDuplication: 5,
+            techDebt: 30,
+            staticIssues: 12,
+            escapeRate: 8,
+            refactorRatio: 22,
+            prPassRate: 85,
+            reviewResponseTime: 3.2,
+            mergeTime: 8.5,
+            taskCycle: 2.3,
+            focusTimeRatio: 68,
+            contextSwitches: 4,
+            blockTimeRatio: 12,
+            docCompletion: 88,
+            newTechRatio: 18,
+            vulnFixTime: 12,
+            complianceRatio: 96,
+          },
+          quarter: {
+            commitCount: 456,
+            codeLines: 15782,
+            growthRate: '12.3%',
+            workHours: 520,
+            loadRate: 75,
+            testCoverage: 73,
+            codeDuplication: 6,
+            techDebt: 35,
+            staticIssues: 42,
+            escapeRate: 9,
+            refactorRatio: 20,
+            prPassRate: 82,
+            reviewResponseTime: 3.5,
+            mergeTime: 9.2,
+            taskCycle: 2.5,
+            focusTimeRatio: 65,
+            contextSwitches: 4.5,
+            blockTimeRatio: 14,
+            docCompletion: 85,
+            newTechRatio: 22,
+            vulnFixTime: 15,
+            complianceRatio: 95,
+          },
+          year: {
+            commitCount: 1856,
+            codeLines: 68542,
+            growthRate: '9.8%',
+            workHours: 2150,
+            loadRate: 70,
+            testCoverage: 70,
+            codeDuplication: 7,
+            techDebt: 40,
+            staticIssues: 185,
+            escapeRate: 10,
+            refactorRatio: 18,
+            prPassRate: 80,
+            reviewResponseTime: 4.0,
+            mergeTime: 10.5,
+            taskCycle: 2.8,
+            focusTimeRatio: 62,
+            contextSwitches: 5,
+            blockTimeRatio: 15,
+            docCompletion: 82,
+            newTechRatio: 25,
+            vulnFixTime: 18,
+            complianceRatio: 94,
+          },
+        };
+
+        // 更新数值并添加动画效果
+        function animateValue(
+          id,
+          start,
+          end,
+          duration,
+          isPercentage = false,
+          isDecimal = false
+        ) {
+          const obj = document.getElementById(id);
+          let startTimestamp = null;
+          const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min(
+              (timestamp - startTimestamp) / duration,
+              1
+            );
+            let value;
+
+            if (isDecimal) {
+              value = (progress * (end - start) + start).toFixed(1);
+            } else {
+              value = Math.floor(progress * (end - start) + start);
+            }
+
+            if (isPercentage) {
+              obj.textContent = `${value}%`;
+            } else {
+              if (id === 'codeLines') {
+                obj.textContent = value.toLocaleString();
+              } else if (id === 'workHours' && range === 'day') {
+                obj.textContent = value.toFixed(1);
+              } else {
+                obj.textContent = value;
+              }
+            }
+
+            if (progress < 1) {
+              window.requestAnimationFrame(step);
+            }
+          };
+          window.requestAnimationFrame(step);
+        }
+
+        // 获取当前值作为动画起点
+        const currentCommitCount = parseInt(
+          document.getElementById('commitCount').textContent.replace(/,/g, '')
+        );
+        const currentCodeLines = parseInt(
+          document.getElementById('codeLines').textContent.replace(/,/g, '')
+        );
+        const currentWorkHours = parseFloat(
+          document.getElementById('workHours').textContent
+        );
+        const currentLoadRate = parseInt(
+          document.getElementById('loadRateValue').textContent.replace('%', '')
+        );
+        const currentTestCoverage = parseInt(
+          document.getElementById('testCoverage').textContent.replace('%', '')
+        );
+        const currentCodeDuplication = parseInt(
+          document
+            .getElementById('codeDuplication')
+            .textContent.replace('%', '')
+        );
+        const currentTechDebt = parseInt(
+          document.getElementById('techDebt').textContent.replace('%', '')
+        );
+        const currentStaticIssues = parseInt(
+          document.getElementById('staticIssues').textContent
+        );
+        const currentEscapeRate = parseInt(
+          document.getElementById('escapeRate').textContent.replace('%', '')
+        );
+        const currentRefactorRatio = parseInt(
+          document.getElementById('refactorRatio').textContent.replace('%', '')
+        );
+        const currentPrPassRate = parseInt(
+          document.getElementById('prPassRate').textContent.replace('%', '')
+        );
+        const currentReviewResponseTime = parseFloat(
+          document.getElementById('reviewResponseTime').textContent
+        );
+        const currentMergeTime = parseFloat(
+          document.getElementById('mergeTime').textContent
+        );
+        const currentTaskCycle = parseFloat(
+          document.getElementById('taskCycle').textContent
+        );
+        const currentFocusTimeRatio = parseInt(
+          document.getElementById('focusTimeRatio').textContent.replace('%', '')
+        );
+        const currentContextSwitches = parseInt(
+          document.getElementById('contextSwitches').textContent
+        );
+        const currentBlockTimeRatio = parseInt(
+          document.getElementById('blockTimeRatio').textContent.replace('%', '')
+        );
+        const currentDocCompletion = parseInt(
+          document.getElementById('docCompletion').textContent.replace('%', '')
+        );
+        const currentNewTechRatio = parseInt(
+          document.getElementById('newTechRatio').textContent.replace('%', '')
+        );
+        const currentVulnFixTime = parseInt(
+          document.getElementById('vulnFixTime').textContent
+        );
+        const currentComplianceRatio = parseInt(
+          document
+            .getElementById('complianceRatio')
+            .textContent.replace('%', '')
+        );
+
+        // 应用动画更新所有指标
+        animateValue(
+          'commitCount',
+          currentCommitCount,
+          data[range].commitCount,
+          800
+        );
+        animateValue('codeLines', currentCodeLines, data[range].codeLines, 800);
+        document.getElementById('growthRate').textContent =
+          data[range].growthRate;
+        animateValue(
+          'workHours',
+          currentWorkHours,
+          data[range].workHours,
+          800,
+          false,
+          range === 'day'
+        );
+        animateValue(
+          'loadRateValue',
+          currentLoadRate,
+          data[range].loadRate,
+          800,
+          true
+        );
+
+        // 代码质量指标
+        animateValue(
+          'testCoverage',
+          currentTestCoverage,
+          data[range].testCoverage,
+          800,
+          true
+        );
+        document.getElementById('coverageCircle').style.strokeDashoffset =
+          100 - data[range].testCoverage;
+
+        animateValue(
+          'codeDuplication',
+          currentCodeDuplication,
+          data[range].codeDuplication,
+          800,
+          true
+        );
+        document.getElementById('duplicationCircle').style.strokeDashoffset =
+          100 - data[range].codeDuplication;
+
+        animateValue(
+          'techDebt',
+          currentTechDebt,
+          data[range].techDebt,
+          800,
+          true
+        );
+        document.getElementById('debtCircle').style.strokeDashoffset =
+          100 - data[range].techDebt;
+
+        animateValue(
+          'staticIssues',
+          currentStaticIssues,
+          data[range].staticIssues,
+          800
+        );
+        animateValue(
+          'escapeRate',
+          currentEscapeRate,
+          data[range].escapeRate,
+          800,
+          true
+        );
+        animateValue(
+          'refactorRatio',
+          currentRefactorRatio,
+          data[range].refactorRatio,
+          800,
+          true
+        );
+
+        // PR指标
+        animateValue(
+          'prPassRate',
+          currentPrPassRate,
+          data[range].prPassRate,
+          800,
+          true
+        );
+        document.querySelector(
+          '.bg-primary.h-2'
+        ).style.width = `${data[range].prPassRate}%`;
+
+        animateValue(
+          'reviewResponseTime',
+          currentReviewResponseTime,
+          data[range].reviewResponseTime,
+          800,
+          false,
+          true
+        );
+        document.querySelectorAll('.bg-secondary.h-2')[0].style.width = `${
+          80 - data[range].reviewResponseTime * 5
+        }%`;
+
+        animateValue(
+          'mergeTime',
+          currentMergeTime,
+          data[range].mergeTime,
+          800,
+          false,
+          true
+        );
+        document.querySelector('.bg-warning.h-2').style.width = `${
+          90 - data[range].mergeTime * 3
+        }%`;
+
+        // 任务效率指标
+        animateValue(
+          'taskCycle',
+          currentTaskCycle,
+          data[range].taskCycle,
+          800,
+          false,
+          true
+        );
+        animateValue(
+          'focusTimeRatio',
+          currentFocusTimeRatio,
+          data[range].focusTimeRatio,
+          800,
+          true
+        );
+        animateValue(
+          'contextSwitches',
+          currentContextSwitches,
+          data[range].contextSwitches,
+          800
+        );
+        animateValue(
+          'blockTimeRatio',
+          currentBlockTimeRatio,
+          data[range].blockTimeRatio,
+          800,
+          true
+        );
+
+        // 文档与知识分享
+        animateValue(
+          'docCompletion',
+          currentDocCompletion,
+          data[range].docCompletion,
+          800,
+          true
+        );
+        document.querySelectorAll(
+          '.bg-primary.h-2'
+        )[1].style.width = `${data[range].docCompletion}%`;
+
+        // 技能发展指标
+        animateValue(
+          'newTechRatio',
+          currentNewTechRatio,
+          data[range].newTechRatio,
+          800,
+          true
+        );
+        document.getElementById(
+          'newTechBar'
+        ).style.width = `${data[range].newTechRatio}%`;
+
+        // 安全与合规指标
+        animateValue(
+          'vulnFixTime',
+          currentVulnFixTime,
+          data[range].vulnFixTime,
+          800
+        );
+        animateValue(
+          'complianceRatio',
+          currentComplianceRatio,
+          data[range].complianceRatio,
+          800,
+          true
+        );
+
+        // 更新荷载率图表
+        loadRateChart.data.datasets[0].data = [
+          data[range].loadRate,
+          100 - data[range].loadRate,
+        ];
+        loadRateChart.update({
+          duration: 1000,
+          easing: 'easeOutQuart',
+        });
+
+        // 更新趋势图数据
+        updateTrendChart('commits');
+
+        // 添加数值变化高亮效果
+        const statsElements = document.querySelectorAll(
+          'h3.font-bold, #loadRateValue, #testCoverage, #codeDuplication, #techDebt, #staticIssues, #escapeRate, #refactorRatio'
+        );
+        statsElements.forEach((el) => {
+          el.classList.add('scale-110', 'text-primary');
+          setTimeout(() => {
+            el.classList.remove('scale-110', 'text-primary');
+          }, 500);
+        });
+      }
+
+      // 页面滚动时导航栏效果
+      window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 10) {
+          header.classList.add('py-2', 'shadow');
+          header.classList.remove('py-4', 'shadow-sm');
+        } else {
+          header.classList.add('py-4', 'shadow-sm');
+          header.classList.remove('py-2', 'shadow');
+        }
+      });
+
+      // 页面加载完成后初始化
+      window.addEventListener('load', () => {
+        // 初始化所有图表
+        initTrendChart();
+        initLoadRateChart();
+        // initQualityRadarChart();
+        // initPrDistributionChart();
+        // initProblemSolvingChart();
+        // initResourceOptimizationChart();
+
+        // 卡片渐入动画
+        const cards = document.querySelectorAll('.card-hover');
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 100 * index);
+        });
+
+        // 技能进度条动画
+        const progressBars = document.querySelectorAll(
+          '.bg-primary.h-2, .bg-secondary.h-2, .bg-success.h-2, .bg-warning.h-2'
+        );
+        progressBars.forEach((bar) => {
+          const width = bar.parentElement.previousElementSibling
+            .querySelector('span:last-child')
+            .textContent.replace('%', '');
+          setTimeout(() => {
+            bar.style.width = `${width}%`;
+          }, 500);
+        });
+
+        // 圆形进度条动画
+        setTimeout(() => {
+          document.getElementById('coverageCircle').style.transition =
+            'stroke-dashoffset 1s ease-out';
+          document.getElementById('coverageCircle').style.strokeDashoffset =
+            100 - parseInt(document.getElementById('testCoverage').textContent);
+
+          document.getElementById('duplicationCircle').style.transition =
+            'stroke-dashoffset 1s ease-out 0.2s';
+          document.getElementById('duplicationCircle').style.strokeDashoffset =
+            100 -
+            parseInt(document.getElementById('codeDuplication').textContent);
+
+          document.getElementById('debtCircle').style.transition =
+            'stroke-dashoffset 1s ease-out 0.4s';
+          document.getElementById('debtCircle').style.strokeDashoffset =
+            100 - parseInt(document.getElementById('techDebt').textContent);
+
+          document.getElementById('newTechBar').style.transition =
+            'width 1.5s ease-out 0.6s';
+          document.getElementById('newTechBar').style.width =
+            document.getElementById('newTechRatio').textContent;
+        }, 800);
+
+        // 项目进度条动画
+        const projectBars = document.querySelectorAll(
+          '.project-item .bg-success.h-1.5, .project-item .bg-dark-2.h-1.5'
+        );
+        projectBars.forEach((bar) => {
+          const widthText =
+            bar.parentElement.previousElementSibling.querySelector(
+              'span:last-child'
+            ).textContent;
+          const width = widthText.replace('%', '');
+          setTimeout(() => {
+            bar.style.width = `${width}%`;
+          }, 800);
+        });
+      });
+    </script>
+  </body>
+</html>

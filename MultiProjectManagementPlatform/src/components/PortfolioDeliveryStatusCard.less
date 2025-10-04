@@ -1,0 +1,149 @@
+.portfolio-delivery-status-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+}
+
+.last-updated {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+/* 整体健康度部分 */
+.overall-health-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: #f6ffed;
+  border-radius: 8px;
+}
+
+.overall-health-score {
+  margin-bottom: 12px;
+}
+
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 6px solid #52c41a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score-text {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.score-label {
+  font-size: 14px;
+  color: #595959;
+}
+
+.health-status-tag {
+  margin-top: 8px;
+}
+
+/* 关键指标部分 */
+.key-metrics-section {
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border-left: 4px solid #1890ff;
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.metric-icon {
+  font-size: 18px;
+  color: #1890ff;
+  margin-right: 8px;
+}
+
+.metric-title {
+  font-size: 14px;
+  color: #595959;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+/* 项目组合概览部分 */
+.portfolio-overview-section {
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .portfolio-delivery-status-card {
+    padding: 16px;
+  }
+  
+  .overall-health-section {
+    padding: 16px;
+  }
+  
+  .score-circle {
+    width: 100px;
+    height: 100px;
+    border-width: 4px;
+  }
+  
+  .score-text {
+    font-size: 24px;
+  }
+  
+  .metric-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-delivery-status-card {
+    padding: 12px;
+  }
+  
+  .overall-health-section {
+    padding: 12px;
+  }
+  
+  .score-circle {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .score-text {
+    font-size: 20px;
+  }
+  
+  .metric-card {
+    padding: 12px;
+  }
+  
+  .metric-value {
+    font-size: 18px;
+  }
+}
